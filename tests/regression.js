@@ -302,7 +302,7 @@ async function run(url) {
     await page.waitForTimeout(300);
     await selectCondicao(page, 'Enxaqueca');
     await page.click('body');
-    await page.keyboard.press('Ctrl+Enter').catch(() => {});
+    await page.keyboard.press('Control+Enter').catch(() => {});
     await page.waitForTimeout(200);
     const limpouComCtrlEnter = await page.evaluate(() =>
       document.querySelector('#receitaPaper').innerText.includes('Selecione condições ou medicamentos ao lado.'));
