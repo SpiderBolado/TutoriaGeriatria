@@ -310,6 +310,45 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- 12. Edicao permanente de medicamento avulso (catalogo) ----
+  {
+    const browser = await chromium.launch();
+    const { page } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#search', 'Azitromicina 500mg');
+    await page.waitForTimeout(250);
+    const cliqueEdit = await page.evaluate(() => {
+      const btn = document.querySelector('#listaContainer .card.med-avulso .avulso-edit');
+      if (!btn) return false;
+      btn.click();
+      return true;
+    });
+    await page.waitForTimeout(200);
+    if (cliqueEdit) {
+      await page.fill('.edit-form .ef-qtde', '01 Caixa');
+      await page.fill('.edit-form .ef-pos', 'Tomar 01 comprimido ao dia, por 05 dias.');
+      await page.click('.edit-form .ef-save');
+      await page.waitForTimeout(200);
+    }
+    // recarrega pra confirmar que persistiu, depois seleciona e confere a receita
+    await page.reload();
+    await page.waitForTimeout(400);
+    await page.fill('#search', 'Azitromicina 500mg');
+    await page.waitForTimeout(250);
+    const textoPosEdicao = await page.evaluate(() => document.querySelector('#listaContainer .card.med-avulso .pos')?.textContent || '');
+    let checkboxes = await page.$$('#listaContainer .card.med-avulso input[type=checkbox]');
+    if (checkboxes[0]) await checkboxes[0].click();
+    await page.waitForTimeout(200);
+    const receita = await page.evaluate(() => document.querySelector('#receitaPaper').innerText);
+    const ok = cliqueEdit
+      && textoPosEdicao.includes('Tomar 01 comprimido ao dia, por 05 dias.')
+      && receita.includes('01 comprimido ao dia, por 05 dias')
+      && !receita.includes('____');
+    record('edicao permanente de medicamento avulso persiste e e usada ao selecionar', ok, 'posCard=' + JSON.stringify(textoPosEdicao));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

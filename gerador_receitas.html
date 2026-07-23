@@ -334,6 +334,10 @@
 
   .med-avulso .card-head{cursor:pointer;}
   .med-avulso .meta{font-size:11.5px;color:var(--ink-soft);}
+  .avulso-texto{flex:1;min-width:0;}
+  .avulso-texto .pos{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .avulso-edit{flex:none;}
+  .avulso-edit-titulo{font-weight:600;margin-bottom:6px;}
 
   .add-custom{
     margin-top:14px;
@@ -5471,6 +5475,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   let usoCondicoes = {}; // contagem de uso por condição (mais usadas sobem)
   let historico = [];    // últimas receitas geradas
   let customCondicoes = {}; // nome -> { meds: [...], orientacoes: [...] }
+  let overridesMedicamentos = {}; // avulsoId -> {qtde, via, fator, posologia} (edição permanente de um item avulso)
 
   const el = id => document.getElementById(id);
 
@@ -5507,6 +5512,17 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   async function saveCustomCondicoes(){
     try{ await storage.set('custom-condicoes', JSON.stringify(customCondicoes), false); }
     catch(e){ console.error('Falha ao salvar condições personalizadas', e); }
+  }
+
+  async function loadOverridesMedicamentos(){
+    try{
+      const r = await storage.get('overrides-medicamentos', false);
+      overridesMedicamentos = r && r.value ? JSON.parse(r.value) : {};
+    }catch(e){ overridesMedicamentos = {}; }
+  }
+  async function saveOverridesMedicamentos(){
+    try{ await storage.set('overrides-medicamentos', JSON.stringify(overridesMedicamentos), false); }
+    catch(e){ console.error('Falha ao salvar edições de medicamentos avulsos', e); }
   }
 
   function allMedicamentos(){
@@ -5978,22 +5994,93 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     return 'avulso:idx:' + allMedicamentos().indexOf(m);
   }
 
+  // Aplica a edição permanente (se existir) sobre um medicamento avulso do
+  // catálogo — usado tanto pra exibir o card quanto ao selecionar o item pra
+  // receita, pra não precisar preencher o mesmo modo de uso toda vez.
+  function getMedicamentoEfetivo(m){
+    const ov = overridesMedicamentos[avulsoId(m)];
+    return ov ? Object.assign({}, m, ov) : m;
+  }
+  function setOverrideMedicamento(id, fields){
+    overridesMedicamentos[id] = Object.assign({}, overridesMedicamentos[id], fields);
+    saveOverridesMedicamentos();
+  }
+  function clearOverrideMedicamento(id){
+    delete overridesMedicamentos[id];
+    saveOverridesMedicamentos();
+  }
+
   function renderMedAvulsoCard(m){
     const id = avulsoId(m);
     const card = document.createElement('div');
     card.className = 'card med-avulso';
+    const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
+
+    if(editingRow === id){
+      card.classList.add('editing-avulso');
+      const efetivo = getMedicamentoEfetivo(m);
+      const box = document.createElement('div');
+      box.className = 'edit-form';
+      box.innerHTML = `
+        <div class="avulso-edit-titulo">${escapeHtml(displayNome)}</div>
+        <div class="edit-grid">
+          <input type="text" class="ef-qtde" value="${escapeHtml(efetivo.qtde||'')}" placeholder="Quantidade">
+          <select class="ef-via">${renderViaOptions(efetivo.via)}</select>
+          <input type="text" class="ef-fator" value="${efetivo.fator!==null && efetivo.fator!==undefined ? efetivo.fator : ''}" placeholder="Fator/kg (opcional)">
+        </div>
+        <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(efetivo.posologia||'')}</textarea>
+        <div class="edit-actions">
+          <button class="ef-save">Salvar</button>
+          <button class="ef-cancel">Cancelar</button>
+          <button class="ef-restore">Restaurar original</button>
+        </div>
+      `;
+      box.querySelector('.ef-save').addEventListener('click', (e) => {
+        e.stopPropagation();
+        setOverrideMedicamento(id, {
+          qtde: box.querySelector('.ef-qtde').value.trim(),
+          via: box.querySelector('.ef-via').value,
+          fator: parseFator(box.querySelector('.ef-fator').value.trim()),
+          posologia: box.querySelector('.ef-pos').value.trim()
+        });
+        editingRow = null;
+        renderTudo();
+        showToast('Medicamento atualizado permanentemente no catálogo');
+      });
+      box.querySelector('.ef-cancel').addEventListener('click', (e) => { e.stopPropagation(); editingRow = null; renderLista(el('search').value); });
+      box.querySelector('.ef-restore').addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearOverrideMedicamento(id);
+        editingRow = null;
+        renderTudo();
+        showToast('Restaurado ao original');
+      });
+      card.appendChild(box);
+      return card;
+    }
+
+    const efetivo = getMedicamentoEfetivo(m);
+    const editado = !!overridesMedicamentos[id];
     const isSel = !!selected[id];
     const head = document.createElement('div');
     head.className = 'card-head';
-    const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
     head.innerHTML = `
       <input type="checkbox" ${isSel ? 'checked':''}>
-      <span class="nome">${escapeHtml(displayNome)}</span>
-      <span class="meta">${escapeHtml(m.via||'')}</span>
+      <div class="avulso-texto">
+        <span class="nome">${escapeHtml(displayNome)}</span>
+        <span class="meta">${escapeHtml(efetivo.via||'')}${editado ? ' <span class="tag-editado">editado</span>' : ''}</span>
+        ${efetivo.posologia ? `<div class="pos">${escapeHtml(efetivo.qtde ? efetivo.qtde + ' — ' : '')}${escapeHtml(efetivo.posologia)}</div>` : ''}
+      </div>
+      <button type="button" class="icon-btn avulso-edit" title="Editar permanentemente no catálogo">&#9998;</button>
     `;
     head.querySelector('input').addEventListener('click', (e) => {
       e.stopPropagation();
       toggleMedAvulso(m, e.target.checked);
+    });
+    head.querySelector('.avulso-edit').addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingRow = id;
+      renderLista(el('search').value);
     });
     card.appendChild(head);
     return card;
@@ -6040,10 +6127,11 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   function toggleMedAvulso(m, ligar){
     const id = avulsoId(m);
     if(ligar){
+      const efetivo = getMedicamentoEfetivo(m);
       const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
       selected[id] = {
-        nome: displayNome, qtde: m.qtde, posologiaBase: m.posologia,
-        via: m.via || 'Outro', fator: m.fator !== undefined ? m.fator : null, origemCondicao: null
+        nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
+        via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null, origemCondicao: null
       };
     } else {
       delete selected[id];
@@ -6415,7 +6503,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       app: 'gerador-receitas',
       versao: 1,
       exportadoEm: new Date().toISOString(),
-      customMeds, overrides, usoCondicoes, historico, customCondicoes,
+      customMeds, overrides, overridesMedicamentos, usoCondicoes, historico, customCondicoes,
       medico: { nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -6439,7 +6527,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   async function atualizarAvisoBackup(){
     const nota = el('storageNote');
     const base = 'Suas edições, catálogo pessoal, histórico e dados do médico ficam salvos no armazenamento deste app, neste dispositivo. Exporte um backup antes de trocar de computador.';
-    const temAlgoParaPerder = customMeds.length || Object.keys(customCondicoes).length || historico.length;
+    const temAlgoParaPerder = customMeds.length || Object.keys(customCondicoes).length || historico.length || Object.keys(overridesMedicamentos).length;
     if(!temAlgoParaPerder){ nota.textContent = base; return; }
     const r = await storage.get('ultimo-backup', false);
     if(!r || !r.value){
@@ -6470,6 +6558,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       customMeds = Array.isArray(payload.customMeds) ? payload.customMeds : [];
       customCondicoes = payload.customCondicoes && typeof payload.customCondicoes === 'object' ? payload.customCondicoes : {};
       overrides = payload.overrides && typeof payload.overrides === 'object' ? payload.overrides : {};
+      overridesMedicamentos = payload.overridesMedicamentos && typeof payload.overridesMedicamentos === 'object' ? payload.overridesMedicamentos : {};
       usoCondicoes = payload.usoCondicoes && typeof payload.usoCondicoes === 'object' ? payload.usoCondicoes : {};
       historico = Array.isArray(payload.historico) ? payload.historico : [];
       if(payload.medico){
@@ -6479,6 +6568,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       await saveCustomMeds();
       await saveCustomCondicoes();
       await saveOverrides();
+      await saveOverridesMedicamentos();
       await saveUso();
       await saveHistorico();
       await saveMedico();
@@ -7502,18 +7592,19 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   function getUniqueMedsList(){
     const map = new Map();
     
-    // 1. From DATA.medicamentos & customMeds
+    // 1. From DATA.medicamentos & customMeds (já com edição permanente aplicada)
     allMedicamentos().forEach(m => {
+      const efetivo = getMedicamentoEfetivo(m);
       const concentracao = m.concentracao ? m.concentracao.trim() : '';
       const nomeCompleto = m.nome.trim() + (concentracao ? ' ' + concentracao : '');
       const key = norm(nomeCompleto);
       if(key && !map.has(key)){
         map.set(key, {
           nomeCompleto,
-          qtde: m.qtde ? m.qtde.trim() : '',
-          via: m.via ? m.via.trim() : 'Oral',
-          fator: m.fator !== undefined && m.fator !== null ? m.fator : null,
-          posologia: m.posologia ? m.posologia.trim() : ''
+          qtde: efetivo.qtde ? efetivo.qtde.trim() : '',
+          via: efetivo.via ? efetivo.via.trim() : 'Oral',
+          fator: efetivo.fator !== undefined && efetivo.fator !== null ? efetivo.fator : null,
+          posologia: efetivo.posologia ? efetivo.posologia.trim() : ''
         });
       }
     });
@@ -7798,6 +7889,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     await loadCustomMeds();
     await loadCustomCondicoes();
     await loadOverrides();
+    await loadOverridesMedicamentos();
     await loadMedico();
     await loadLocal();
     await loadUnidade();
