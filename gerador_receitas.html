@@ -25,12 +25,12 @@
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:'Inter',system-ui,sans-serif;
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     font-size:14px;
     line-height:1.45;
   }
-  h1,h2,h3,.serif{font-family:'Source Serif 4',serif;}
-  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,.serif{font-family:'Source Serif 4',Georgia,Cambria,serif;}
+  .mono{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;}
 
   #app{
     display:grid;
@@ -382,7 +382,7 @@
     margin-bottom:10px;
   }
   .toolbar button{
-    font-family:'Inter',sans-serif;
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     font-size:12.5px;
     font-weight:600;
     padding:8px 14px;
@@ -463,10 +463,10 @@
     gap:8px;
     margin-top:10px;
   }
-  .item-linha .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);flex:none;}
+  .item-linha .num{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:12px;color:var(--ink-soft);flex:none;}
   .item-linha .nome-med{font-weight:600;white-space:nowrap;}
   .item-linha .dots{flex:1;border-bottom:1.5px dotted var(--line); position:relative; top:-3px;}
-  .item-linha .qtde{font-family:'IBM Plex Mono',monospace;font-size:12.5px;flex:none;color:var(--ink-soft);}
+  .item-linha .qtde{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:12.5px;flex:none;color:var(--ink-soft);}
   .item-pos{
     margin:2px 0 0 24px;
     font-size:12.5px;
@@ -853,21 +853,7 @@
       <div class="grid">
         <input type="text" id="novoNome" placeholder="Nome (ex: Paracetamol 750mg)">
         <input type="text" id="novoQtde" placeholder="Quantidade (ex: 20 comprimidos)">
-        <select id="novoVia">
-          <option>Oral</option>
-          <option>Intramuscular</option>
-          <option>Endovenoso</option>
-          <option>Subcutâneo</option>
-          <option>Tópico</option>
-          <option>Inalatório</option>
-          <option>Oftálmico</option>
-          <option>Nasal</option>
-          <option>Vaginal</option>
-          <option>Retal</option>
-          <option>Externo</option>
-          <option>Para Hidratação</option>
-          <option>Outro</option>
-        </select>
+        <select id="novoVia"></select>
         <input type="text" id="novoFator" placeholder="Fator dose/kg (opcional, ex: 0.6)">
       </div>
       <textarea id="novoPosologia" placeholder="Posologia. Use a palavra DOSE onde o valor calculado pelo peso deve entrar (opcional)."></textarea>
@@ -904,6 +890,7 @@
 
     <details class="add-custom" id="histDetails">
       <summary>Histórico de receitas geradas</summary>
+      <input type="text" id="histBuscaPaciente" placeholder="Buscar por nome do paciente..." style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; margin-bottom: 8px;">
       <div id="histLista"></div>
       <button id="btnLimparHist">Limpar histórico</button>
       <div class="mini-note">Fica guardado apenas neste navegador. "Reaplicar" restaura os itens e o peso — não o nome do paciente.</div>
@@ -958,15 +945,7 @@
           </div>
           <div class="field">
             <label for="editItemVia" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Via</label>
-            <select id="editItemVia" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px; height: 34px;">
-              <option>Oral</option>
-              <option>Tópico</option>
-              <option>Injetável</option>
-              <option>Inalatório</option>
-              <option>Externo</option>
-              <option>Para Hidratação</option>
-              <option>Outro</option>
-            </select>
+            <select id="editItemVia" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px; height: 34px;"></select>
           </div>
           <div class="field">
             <label for="editItemFator" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Fator/kg</label>
@@ -1609,7 +1588,7 @@ const DATA = {
         "Realizar agendamento de atendimento em centro Viva Vida, conforme orientação entregue em consultório."
       ]
     },
-    "Constipaçao": {
+    "Constipação": {
       "meds": [
         {
           "nome": "Lactulose 667 mg/mL",
@@ -1844,7 +1823,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Ácido Tranexânico 250mg",
+          "nome": "Ácido Tranexâmico 250mg",
           "qtde": "15 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
@@ -1964,7 +1943,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "compressas mornas",
+          "nome": "Compressas Mornas",
           "qtde": null,
           "posologia": "Aplicar compressas, de gazes, em soro fisiológico morno, sobre a região acometida, até 04 vezes ao dia.",
           "via": "Tópico",
@@ -2234,7 +2213,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "compressas Frias",
+          "nome": "Compressas Frias",
           "qtde": null,
           "posologia": "Aplicar compressas de gazes, em soro fisiológico frio, sobre a região acometida, até 04 vezes ao dia, por 10 minutos cada, para redução do inchaço e da coceira",
           "via": "Tópico",
@@ -2249,7 +2228,7 @@ const DATA = {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "01 Caixa",
           "posologia": "Tomar 01 comprimido antes de dormir, por 05 dias. \nSe muita sonolência no próximo dia, tomar apenas meio comprimido.",
-          "via": "",
+          "via": "Oral",
           "fator": null
         }
       ],
@@ -2469,9 +2448,9 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Cefalexina 500mg - Se múltiplos locais acometidos",
+          "nome": "Cefalexina 500mg",
           "qtde": "28 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias.",
+          "posologia": "Se múltiplos locais acometidos: tomar 01 comprimido, de 06/06 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2842,7 +2821,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "compressas Frias",
+          "nome": "Compressas Frias",
           "qtde": null,
           "posologia": "Aplicar compressas frias sobre o cotovelo, de 08/08 horas, por 15 minutos.",
           "via": "Tópico",
@@ -3066,7 +3045,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "compressas Frias",
+          "nome": "Compressas Frias",
           "qtde": null,
           "posologia": "Aplicar compressas frias na região do trauma, de 04/04 horas, por 20 minutos.",
           "via": "Tópico",
@@ -3276,7 +3255,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "compressas Mornas",
+          "nome": "Compressas Mornas",
           "qtde": null,
           "posologia": "Aplicar compressas mornas de Soro Fisiológico 0,9% na lesão, de 06/06 horas, por 15 minutos.",
           "via": "Tópico",
@@ -3317,7 +3296,7 @@ const DATA = {
           "nome": "Paracetamol 500mg",
           "qtde": "01 Caixa",
           "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor.",
-          "via": "",
+          "via": "Oral",
           "fator": null
         }
       ],
@@ -3345,7 +3324,7 @@ const DATA = {
     "Cervicalgia",
     "COVID",
     "PEP",
-    "Constipaçao",
+    "Constipação",
     "Costocondrite",
     "Corpo estranho",
     "Dermatite",
@@ -3446,7 +3425,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Ácido Tranexânico",
+      "nome": "Ácido Tranexâmico",
       "concentracao": "250mg",
       "forma": "",
       "qtde": "15 Comprimidos",
@@ -3506,7 +3485,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Betahistina",
@@ -3623,7 +3602,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Cetoprofeno",
@@ -3650,7 +3629,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
       "nome": "Cinarizina",
@@ -3695,7 +3674,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Colchicina",
@@ -3713,7 +3692,7 @@ const DATA = {
       "qtde": "",
       "posologia": "Aplicar compressas banhadas em líquido frio sobre o local acometido por 10 minutos de 6/6 horas",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Compressas Mornas",
@@ -3722,7 +3701,7 @@ const DATA = {
       "qtde": "",
       "posologia": "Aplicar compressas banhadas em líquido quente sobre o local acometido por 10 minutos de 6/6 horas",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Curativo",
@@ -3731,7 +3710,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Deflazacort",
@@ -3821,7 +3800,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oral"
     },
     {
       "nome": "Domperidona",
@@ -3911,7 +3890,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
       "nome": "Hidroxizina",
@@ -3956,7 +3935,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
       "nome": "Lactulose",
@@ -4001,7 +3980,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Loratadina",
@@ -4028,7 +4007,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Externo"
     },
     {
       "nome": "Meloxicam",
@@ -4073,7 +4052,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Naproxeno",
@@ -4100,7 +4079,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Nistatina",
@@ -4118,7 +4097,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Nistatina Suspensão Oral",
@@ -4127,7 +4106,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oral"
     },
     {
       "nome": "Olopatadina",
@@ -4136,7 +4115,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
       "nome": "Omeprazol",
@@ -4144,15 +4123,6 @@ const DATA = {
       "forma": "",
       "qtde": "01 Caixa",
       "posologia": "Tomar 01 comprimido, em jejum, pela manhã",
-      "tempo": "",
-      "via": "Oral"
-    },
-    {
-      "nome": "Omeprazol",
-      "concentracao": "20mg",
-      "forma": "",
-      "qtde": "",
-      "posologia": "",
       "tempo": "",
       "via": "Oral"
     },
@@ -4172,10 +4142,10 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
-      "nome": "Predinisolona",
+      "nome": "Prednisolona",
       "concentracao": "20mg",
       "forma": "",
       "qtde": "",
@@ -4184,16 +4154,16 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Predinisolona Colírio",
+      "nome": "Prednisolona Colírio",
       "concentracao": "0.01",
       "forma": "",
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
-      "nome": "Predinisolona xarope",
+      "nome": "Prednisolona xarope",
       "concentracao": "3mg/mL",
       "forma": "",
       "qtde": "",
@@ -4202,20 +4172,11 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Predinisona",
+      "nome": "Prednisona",
       "concentracao": "20mg",
       "forma": "",
       "qtde": "01 Caixa",
       "posologia": "Tomar 02 comprimidos, pela manhã, durante 05 dias.",
-      "tempo": "",
-      "via": "Oral"
-    },
-    {
-      "nome": "Predinisona",
-      "concentracao": "20mg",
-      "forma": "",
-      "qtde": "",
-      "posologia": "",
       "tempo": "",
       "via": "Oral"
     },
@@ -4226,7 +4187,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Retal"
     },
     {
       "nome": "Prometazina",
@@ -4280,7 +4241,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Injetável"
     },
     {
       "nome": "Soro de Reidratação Oral",
@@ -4298,7 +4259,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Para Hidratação"
     },
     {
       "nome": "Sulfadiazina de Prata",
@@ -4307,7 +4268,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Tansulozina",
@@ -4325,7 +4286,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oral"
     },
     {
       "nome": "Tiorfan",
@@ -4343,7 +4304,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Oftálmico"
     },
     {
       "nome": "Tramadol",
@@ -4388,7 +4349,7 @@ const DATA = {
       "qtde": "",
       "posologia": "",
       "tempo": "",
-      "via": ""
+      "via": "Tópico"
     },
     {
       "nome": "Vitamina D",
@@ -4409,7 +4370,7 @@ const DATA = {
       "via": "Intramuscular"
     },
     {
-      "nome": "Ácido Acetilsalicilico",
+      "nome": "Ácido Acetilsalicílico",
       "concentracao": "100mg",
       "forma": "",
       "qtde": "____ Comprimidos",
@@ -4418,7 +4379,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Ácido Folico (vitamina B9",
+      "nome": "Ácido Fólico (vitamina B9)",
       "concentracao": "0.2mg",
       "forma": "",
       "qtde": "01 Frasco",
@@ -4427,7 +4388,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Ácido Folico (vitamina B9",
+      "nome": "Ácido Fólico (vitamina B9)",
       "concentracao": "5mg",
       "forma": "",
       "qtde": "____ Comprimidos",
@@ -5435,7 +5396,7 @@ const DATA = {
       "via": "Externo"
     },
     {
-      "nome": "Valproato De Sódio (ácido Valproico)",
+      "nome": "Valproato De Sódio (ácido Valpróico)",
       "concentracao": "250mg",
       "forma": "",
       "qtde": "____ Cápsulas",
@@ -5444,7 +5405,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Valproato De Sódio (ácido Valproico)",
+      "nome": "Valproato De Sódio (ácido Valpróico)",
       "concentracao": "50mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
@@ -5514,25 +5475,37 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   const el = id => document.getElementById(id);
 
   // ---------- Storage (persistência pessoal) ----------
+  // Shim local sobre localStorage, mantendo a interface assíncrona get/set
+  // já esperada pelo resto do código (era `window.storage`, nunca definido).
+  const storage = {
+    async get(key){
+      try{ const v = localStorage.getItem(key); return v === null ? null : { value: v }; }
+      catch(e){ return null; }
+    },
+    async set(key, value){
+      localStorage.setItem(key, value);
+    }
+  };
+
   async function loadCustomMeds(){
     try{
-      const r = await window.storage.get('meus-medicamentos', false);
+      const r = await storage.get('meus-medicamentos', false);
       customMeds = r && r.value ? JSON.parse(r.value) : [];
     }catch(e){ customMeds = []; }
   }
   async function saveCustomMeds(){
-    try{ await window.storage.set('meus-medicamentos', JSON.stringify(customMeds), false); }
+    try{ await storage.set('meus-medicamentos', JSON.stringify(customMeds), false); }
     catch(e){ console.error('Falha ao salvar catálogo pessoal', e); }
   }
 
   async function loadCustomCondicoes(){
     try{
-      const r = await window.storage.get('custom-condicoes', false);
+      const r = await storage.get('custom-condicoes', false);
       customCondicoes = r && r.value ? JSON.parse(r.value) : {};
     }catch(e){ customCondicoes = {}; }
   }
   async function saveCustomCondicoes(){
-    try{ await window.storage.set('custom-condicoes', JSON.stringify(customCondicoes), false); }
+    try{ await storage.set('custom-condicoes', JSON.stringify(customCondicoes), false); }
     catch(e){ console.error('Falha ao salvar condições personalizadas', e); }
   }
 
@@ -5546,36 +5519,48 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     return baseOrdem.concat(customNomes);
   }
 
+  // A condição "Constipaçao" (sem til) foi corrigida pra "Constipação" — quem
+  // já tinha edições/uso salvos sob o nome antigo não pode perder isso.
+  function migrarChaveConstipacao(obj){
+    if(obj && Object.prototype.hasOwnProperty.call(obj, 'Constipaçao') && !Object.prototype.hasOwnProperty.call(obj, 'Constipação')){
+      obj['Constipação'] = obj['Constipaçao'];
+      delete obj['Constipaçao'];
+    }
+    return obj;
+  }
+
   async function loadOverrides(){
     try{
-      const r = await window.storage.get('overrides-condicoes', false);
+      const r = await storage.get('overrides-condicoes', false);
       overrides = r && r.value ? JSON.parse(r.value) : {};
+      migrarChaveConstipacao(overrides);
     }catch(e){ overrides = {}; }
   }
   async function saveOverrides(){
-    try{ await window.storage.set('overrides-condicoes', JSON.stringify(overrides), false); }
+    try{ await storage.set('overrides-condicoes', JSON.stringify(overrides), false); }
     catch(e){ console.error('Falha ao salvar edições', e); }
   }
 
   async function loadUso(){
     try{
-      const r = await window.storage.get('uso-condicoes', false);
+      const r = await storage.get('uso-condicoes', false);
       usoCondicoes = r && r.value ? JSON.parse(r.value) : {};
+      migrarChaveConstipacao(usoCondicoes);
     }catch(e){ usoCondicoes = {}; }
   }
   async function saveUso(){
-    try{ await window.storage.set('uso-condicoes', JSON.stringify(usoCondicoes), false); }
+    try{ await storage.set('uso-condicoes', JSON.stringify(usoCondicoes), false); }
     catch(e){ console.error('Falha ao salvar contagem de uso', e); }
   }
 
   async function loadHistorico(){
     try{
-      const r = await window.storage.get('historico-receitas', false);
+      const r = await storage.get('historico-receitas', false);
       historico = r && r.value ? JSON.parse(r.value) : [];
     }catch(e){ historico = []; }
   }
   async function saveHistorico(){
-    try{ await window.storage.set('historico-receitas', JSON.stringify(historico), false); }
+    try{ await storage.set('historico-receitas', JSON.stringify(historico), false); }
     catch(e){ console.error('Falha ao salvar histórico', e); }
   }
 
@@ -5583,10 +5568,22 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   function norm(s){
     return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   }
-  function escapeAttr(s){
+  function escapeHtml(s){
     return (s===null||s===undefined?'':s).toString()
       .replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
+
+  // ---------- Vias de administração (lista única, usada em todo o app) ----------
+  const VIA_OPTIONS = ['Oral','Intramuscular','Intravenoso','Subcutâneo','Tópico','Externo','Externo - Tópico','Inalatório','Oftálmico','Nasal','Vaginal','Retal','Injetável','Para Hidratação','Outro'];
+
+  // Gera as <option> pra um <select> de via, sempre incluindo o valor já
+  // selecionado mesmo que ele não esteja na lista canônica — preserva o dado
+  // real em vez de deixar o navegador cair em branco ou na primeira opção.
+  function renderViaOptions(selecionado){
+    const opcoes = (selecionado && !VIA_OPTIONS.includes(selecionado)) ? [selecionado, ...VIA_OPTIONS] : VIA_OPTIONS;
+    return opcoes.map(v => `<option ${v===selecionado?'selected':''}>${escapeHtml(v)}</option>`).join('');
+  }
+  el('novoVia').innerHTML = renderViaOptions(null);
 
   // ---------- Camada de edição por condição ----------
   function ensureOverrideCond(nome){
@@ -5670,6 +5667,16 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     return Object.values(selected).some(it => it.fator !== null && it.fator !== undefined && it.fator !== '');
   }
 
+  // Converte o texto digitado em "Fator dose/kg" pra número, ou null se vazio
+  // ou não numérico — sem o guard de NaN aqui, um texto inválido ficava preso
+  // pedindo peso pra sempre (anySelectedNeedsPeso trata NaN como "precisa").
+  function parseFator(texto){
+    const t = (texto || '').trim();
+    if(!t) return null;
+    const n = parseFloat(t.replace(',', '.'));
+    return isNaN(n) ? null : n;
+  }
+
   // ---------- Renderização da lista (esquerda) ----------
   function renderLista(filtro){
     const cont = el('listaContainer');
@@ -5690,7 +5697,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     if(condMatches.length === 0 && medsMatches.length === 0){
       const wrap = document.createElement('div');
       wrap.className = 'empty-search';
-      wrap.innerHTML = 'Nada encontrado para "' + escapeAttr(filtro||'') + '"<br>';
+      wrap.innerHTML = 'Nada encontrado para "' + escapeHtml(filtro||'') + '"<br>';
       const btn = document.createElement('button');
       btn.className = 'restore-btn';
       btn.style.marginTop = '8px';
@@ -5748,7 +5755,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     head.className = 'card-head';
     head.innerHTML = `
       <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check">
-      <span class="nome">${nome}</span>
+      <span class="nome">${escapeHtml(nome)}</span>
       <span class="count">${eff.meds.length} item${eff.meds.length!==1?'s':''}</span>
       <span class="chev">&#9656;</span>
     `;
@@ -5789,16 +5796,15 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
     if(editingRow === key){
       wrap.classList.add('editing');
-      const viaOpts = ['Oral','Intramuscular','Endovenoso','Subcutâneo','Tópico','Inalatório','Oftálmico','Nasal','Vaginal','Retal','Externo','Para Hidratação','Outro'];
       wrap.innerHTML = `
         <div class="edit-form">
-          <input type="text" class="ef-nome" value="${escapeAttr(m.nome)}" placeholder="Nome do medicamento">
+          <input type="text" class="ef-nome" value="${escapeHtml(m.nome)}" placeholder="Nome do medicamento">
           <div class="edit-grid">
-            <input type="text" class="ef-qtde" value="${escapeAttr(m.qtde)}" placeholder="Quantidade">
-            <select class="ef-via">${viaOpts.map(v=>'<option '+(v===m.via?'selected':'')+'>'+v+'</option>').join('')}</select>
+            <input type="text" class="ef-qtde" value="${escapeHtml(m.qtde)}" placeholder="Quantidade">
+            <select class="ef-via">${renderViaOptions(m.via)}</select>
             <input type="text" class="ef-fator" value="${m.fator!==null && m.fator!==undefined ? m.fator : ''}" placeholder="Fator/kg (opcional)">
           </div>
-          <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeAttr(m.posologia)}</textarea>
+          <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(m.posologia)}</textarea>
           <div class="edit-actions">
             <button class="ef-save">Salvar</button>
             <button class="ef-cancel">Cancelar</button>
@@ -5812,7 +5818,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
           nome: wrap.querySelector('.ef-nome').value.trim(),
           qtde: wrap.querySelector('.ef-qtde').value.trim(),
           via: wrap.querySelector('.ef-via').value,
-          fator: wrap.querySelector('.ef-fator').value.trim() ? parseFloat(wrap.querySelector('.ef-fator').value.trim().replace(',','.')) : null,
+          fator: parseFator(wrap.querySelector('.ef-fator').value.trim()),
           posologia: wrap.querySelector('.ef-pos').value.trim()
         };
         setOverrideMed(nome, m.idx, novo);
@@ -5835,8 +5841,8 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
     wrap.innerHTML = `
       <input type="checkbox" ${selected[id] ? 'checked':''}>
-      <div class="sub-text"><b>${m.nome}</b> — ${m.qtde||''}${m.fator ? ' <span class="tag-peso">(dose por peso)</span>' : ''}${m.editado ? ' <span class="tag-editado">editado</span>' : ''}
-      <span class="pos">${m.posologia||''}</span></div>
+      <div class="sub-text"><b>${escapeHtml(m.nome)}</b> — ${escapeHtml(m.qtde||'')}${m.fator ? ' <span class="tag-peso">(dose por peso)</span>' : ''}${m.editado ? ' <span class="tag-editado">editado</span>' : ''}
+      <span class="pos">${escapeHtml(m.posologia||'')}</span></div>
       <div class="row-actions">
         <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
         <button class="icon-btn ef-remove" title="Remover desta condição">&times;</button>
@@ -5872,7 +5878,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       wrap.classList.add('editing');
       wrap.innerHTML = `
         <div class="edit-form">
-          <textarea class="ef-or-texto" placeholder="Texto da orientação">${escapeAttr(o.texto)}</textarea>
+          <textarea class="ef-or-texto" placeholder="Texto da orientação">${escapeHtml(o.texto)}</textarea>
           <div class="edit-actions">
             <button class="ef-save">Salvar</button>
             <button class="ef-cancel">Cancelar</button>
@@ -5902,7 +5908,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
     wrap.innerHTML = `
       <input type="checkbox" ${selectedOrient[id] ? 'checked':''}>
-      <div class="sub-text">${o.texto}${o.editado ? ' <span class="tag-editado">editado</span>' : ''}</div>
+      <div class="sub-text">${escapeHtml(o.texto)}${o.editado ? ' <span class="tag-editado">editado</span>' : ''}</div>
       <div class="row-actions">
         <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
         <button class="icon-btn ef-remove" title="Remover">&times;</button>
@@ -5948,7 +5954,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       const nomeOriginal = tipo === 'meds' ? base[i].nome : (base[i].length>50 ? base[i].slice(0,50)+'…' : base[i]);
       const row = document.createElement('div');
       row.className = 'hidden-row';
-      row.innerHTML = `<span>${nomeOriginal}</span>`;
+      row.innerHTML = `<span>${escapeHtml(nomeOriginal)}</span>`;
       const btn = document.createElement('button');
       btn.className = 'restore-btn';
       btn.textContent = 'restaurar';
@@ -5963,8 +5969,17 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     return box;
   }
 
+  // Chave estável pra um medicamento avulso — usa a posição do item dentro de
+  // allMedicamentos() (concatenação fixa de DATA.medicamentos + customMeds),
+  // não o nome sozinho. Vários medicamentos no catálogo compartilham nome com
+  // apresentações diferentes (ex. Aciclovir oral e tópico); usar só o nome
+  // como chave fazia uma seleção sobrescrever/apagar a outra.
+  function avulsoId(m){
+    return 'avulso:idx:' + allMedicamentos().indexOf(m);
+  }
+
   function renderMedAvulsoCard(m){
-    const id = 'avulso:' + m.nome;
+    const id = avulsoId(m);
     const card = document.createElement('div');
     card.className = 'card med-avulso';
     const isSel = !!selected[id];
@@ -5973,8 +5988,8 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
     head.innerHTML = `
       <input type="checkbox" ${isSel ? 'checked':''}>
-      <span class="nome">${displayNome}</span>
-      <span class="meta">${m.via||''}</span>
+      <span class="nome">${escapeHtml(displayNome)}</span>
+      <span class="meta">${escapeHtml(m.via||'')}</span>
     `;
     head.querySelector('input').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -6023,12 +6038,12 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   }
 
   function toggleMedAvulso(m, ligar){
-    const id = 'avulso:' + m.nome;
+    const id = avulsoId(m);
     if(ligar){
       const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
       selected[id] = {
         nome: displayNome, qtde: m.qtde, posologiaBase: m.posologia,
-        via: m.via || 'Outro', fator: null, origemCondicao: null
+        via: m.via || 'Outro', fator: m.fator !== undefined ? m.fator : null, origemCondicao: null
       };
     } else {
       delete selected[id];
@@ -6085,13 +6100,13 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         html += `
           <div class="item-linha">
             <span class="num mono">${String(idx+1).padStart(2,'0')}.</span>
-            <span class="nome-med">${it.nome}</span>
+            <span class="nome-med">${escapeHtml(it.nome)}</span>
             <span class="dots"></span>
-            <span class="qtde">${it.qtde||''}</span>
-            <button class="edit-item-btn" data-sel="${escapeAttr(id)}" title="Editar item">&#x270E;</button>
-            <button class="rm-item" data-sel="${escapeAttr(id)}" title="Remover da receita">&times;</button>
+            <span class="qtde">${escapeHtml(it.qtde||'')}</span>
+            <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item">&#x270E;</button>
+            <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita">&times;</button>
           </div>
-          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : (posologia||'')}</div>
+          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
         `;
       });
     });
@@ -6099,7 +6114,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     if(orientEntries.length){
       html += `<div class="orientacoes-bloco"><div class="via-titulo">Orientações</div><ul>`;
       orientEntries.forEach(([id, o]) => {
-        html += `<li>${o.texto} <button class="edit-item-btn" data-orient="${escapeAttr(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeAttr(id)}" title="Remover da receita">&times;</button></li>`;
+        html += `<li>${escapeHtml(o.texto)} <button class="edit-item-btn" data-orient="${escapeHtml(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeHtml(id)}" title="Remover da receita">&times;</button></li>`;
       });
       html += `</ul></div>`;
     }
@@ -6116,13 +6131,13 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         <div class="via-box-header">
           <div class="muni">
             <img src="data:image/png;base64,${LOGO_COMUM_B64}" class="muni-logo" alt="Prefeitura de Carmo do Paranaíba">
-            <div class="muni-text"><b>Prefeitura de Carmo do Paranaíba</b><br>${unidade}</div>
+            <div class="muni-text"><b>Prefeitura de Carmo do Paranaíba</b><br>${escapeHtml(unidade)}</div>
           </div>
           <div class="via-label">${label}</div>
         </div>
         <div class="via-box-title">Receituário de Controle Especial</div>
         <div class="via-box-paciente">
-          <span><b>Paciente:</b> ${nomePaciente || '—'}</span>
+          <span><b>Paciente:</b> ${escapeHtml(nomePaciente || '—')}</span>
           <span class="via-box-data">${dataStr}</span>
         </div>
         <div class="via-box-body">${corpoHtml}</div>
@@ -6130,7 +6145,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
           <div class="carimbo-box"><span>carimbo</span></div>
           <div class="assinatura-linha-wrap">
             <div class="linha"></div>
-            <div class="label">${labelAssinatura}</div>
+            <div class="label">${escapeHtml(labelAssinatura)}</div>
           </div>
         </div>
         <div class="via-box-footer">
@@ -6161,14 +6176,14 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         <div class="via-box-header">
           <div class="muni">
             <img src="data:image/png;base64,${LOGO_PATOS_ICON_B64}" class="muni-logo" alt="Prefeitura de Patos de Minas">
-            <div class="muni-text"><b>Prefeitura de Patos de Minas</b><br>${unidade}</div>
+            <div class="muni-text"><b>Prefeitura de Patos de Minas</b><br>${escapeHtml(unidade)}</div>
             <img src="data:image/png;base64,${LOGO_SUS_B64}" class="muni-sus-logo" alt="SUS">
           </div>
           <div class="via-label">${label || '1ª VIA FARMÁCIA'}</div>
         </div>
         <div class="via-box-title">Receituário de Controle Especial</div>
         <div class="via-box-paciente">
-          <span><b>Paciente:</b> ${nomePaciente || '—'}</span>
+          <span><b>Paciente:</b> ${escapeHtml(nomePaciente || '—')}</span>
           <span class="via-box-data">${dataStr}</span>
         </div>
         <div class="via-box-body">${corpoHtml}</div>
@@ -6176,7 +6191,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
           <div class="carimbo-box"><span>carimbo</span></div>
           <div class="assinatura-linha-wrap">
             <div class="linha"></div>
-            <div class="label">${labelAssinatura}</div>
+            <div class="label">${escapeHtml(labelAssinatura)}</div>
           </div>
         </div>
         <div class="via-box-footer">
@@ -6234,7 +6249,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       paper.innerHTML = `
         ${logosHtml()}
         <div class="receita-head">
-          <div class="paciente"><span class="lbl">Paciente</span>${nomePaciente || '—'}</div>
+          <div class="paciente"><span class="lbl">Paciente</span>${escapeHtml(nomePaciente || '—')}</div>
           <div class="data">${dataStr}</div>
         </div>
         <div class="receita-vazia">Selecione condições ou medicamentos ao lado.<br>A receita é montada aqui, ao vivo.</div>
@@ -6245,7 +6260,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     paper.innerHTML = `
       ${logosHtml()}
       <div class="receita-head">
-        <div class="paciente"><span class="lbl">Paciente</span>${nomePaciente || '—'}</div>
+        <div class="paciente"><span class="lbl">Paciente</span>${escapeHtml(nomePaciente || '—')}</div>
         <div class="data">${dataStr}</div>
       </div>
       ${corpoHtml}
@@ -6253,11 +6268,11 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         <div class="carimbo-box"><span>carimbo</span></div>
         <div class="assinatura-linha-wrap">
           <div class="linha"></div>
-          <div class="label">${(() => {
+          <div class="label">${escapeHtml((() => {
             const mn = (el('medicoNome') && el('medicoNome').value.trim()) || '';
             const mc = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
             return (mn || mc) ? [mn, mc].filter(Boolean).join(' — ') : 'Assinatura do médico';
-          })()}</div>
+          })())}</div>
         </div>
       </div>
     `;
@@ -6268,9 +6283,9 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     const cont = el('chipsMaisUsadas');
     cont.innerHTML = '';
     const top = Object.keys(usoCondicoes)
-      .filter(n => DATA.condicoes[n])
+      .filter(n => DATA.condicoes[n] || customCondicoes[n])
       .sort((a,b) => usoCondicoes[b] - usoCondicoes[a])
-      .slice(0, 5);
+      .slice(0, 9); // até 9, pra bater com o atalho de teclado 1-9
     top.forEach(nome => {
       const state = condicaoSelectionState(nome);
       const chip = document.createElement('button');
@@ -6298,7 +6313,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         const div = document.createElement('div');
         div.className = 'aviso amber';
         const nomeExib = token.charAt(0).toUpperCase() + token.slice(1);
-        div.innerHTML = `&#9888; Possível duplicidade: <b>${nomeExib}</b> aparece em ${porToken[token].length} itens (${porToken[token].join(' · ')}). Confira se é intencional.`;
+        div.innerHTML = `&#9888; Possível duplicidade: <b>${escapeHtml(nomeExib)}</b> aparece em ${porToken[token].length} itens (${escapeHtml(porToken[token].join(' · '))}). Confira se é intencional.`;
         bar.appendChild(div);
       }
     });
@@ -6346,22 +6361,28 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     renderHistorico();
   }
 
-  function renderHistorico(){
+  function renderHistorico(filtroPaciente){
     const lista = el('histLista');
     lista.innerHTML = '';
     if(!historico.length){
       lista.innerHTML = '<div class="mini-note">Nenhuma receita gerada ainda. Assim que você imprimir, copiar ou baixar uma, ela aparece aqui.</div>';
       return;
     }
-    historico.forEach((h, i) => {
+    const f = norm(filtroPaciente || '');
+    const itens = f ? historico.filter((h, i) => norm(h.paciente || '').includes(f)).map(h => ({ h, i: historico.indexOf(h) })) : historico.map((h, i) => ({ h, i }));
+    if(!itens.length){
+      lista.innerHTML = '<div class="mini-note">Nenhuma receita encontrada para esse paciente.</div>';
+      return;
+    }
+    itens.forEach(({ h, i }) => {
       const row = document.createElement('div');
       row.className = 'hist-row';
       const dt = new Date(h.quando);
       const quando = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
       row.innerHTML = `
         <div class="hist-info">
-          <b>${quando}${h.peso ? ' · ' + h.peso + 'kg' : ''}</b>
-          <span>${escapeAttr(h.resumo)}</span>
+          <b>${escapeHtml(h.paciente || 'Sem nome')}</b> — ${quando}${h.peso ? ' · ' + h.peso + 'kg' : ''}
+          <span>${escapeHtml(h.resumo)}</span>
         </div>
       `;
       const btnRe = document.createElement('button');
@@ -6380,7 +6401,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       btnDel.addEventListener('click', () => {
         historico.splice(i, 1);
         saveHistorico();
-        renderHistorico();
+        renderHistorico(el('histBuscaPaciente').value);
       });
       row.appendChild(btnRe);
       row.appendChild(btnDel);
@@ -6389,7 +6410,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   }
 
   // ---------- Backup: exportar / importar ----------
-  function exportarBackup(){
+  async function exportarBackup(){
     const payload = {
       app: 'gerador-receitas',
       versao: 1,
@@ -6401,12 +6422,36 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'backup-receitas-' + new Date().toISOString().slice(0,10) + '.json';
+    a.download = 'gerador-receitas-backup-' + new Date().toISOString().slice(0,10) + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 4000);
+    await storage.set('ultimo-backup', payload.exportadoEm, false);
+    atualizarAvisoBackup();
     showToast('Backup exportado');
+  }
+
+  // Mostra um aviso discreto quando faz tempo que não se exporta um backup e
+  // já existe algo de valor pra perder (catálogo pessoal, condições
+  // personalizadas ou histórico) — sem isso, trocar de computador silenciosamente
+  // perdia tudo o que só ficava salvo no localStorage daquele navegador.
+  async function atualizarAvisoBackup(){
+    const nota = el('storageNote');
+    const base = 'Suas edições, catálogo pessoal, histórico e dados do médico ficam salvos no armazenamento deste app, neste dispositivo. Exporte um backup antes de trocar de computador.';
+    const temAlgoParaPerder = customMeds.length || Object.keys(customCondicoes).length || historico.length;
+    if(!temAlgoParaPerder){ nota.textContent = base; return; }
+    const r = await storage.get('ultimo-backup', false);
+    if(!r || !r.value){
+      nota.innerHTML = base + ' <b style="color:var(--amber);">Você ainda não exportou nenhum backup.</b>';
+      return;
+    }
+    const dias = Math.floor((Date.now() - new Date(r.value).getTime()) / 86400000);
+    if(dias >= 7){
+      nota.innerHTML = base + ` <b style="color:var(--amber);">Já fazem ${dias} dias desde o último backup — considere exportar de novo.</b>`;
+    } else {
+      nota.textContent = base;
+    }
   }
 
   async function importarBackup(file){
@@ -6414,8 +6459,12 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       const texto = await file.text();
       const payload = JSON.parse(texto);
       if(payload.app !== 'gerador-receitas'){ showToast('Este arquivo não parece ser um backup do gerador'); return; }
+      const nMeds = Array.isArray(payload.customMeds) ? payload.customMeds.length : 0;
+      const nCond = payload.customCondicoes && typeof payload.customCondicoes === 'object' ? Object.keys(payload.customCondicoes).length : 0;
+      const nHist = Array.isArray(payload.historico) ? payload.historico.length : 0;
+      const resumo = `Este backup tem ${nMeds} medicamento(s) pessoal(is), ${nCond} condição(ões) personalizada(s) e ${nHist} receita(s) no histórico.\n\nImportar vai SUBSTITUIR suas edições, catálogo pessoal e histórico atuais. Continuar?`;
       const ok = typeof window.confirm === 'function'
-        ? window.confirm('Importar este backup vai substituir suas edições, catálogo pessoal e histórico atuais. Continuar?')
+        ? window.confirm(resumo)
         : true;
       if(!ok) return;
       customMeds = Array.isArray(payload.customMeds) ? payload.customMeds : [];
@@ -6436,6 +6485,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       populateEditorMedsDatalist();
       renderTudo();
       renderHistorico();
+      atualizarAvisoBackup();
       showToast('Backup importado com sucesso');
     }catch(e){
       console.error(e);
@@ -6519,7 +6569,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   // ---------- Dados do médico (persistidos localmente) ----------
   async function loadMedico(){
     try{
-      const r = await window.storage.get('medico-info', false);
+      const r = await storage.get('medico-info', false);
       const info = r && r.value ? JSON.parse(r.value) : null;
       el('medicoNome').value = info && info.nome ? info.nome : '';
       el('medicoCrm').value = info && info.crm ? info.crm : '';
@@ -6530,32 +6580,32 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   }
   async function saveMedico(){
     try{
-      await window.storage.set('medico-info', JSON.stringify({ nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }), false);
+      await storage.set('medico-info', JSON.stringify({ nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }), false);
     }catch(e){ console.error('Falha ao salvar dados do médico', e); }
   }
 
   // ---------- Local (Carmo do Paranaíba / Patos de Minas), persistido localmente ----------
   async function loadLocal(){
     try{
-      const r = await window.storage.get('local-receita', false);
+      const r = await storage.get('local-receita', false);
       const val = r && r.value ? r.value : 'carmo';
       const radio = document.querySelector('input[name=localReceita][value="'+val+'"]');
       if(radio) radio.checked = true;
     }catch(e){ /* mantém padrão Carmo já marcado no HTML */ }
   }
   async function saveLocal(){
-    try{ await window.storage.set('local-receita', localAtual(), false); }catch(e){ console.error('Falha ao salvar local', e); }
+    try{ await storage.set('local-receita', localAtual(), false); }catch(e){ console.error('Falha ao salvar local', e); }
   }
 
   // ---------- Unidade de Saúde (local de trabalho atual), persistida localmente ----------
   async function loadUnidade(){
     try{
-      const r = await window.storage.get('unidade-saude', false);
+      const r = await storage.get('unidade-saude', false);
       el('unidadeSaude').value = r && r.value ? r.value : '';
     }catch(e){ el('unidadeSaude').value = ''; }
   }
   async function saveUnidade(){
-    try{ await window.storage.set('unidade-saude', el('unidadeSaude').value.trim(), false); }catch(e){ console.error('Falha ao salvar unidade', e); }
+    try{ await storage.set('unidade-saude', el('unidadeSaude').value.trim(), false); }catch(e){ console.error('Falha ao salvar unidade', e); }
   }
 
   // ---------- Coleta os dados atuais para geração do .docx ----------
@@ -6921,6 +6971,20 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       el('search').focus();
     }
   });
+  // Atalhos 1-9 (aplica a N-ésima condição de "mais usadas") e Ctrl/Cmd+Enter
+  // (nova receita) — só fora de campos de texto, pra não atrapalhar digitação.
+  document.addEventListener('keydown', (e) => {
+    const emCampoDeTexto = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+    if(!emCampoDeTexto && /^[1-9]$/.test(e.key)){
+      const chips = [...el('chipsMaisUsadas').querySelectorAll('.chip')];
+      const chip = chips[Number(e.key) - 1];
+      if(chip){ e.preventDefault(); chip.click(); }
+    }
+    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+      e.preventDefault();
+      el('btnLimpar').click();
+    }
+  });
 
   // Remoção de itens direto pelo papel da receita (delegação)
   el('receitaPaper').addEventListener('click', (e) => {
@@ -6961,7 +7025,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       
       inputNome.value = item.nome || '';
       inputQtde.value = item.qtde || '';
-      selectVia.value = item.via || 'Oral';
+      selectVia.innerHTML = renderViaOptions(item.via || 'Oral');
       inputFator.value = item.fator !== null && item.fator !== undefined ? item.fator : '';
       textareaPos.value = item.posologiaBase || '';
       inputId.value = id;
@@ -6977,7 +7041,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       
       inputNome.value = '';
       inputQtde.value = '';
-      selectVia.value = 'Oral';
+      selectVia.innerHTML = renderViaOptions('Oral');
       inputFator.value = '';
       textareaPos.value = item.texto || '';
       inputId.value = id;
@@ -7007,7 +7071,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     const via = el('editItemVia').value;
     const fatorTxt = el('editItemFator').value.trim();
     const posologia = el('editItemPosologia').value.trim();
-    const fator = fatorTxt ? parseFloat(fatorTxt.replace(',', '.')) : null;
+    const fator = parseFator(fatorTxt);
     
     if(selectedOrient[id]){
       if(!posologia){
@@ -7023,7 +7087,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       selected[id].nome = nome;
       selected[id].qtde = qtde || null;
       selected[id].via = via;
-      selected[id].fator = isNaN(fator) ? null : fator;
+      selected[id].fator = fator;
       selected[id].posologiaBase = posologia || null;
     }
     
@@ -7064,6 +7128,9 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     renderHistorico();
     showToast('Histórico limpo');
   });
+  el('histBuscaPaciente').addEventListener('input', () => {
+    renderHistorico(el('histBuscaPaciente').value);
+  });
 
   el('nomePaciente').addEventListener('input', renderReceita);
   el('peso').addEventListener('input', () => { renderReceita(); atualizarDestaquePeso(); });
@@ -7085,7 +7152,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
   function fitChromeCss(){
     return `
-      .via-box{border:1.5px solid #16241F;border-radius:4px;overflow:hidden;font-family:'Inter',system-ui,sans-serif;color:#16241F;}
+      .via-box{border:1.5px solid #16241F;border-radius:4px;overflow:hidden;font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#16241F;}
       .via-box-header{display:flex;border-bottom:1.5px solid #16241F;}
       .via-box-header .muni{flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-right:1.5px solid #16241F;min-width:0;}
       .via-box-header .muni-logo{height:34px;width:auto;flex:none;}
@@ -7130,16 +7197,26 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       .via-titulo{font-size:${s(11.5)}px;font-weight:700;letter-spacing:.1em;color:#0A4F41;text-transform:uppercase;margin:${s(18)}px 0 ${s(8)}px 0;padding-bottom:4px;border-bottom:1px solid #E4EFEC;}
       .via-titulo:first-of-type{margin-top:0;}
       .item-linha{display:flex;align-items:baseline;gap:8px;margin-top:${s(10)}px;}
-      .item-linha .num{font-family:'IBM Plex Mono',monospace;font-size:${s(12)}px;color:#4B5A55;flex:none;}
+      .item-linha .num{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:${s(12)}px;color:#4B5A55;flex:none;}
       .item-linha .nome-med{font-weight:600;white-space:nowrap;font-size:${s(15)}px;}
       .item-linha .dots{flex:1;border-bottom:1.5px dotted #D7DEDA;position:relative;top:-3px;}
-      .item-linha .qtde{font-family:'IBM Plex Mono',monospace;font-size:${s(12.5)}px;flex:none;color:#4B5A55;}
+      .item-linha .qtde{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:${s(12.5)}px;flex:none;color:#4B5A55;}
       .item-pos{margin:2px 0 0 ${s(24)}px;font-size:${s(12.5)}px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:${s(22)}px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
       .orientacoes-bloco li{font-size:${s(12.5)}px;color:#4B5A55;margin-bottom:${s(6)}px;}
       .continuacao-nota{font-size:${s(11)}px;font-style:italic;color:#4B5A55;margin-bottom:${s(8)}px;}
     `;
+  }
+
+  // Escopa cada seletor da folha de estilo sob #fitProbe, pra que essas regras
+  // (pensadas só pra medir a altura da via numa div invisível) nunca vazem pro
+  // resto do documento — inclusive a pré-visualização real da receita, que usa
+  // as mesmas classes (.via-box, .item-linha etc).
+  function scopeCssParaProbe(css){
+    return css.replace(/([^{}]+)\{/g, (m, selectors) =>
+      selectors.split(',').map(s => '#fitProbe ' + s.trim()).join(', ') + '{'
+    );
   }
 
   function medirProbe(){
@@ -7151,7 +7228,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       document.body.appendChild(probe);
       const style = document.createElement('style');
       style.id = 'fitProbeStyle';
-      style.textContent = fitChromeCss();
+      style.textContent = scopeCssParaProbe(fitChromeCss());
       document.head.appendChild(style);
     }
     return probe;
@@ -7159,11 +7236,18 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
   function medirAlturaVia(viaHtml, scale){
     const probe = medirProbe();
-    el('fitProbeStyle').textContent = fitChromeCss() + fitBodyCss(scale);
+    el('fitProbeStyle').textContent = scopeCssParaProbe(fitChromeCss() + fitBodyCss(scale));
     probe.innerHTML = viaHtml;
     const h = probe.scrollHeight;
     probe.innerHTML = '';
     return h;
+  }
+
+  function limparProbeDeMedicao(){
+    const probe = document.getElementById('fitProbe');
+    if(probe) probe.remove();
+    const style = document.getElementById('fitProbeStyle');
+    if(style) style.remove();
   }
 
   function construirEntradasReceita(medEntries, orientEntries){
@@ -7199,18 +7283,18 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         html += `
           <div class="item-linha">
             <span class="num mono">${String(e.idx+1).padStart(2,'0')}.</span>
-            <span class="nome-med">${it.nome}</span>
+            <span class="nome-med">${escapeHtml(it.nome)}</span>
             <span class="dots"></span>
-            <span class="qtde">${it.qtde||''}</span>
+            <span class="qtde">${escapeHtml(it.qtde||'')}</span>
           </div>
-          <div class="item-pos">${precisaPeso ? '<span style="color:#B8860B;font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '' : (posologia||'')}</div>
+          <div class="item-pos">${precisaPeso ? '<span style="color:#B8860B;font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '' : escapeHtml(posologia||'')}</div>
         `;
       } else if(e.tipo === 'orientTitulo'){
         html += `<div class="orientacoes-bloco"><div class="via-titulo">Orientações</div><ul>`;
         listaAberta = true;
       } else if(e.tipo === 'orientItem'){
         if(!listaAberta){ html += `<div class="orientacoes-bloco"><ul>`; listaAberta = true; }
-        html += `<li>${e.o.texto}</li>`;
+        html += `<li>${escapeHtml(e.o.texto)}</li>`;
       }
     });
     if(listaAberta) html += `</ul></div>`;
@@ -7218,39 +7302,46 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
   }
 
   function calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr){
-    const buildVia = corpoHtml => local === 'patos'
-      ? viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
-      : viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA');
+    try{
+      const buildVia = corpoHtml => local === 'patos'
+        ? viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
+        : viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA');
 
-    const entradas = construirEntradasReceita(medEntries, orientEntries);
-    const corpoCompleto = renderEntradasHtml(entradas, peso);
+      const entradas = construirEntradasReceita(medEntries, orientEntries);
+      const corpoCompleto = renderEntradasHtml(entradas, peso);
 
-    // 1) tenta encaixar tudo em uma única folha, reduzindo a fonte gradualmente
-    for(let scale = FIT_SCALE_MAX; scale >= FIT_SCALE_MIN - 1e-6; scale -= FIT_SCALE_STEP){
-      const altura = medirAlturaVia(buildVia(corpoCompleto), scale);
-      if(altura <= FIT_MAX_HEIGHT){
-        return { scale: Math.round(scale * 100) / 100, paginas: [ corpoCompleto ] };
+      // 1) tenta encaixar tudo em uma única folha, reduzindo a fonte gradualmente
+      for(let scale = FIT_SCALE_MAX; scale >= FIT_SCALE_MIN - 1e-6; scale -= FIT_SCALE_STEP){
+        const altura = medirAlturaVia(buildVia(corpoCompleto), scale);
+        if(altura <= FIT_MAX_HEIGHT){
+          return { scale: Math.round(scale * 100) / 100, paginas: [ corpoCompleto ] };
+        }
       }
-    }
 
-    // 2) não coube nem no tamanho mínimo — divide em duas folhas
-    const scale = FIT_SCALE_MIN;
-    let corte = 1;
-    for(let n = entradas.length - 1; n >= 1; n--){
-      const html = renderEntradasHtml(entradas.slice(0, n), peso);
-      const altura = medirAlturaVia(buildVia(html), scale);
-      if(altura <= FIT_MAX_HEIGHT){ corte = n; break; }
+      // 2) não coube nem no tamanho mínimo — divide em duas folhas
+      const scale = FIT_SCALE_MIN;
+      let corte = 1;
+      for(let n = entradas.length - 1; n >= 1; n--){
+        const html = renderEntradasHtml(entradas.slice(0, n), peso);
+        const altura = medirAlturaVia(buildVia(html), scale);
+        if(altura <= FIT_MAX_HEIGHT){ corte = n; break; }
+      }
+      const pagina1 = renderEntradasHtml(entradas.slice(0, corte), peso);
+      const restante = entradas.slice(corte);
+      let nota = null;
+      if(restante.length && restante[0].tipo === 'item'){
+        nota = 'Continuação da prescrição — Uso ' + restante[0].it.via;
+      } else if(restante.length && restante[0].tipo === 'orientItem'){
+        nota = 'Continuação — Orientações';
+      }
+      const pagina2 = restante.length ? renderEntradasHtml(restante, peso, nota) : null;
+      return { scale: Math.round(scale * 100) / 100, paginas: pagina2 ? [ pagina1, pagina2 ] : [ pagina1 ] };
+    } finally {
+      // Sempre limpa a div/estilo de medição, mesmo que a função retorne mais
+      // cedo — sem isso o vazamento de CSS pra página real persistia até o
+      // reload (botões de editar/remover somem pra sempre).
+      limparProbeDeMedicao();
     }
-    const pagina1 = renderEntradasHtml(entradas.slice(0, corte), peso);
-    const restante = entradas.slice(corte);
-    let nota = null;
-    if(restante.length && restante[0].tipo === 'item'){
-      nota = 'Continuação da prescrição — Uso ' + restante[0].it.via;
-    } else if(restante.length && restante[0].tipo === 'orientItem'){
-      nota = 'Continuação — Orientações';
-    }
-    const pagina2 = restante.length ? renderEntradasHtml(restante, peso, nota) : null;
-    return { scale: Math.round(scale * 100) / 100, paginas: pagina2 ? [ pagina1, pagina2 ] : [ pagina1 ] };
   }
 
   el('btnImprimir').addEventListener('click', () => {
@@ -7284,8 +7375,8 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     }
 
     const printStyles = `
-      ${ehControle ? '@page{ size: landscape; margin: 12mm; }' : ''}
-      body{font-family:'Inter',system-ui,sans-serif; color:#16241F; padding:34px 38px; max-width:${ehControle ? '1000px' : '700px'}; margin:0 auto;}
+      ${ehControle ? '@page{ size: landscape; margin: 12mm; }' : '@page{ size: portrait; margin: 14mm 16mm; }'}
+      body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#16241F; padding:34px 38px; max-width:${ehControle ? '1000px' : '700px'}; margin:0 auto;}
       .folha-seguinte{ page-break-before: always; }
       .vias-lado-a-lado{display:flex; gap:16px; align-items:flex-start;}
       .vias-lado-a-lado .via-box{flex:1 1 0; min-width:0; margin-bottom:0;}
@@ -7339,16 +7430,24 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
       .via-titulo{font-size:11.5px;font-weight:700;letter-spacing:.1em;color:#0A4F41;text-transform:uppercase;margin:18px 0 8px 0;padding-bottom:4px;border-bottom:1px solid #E4EFEC;}
       .via-titulo:first-of-type{margin-top:0;}
       .item-linha{display:flex;align-items:baseline;gap:8px;margin-top:10px;}
-      .item-linha .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#4B5A55;flex:none;}
+      .item-linha .num{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:12px;color:#4B5A55;flex:none;}
       .item-linha .nome-med{font-weight:600;white-space:nowrap;}
       .item-linha .dots{flex:1;border-bottom:1.5px dotted #D7DEDA;position:relative;top:-3px;}
-      .item-linha .qtde{font-family:'IBM Plex Mono',monospace;font-size:12.5px;flex:none;color:#4B5A55;}
+      .item-linha .qtde{font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;font-size:12.5px;flex:none;color:#4B5A55;}
       .item-pos{margin:2px 0 0 24px;font-size:12.5px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:22px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
       .orientacoes-bloco li{font-size:12.5px;color:#4B5A55;margin-bottom:6px;}
       .assinatura{margin-top:44px;padding-top:10px;text-align:center;font-size:12px;color:#4B5A55;}
       .assinatura .linha{width:260px;border-top:1px solid #16241F;margin:0 auto 6px auto;}
+      /* Evita que a paginação nativa do navegador quebre um item ou bloco no
+         meio, ou jogue o cabeçalho/assinatura sozinhos numa folha — sem isso,
+         a receita comum podia sobrar espaço em branco na 1ª página e ainda
+         assim empurrar um bloco pequeno (ex. orientações) pra 2ª. */
+      .item-linha{ break-inside: avoid; }
+      .orientacoes-bloco{ break-inside: avoid; }
+      .assinatura-bloco{ break-inside: avoid; break-before: avoid; }
+      .receita-head{ break-after: avoid; }
       ${ehControle ? fitBodyCss(fitScale) : ''}
       @media print{ body{padding:0;} }
     `;
@@ -7382,8 +7481,8 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
     if(!nome){ showToast('Digite o nome do medicamento'); return; }
 
-    const fator = fatorTxt ? parseFloat(fatorTxt.replace(',','.')) : null;
-    const novoMed = { nome, concentracao:'', forma:'', qtde, posologia, tempo:'', via };
+    const fator = parseFator(fatorTxt);
+    const novoMed = { nome, concentracao:'', forma:'', qtde, posologia, tempo:'', via, fator };
 
     const id = 'avulso:' + nome + ':' + Date.now();
     selected[id] = { nome, qtde, posologiaBase: posologia, via: via||'Outro', fator, origemCondicao: null };
@@ -7541,21 +7640,20 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
 
   function addMedRowToEditor(med = null){
     const container = el('editorMedsContainer');
-    const viaOpts = ['Oral','Tópico','Injetável','Inalatório','Externo','Para Hidratação','Outro'];
-    
+
     const box = document.createElement('div');
     box.className = 'editor-med-box';
     box.innerHTML = `
       <button type="button" class="btn-remove-row" title="Remover">&times;</button>
-      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" value="${med ? escapeAttr(med.nome) : ''}" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;" list="datalistMedicamentosEditor">
+      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" value="${med ? escapeHtml(med.nome) : ''}" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;" list="datalistMedicamentosEditor">
       <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 6px;">
-        <input type="text" class="ed-med-qtde" placeholder="Qtde" value="${med ? escapeAttr(med.qtde || '') : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
+        <input type="text" class="ed-med-qtde" placeholder="Qtde" value="${med ? escapeHtml(med.qtde || '') : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
         <select class="ed-med-via" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
-          ${viaOpts.map(v => `<option ${med && med.via === v ? 'selected' : ''}>${v}</option>`).join('')}
+          ${renderViaOptions(med ? med.via : null)}
         </select>
         <input type="text" class="ed-med-fator" placeholder="Fator/kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
       </div>
-      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" style="width: 100%; margin-top: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${med ? escapeAttr(med.posologia || '') : ''}</textarea>
+      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" style="width: 100%; margin-top: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
     `;
     
     const inputNome = box.querySelector('.ed-med-nome');
@@ -7573,7 +7671,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
         const textareaPos = box.querySelector('.ed-med-pos');
         
         if(!inputQtde.value.trim() && match.qtde) inputQtde.value = match.qtde;
-        if(match.via) selectVia.value = match.via;
+        if(match.via) selectVia.innerHTML = renderViaOptions(match.via);
         if(!inputFator.value.trim() && match.fator !== null && match.fator !== undefined) {
           inputFator.value = match.fator;
         }
@@ -7596,7 +7694,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     row.className = 'editor-orient-row';
     row.style.marginBottom = '6px';
     row.innerHTML = `
-      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" style="width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${escapeAttr(texto)}</textarea>
+      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" style="width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${escapeHtml(texto)}</textarea>
       <button type="button" class="btn-remove-row" title="Remover">&times;</button>
     `;
     
@@ -7636,13 +7734,13 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
           const via = box.querySelector('.ed-med-via').value;
           const fatorTxt = box.querySelector('.ed-med-fator').value.trim();
           const posologia = box.querySelector('.ed-med-pos').value.trim();
-          const fator = fatorTxt ? parseFloat(fatorTxt.replace(',','.')) : null;
-          
+          const fator = parseFator(fatorTxt);
+
           meds.push({
             nome: mNome,
             qtde: qtde || null,
             via: via,
-            fator: isNaN(fator) ? null : fator,
+            fator: fator,
             posologia: posologia || null
           });
         }
@@ -7705,7 +7803,7 @@ const LOGO_PATOS_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEgAAABgCAYAAAC+EjQcAAAsgEl
     await loadUnidade();
     await loadUso();
     await loadHistorico();
-    el('storageNote').textContent = 'Suas edições, catálogo pessoal, histórico e dados do médico ficam salvos no armazenamento deste app, neste dispositivo. Exporte um backup antes de trocar de computador.';
+    atualizarAvisoBackup();
     renderHistorico();
     renderTudo();
     initEditorCondicoes();
