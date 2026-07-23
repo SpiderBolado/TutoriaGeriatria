@@ -316,10 +316,14 @@ async function run(url) {
     const { page } = await newPage(browser);
     await page.goto(url);
     await page.waitForTimeout(300);
-    await page.fill('#search', 'Azitromicina 500mg');
+    // A busca so filtra pelo nome (sem concentracao), entao busca "Azitromicina"
+    // e depois acha o card cujo nome exibido bate exatamente com "Azitromicina 500mg".
+    await page.fill('#search', 'Azitromicina');
     await page.waitForTimeout(250);
     const cliqueEdit = await page.evaluate(() => {
-      const btn = document.querySelector('#listaContainer .card.med-avulso .avulso-edit');
+      const card = [...document.querySelectorAll('#listaContainer .card.med-avulso')]
+        .find((c) => c.querySelector('.nome')?.textContent.trim() === 'Azitromicina 500mg');
+      const btn = card?.querySelector('.avulso-edit');
       if (!btn) return false;
       btn.click();
       return true;
@@ -334,11 +338,13 @@ async function run(url) {
     // recarrega pra confirmar que persistiu, depois seleciona e confere a receita
     await page.reload();
     await page.waitForTimeout(400);
-    await page.fill('#search', 'Azitromicina 500mg');
+    await page.fill('#search', 'Azitromicina');
     await page.waitForTimeout(250);
-    const textoPosEdicao = await page.evaluate(() => document.querySelector('#listaContainer .card.med-avulso .pos')?.textContent || '');
-    let checkboxes = await page.$$('#listaContainer .card.med-avulso input[type=checkbox]');
-    if (checkboxes[0]) await checkboxes[0].click();
+    const alvo = await page.evaluateHandle(() => [...document.querySelectorAll('#listaContainer .card.med-avulso')]
+      .find((c) => c.querySelector('.nome')?.textContent.trim() === 'Azitromicina 500mg'));
+    const textoPosEdicao = await page.evaluate((card) => card?.querySelector('.pos')?.textContent || '', alvo);
+    const checkbox = await page.evaluateHandle((card) => card?.querySelector('input[type=checkbox]'), alvo);
+    await checkbox.asElement()?.click();
     await page.waitForTimeout(200);
     const receita = await page.evaluate(() => document.querySelector('#receitaPaper').innerText);
     const ok = cliqueEdit
