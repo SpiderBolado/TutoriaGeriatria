@@ -247,9 +247,21 @@ async function run(url) {
     });
     await page.click('#editorBtnSalvar').catch(() => {});
     await page.waitForTimeout(200);
+    const clicarCheckboxCondicao = async (n) => {
+      await page.evaluate((nome) => {
+        const card = [...document.querySelectorAll('#listaContainer .card')]
+          .find((c) => c.querySelector('.card-head .nome')?.textContent.trim() === nome);
+        card.querySelector('input[data-role="cond-check"]').click();
+      }, n);
+      await page.waitForTimeout(100);
+    };
+    await page.fill('#search', 'Condicao De Teste XYZ');
+    await page.waitForTimeout(150);
     for (let i = 0; i < 6; i++) {
-      await selectCondicao(page, 'Condicao De Teste XYZ');
-      await page.evaluate(() => { toggleCondicaoInteira('Condicao De Teste XYZ', false); toggleCondicaoInteira('Condicao De Teste XYZ', true); });
+      // Liga (incrementa uso) e desliga pelo DOM (clique real), sem depender
+      // de funcao interna do closure do app (nao acessivel via page.evaluate).
+      await clicarCheckboxCondicao('Condicao De Teste XYZ');
+      await clicarCheckboxCondicao('Condicao De Teste XYZ');
     }
     await page.waitForTimeout(200);
     const apareceNosChips = await page.evaluate(() => {
@@ -292,7 +304,8 @@ async function run(url) {
     await page.click('body');
     await page.keyboard.press('Ctrl+Enter').catch(() => {});
     await page.waitForTimeout(200);
-    const limpouComCtrlEnter = await page.evaluate(() => Object.keys(selected).length === 0);
+    const limpouComCtrlEnter = await page.evaluate(() =>
+      document.querySelector('#receitaPaper').innerText.includes('Selecione condições ou medicamentos ao lado.'));
     record('Ctrl+Enter limpa a receita', limpouComCtrlEnter);
     await browser.close();
   }
