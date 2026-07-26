@@ -1,4 +1,4 @@
-// Suite de regressao para gerador_receitas.html.
+// Suite de regressao para index.html (+ css/, js/).
 // Roda contra um servidor estatico local (nao file://) para que localStorage
 // tenha uma origem estavel entre navegacoes. Uso: node tests/regression.js [filtro]
 const { chromium } = require('playwright');

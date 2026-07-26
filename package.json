@@ -2,7 +2,7 @@
   "name": "tutoriageriatria-gerador-receitas",
   "private": true,
   "version": "1.0.0",
-  "description": "Gerador de receitas para tutoria em geriatria (app single-file).",
+  "description": "Gerador de receitas para tutoria em geriatria (index.html + css/ + js/).",
   "scripts": {
     "test": "node tests/regression.js"
   },
