@@ -26,7 +26,7 @@ const DATA = {
         {
           "nome": "Naproxeno 500 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, se dor, por no máximo 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, se dor, por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -51,14 +51,14 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 a 07 dias. (Se sonolência, partir o comprimido). Em idosos, usar com cautela pelo risco de sonolência, confusão e queda — considerar evitar em pacientes frágeis.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 a 07 dias. (Se sonolência, partir o comprimido).",
           "via": "Oral",
           "fator": null
         }
@@ -88,7 +88,7 @@ const DATA = {
         {
           "nome": "Ondansetrona 8mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias. Em idosos ou em uso de outras medicações que prolongam o intervalo QT, usar com cautela — risco de arritmia.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -119,7 +119,7 @@ const DATA = {
         {
           "nome": "Domperidona 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, 30 minutos antes das principais refeições, por no máximo 07 dias (uso prolongado tem risco de arritmia cardíaca, principalmente em idosos).",
+          "posologia": "Tomar 01 comprimido, 30 minutos antes das principais refeições, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -265,7 +265,7 @@ const DATA = {
         {
           "nome": "Prednisona 20mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias. Em idosos, usar com cautela — risco de hiperglicemia (atenção se diabético), insônia/agitação e queda mesmo em curso curto.",
+          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -326,8 +326,7 @@ const DATA = {
         "Beba, no mínimo, 2 a 3 litros de água por dia. Isso ajuda a \"lavar\" as bactérias da bexiga",
         "A urina ficará com coloração laranja/avermelhada por causa de um dos medicamentos, isso é esperado",
         "Retorne imediatamente se:\n1. Febre (>37,8°)\n2. Sentir dor forte nas costas\n3. Vômitos ou mal estar muito intenso",
-        "Se os sintomas de dor ao urinar ou urgência não melhorarem após 48 horas do início do tratamento, retorne para reavaliação.",
-        "Em idosos, ITU pode se manifestar de forma atípica — confusão mental/delirium agudo em vez da disúria clássica; não tratar bacteriúria assintomática sem sintomas."
+        "Se os sintomas de dor ao urinar ou urgência não melhorarem após 48 horas do início do tratamento, retorne para reavaliação."
       ]
     },
     "Alergia ocular": {
@@ -366,21 +365,21 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers), risco de sedação, confusão e queda.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Cinarizina 25 mg",
           "qtde": "09 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 03 dias. Em idosos, usar com cautela — associação com parkinsonismo em uso prolongado, além de efeito sedativo.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 03 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Domperidona 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias (uso prolongado tem risco de arritmia cardíaca, principalmente em idosos).",
+          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -391,8 +390,7 @@ const DATA = {
         "Buscar avaliação em Unidade de Saúde para estudo da causa",
         "Quando a tontura começar, sente-se ou deite-se imediatamente, olhando para um ponto fixo.",
         "Evite movimentos bruscos da cabeça.",
-        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou fraqueza em um lado do corpo.\n2. Perda da consciência ou desmaios\n3. Tontura muito forte, que não melhore após 48 horas da medicação.",
-        "Meclin, Cinarizina e Domperidona juntos têm mecanismos sobrepostos — considerar se os três são realmente necessários simultaneamente, especialmente em idosos (carga anticolinérgica cumulativa)."
+        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou fraqueza em um lado do corpo.\n2. Perda da consciência ou desmaios\n3. Tontura muito forte, que não melhore após 48 horas da medicação."
       ]
     },
     "Meniere": {
@@ -400,14 +398,14 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers), risco de sedação, confusão e queda.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Domperidona 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias (uso prolongado tem risco de arritmia cardíaca, principalmente em idosos).",
+          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -583,14 +581,14 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Em idosos, usar com cautela (risco de sonolência e queda) ou preferir apenas medidas não farmacológicas.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -623,14 +621,14 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, se mialgia importante, por 05 dias. Em idosos, usar com cautela (risco de sonolência e queda).",
+          "posologia": "Tomar 01 comprimido, antes de dormir, se mialgia importante, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor ou mialgia importante, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor ou mialgia importante, por 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -680,7 +678,7 @@ const DATA = {
         {
           "nome": "Buscopan composto",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido de 08/08 horas, se dor. Contém escopolamina (anticolinérgica), que pode piorar a constipação e, em idosos, aumentar risco de retenção urinária e confusão — usar com cautela e pelo menor tempo possível.",
+          "posologia": "Tomar 01 comprimido de 08/08 horas, se dor.",
           "via": "Oral",
           "fator": null
         },
@@ -720,7 +718,7 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. (Se sonolência excessiva no próximo dia, favor tomar meio comprimido). Em idosos, usar com cautela pelo risco de sonolência, confusão e queda — considerar evitar em pacientes frágeis.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. (Se sonolência excessiva no próximo dia, favor tomar meio comprimido).",
           "via": "Oral",
           "fator": null
         }
@@ -743,7 +741,7 @@ const DATA = {
         {
           "nome": "Prometazina 25mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Em idosos, usar com cautela — anticolinérgico/sedativo de primeira geração (critérios de Beers), risco de sonolência, confusão, retenção urinária e queda.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -781,7 +779,7 @@ const DATA = {
         {
           "nome": "Ciprofloxacino 500mg",
           "qtde": "14 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias. Em idosos, usar com cautela — fluoroquinolonas têm alerta de bula para risco de tendinopatia/ruptura de tendão, efeitos no SNC e risco aumentado de aneurisma/dissecção de aorta.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -819,14 +817,14 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 08/08 horas (máximo 3x/dia, conforme bula), se dor abdominal, por 05 dias. Contém 3 substâncias anticolinérgicas (além da dipirona) — em idosos, usar com cautela pelo risco de confusão, retenção urinária, constipação e glaucoma de ângulo fechado.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas, se dor abdominal, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Metoclopramida 10 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se náuseas ou vômitos. Usar por no máximo 5 dias — risco de efeitos extrapiramidais e discinesia tardia (mais grave e por vezes irreversível em idosos) com uso prolongado.",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se náuseas ou vômitos, por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -910,7 +908,7 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias. Contém 3 substâncias anticolinérgicas (além da dipirona) — em idosos, usar com cautela pelo risco de confusão, retenção urinária, constipação e glaucoma de ângulo fechado.",
+          "posologia": "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -982,7 +980,7 @@ const DATA = {
         {
           "nome": "Amitriptilina 25mg",
           "qtde": "Contínuo",
-          "posologia": "Tomar 01 comprimido pela noite. Em idosos, considerar iniciar com dose menor (12,5mg) pelo risco de sedação, confusão, hipotensão postural e efeitos anticolinérgicos (critérios de Beers).",
+          "posologia": "Tomar 01 comprimido pela noite.",
           "via": "Oral",
           "fator": null
         },
@@ -1123,7 +1121,7 @@ const DATA = {
         {
           "nome": "Meloxicam 7,5mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, uma vez ao dia, por até 10 dias, se a dor impedir a movimentação das pernas Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante; considerar gastroproteção se uso prolongado.",
+          "posologia": "Tomar 01 comprimido, uma vez ao dia, por até 10 dias, se a dor impedir a movimentação das pernas.",
           "via": "Oral",
           "fator": null
         },
@@ -1400,8 +1398,7 @@ const DATA = {
         "Manter hidratação abundante e repouso relativo",
         "Evitar exposição ao frio e mudanças bruscas de temperatura",
         "Procurar avaliação médica se febre persistente por mais de 72 horas, dificuldade para respirar ou secreção nasal purulenta",
-        "Em idosos com sintomas há menos de 48 horas, considerar oseltamivir (grupo de risco para complicações de influenza).",
-        "Em idosos, a gripe pode se manifestar de forma atípica — confusão mental súbita, quedas, baixa diurese ou piora de doença crônica de base (DPOC, insuficiência cardíaca) podem ser os únicos sinais de gravidade, mesmo sem falta de ar evidente."
+        "Fique atento a: confusão mental súbita, quedas, urinar bem menos que o normal, ou piora de doença crônica de base (DPOC, insuficiência cardíaca) — podem ser sinais de gravidade mesmo sem falta de ar."
       ]
     },
     "Queimadura": {
@@ -1441,7 +1438,7 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, apenas se náusea leve isolada, sem vômitos — vômitos recorrentes/persistentes NÃO devem ser \"tratados\" com este medicamento; são sinal de alarme para retorno imediato. Em idosos, usar com cautela — risco de sedação e queda.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, apenas se náusea leve isolada, sem vômitos — vômitos recorrentes/persistentes não devem ser \"tratados\" com este medicamento; procurar reavaliação se isso ocorrer.",
           "via": "Oral",
           "fator": null
         }
@@ -1497,7 +1494,7 @@ const DATA = {
         {
           "nome": "Terbinafina 250mg (Se resistente)",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido ao dia, por 30 dias. Monitorizar função hepática em uso prolongado, especialmente em idosos com polifarmácia ou uso de outras medicações hepatotóxicas.",
+          "posologia": "Tomar 01 comprimido ao dia, por 30 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -1560,7 +1557,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, pelas próximas 02 noites, se coceira Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers); considerar Loratadina como alternativa menos sedativa.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, pelas próximas 02 noites, se coceira.",
           "via": "Oral",
           "fator": null
         }
@@ -1702,7 +1699,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, se coceira intensa que interfere no sono. Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers); considerar Loratadina como alternativa menos sedativa.",
+          "posologia": "Tomar 01 comprimido, se coceira intensa que interfere no sono.",
           "via": "Oral",
           "fator": null
         },
@@ -1762,7 +1759,7 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias (se dor e tensão muscular). Em idosos, usar com cautela pelo risco de sonolência, confusão e queda — considerar evitar em pacientes frágeis.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias (se dor e tensão muscular).",
           "via": "Oral",
           "fator": null
         }
@@ -1935,7 +1932,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -1957,7 +1954,7 @@ const DATA = {
         {
           "nome": "Cetoprofeno 100mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido de 12/12 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
+          "posologia": "Tomar 01 comprimido de 12/12 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2161,14 +2158,14 @@ const DATA = {
         {
           "nome": "Clonazepam 0,5mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, sublingual, somente se crise de ansiedade intensa e isolada. Em idosos, usar com cautela pelo risco de sedação, queda e confusão (critérios de Beers) — preferir menor dose e uso pontual, não contínuo.",
+          "posologia": "Tomar 01 comprimido, sublingual, somente se crise de ansiedade intensa e isolada.",
           "via": "Sublingual",
           "fator": null
         },
         {
           "nome": "Fluoxetina 20mg",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, pela manhã, por 30 dias. Em idosos, considerar Sertralina ou Escitalopram como alternativa — Fluoxetina tem meia-vida longa e maior potencial de interação medicamentosa.",
+          "posologia": "Tomar 01 comprimido, pela manhã, por 30 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -2213,7 +2210,6 @@ const DATA = {
       "orientacoes": [
         "Manter dieta pastosa ou líquida se dor à mastigação.",
         "Encaminhar para avaliação de imagem (RX/TC de face) e cirurgia buco-maxilo-facial se suspeita de fratura, deformidade, má oclusão dentária ou os sinais de alarme abaixo.",
-        "Em idosos, investigar a causa da queda/trauma (risco de queda, revisão de medicações) — trauma de face costuma ser secundário a uma queda.",
         "Se paciente em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), encaminhar para avaliação de imagem (TC de crânio) mesmo em trauma leve, pelo risco de hematoma intracraniano.",
         "Se houver ferimento associado, avaliar/atualizar profilaxia antitetânica.",
         "Retornar se: visão dupla, dor intensa, sangramento nasal/oral persistente, ou dormência de face."
@@ -2300,7 +2296,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2323,14 +2319,14 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Em idosos, usar com cautela pelo risco de sonolência, confusão e queda — considerar evitar em pacientes frágeis.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -2360,7 +2356,7 @@ const DATA = {
         {
           "nome": "Ciclopentolato 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, 01 vez ao dia, ao deitar (se dor intensa). Pode precipitar glaucoma de ângulo fechado, mais comum em idosos — suspender e procurar atendimento se dor ocular intensa, halos visuais ou embaçamento súbito após o uso.",
+          "posologia": "Aplicar 01 gota, 01 vez ao dia, ao deitar (se dor intensa). Suspender e procurar atendimento se dor ocular intensa, halos visuais ou embaçamento súbito após o uso.",
           "via": "Oftálmico",
           "fator": null
         }
@@ -2398,7 +2394,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -3665,7 +3661,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, considerar dose menor (12,5mg) pelo risco de sedação, hipotensão postural e efeitos anticolinérgicos (critérios de Beers).",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3737,7 +3733,7 @@ const DATA = {
       "concentracao": "2mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, para controle de sintomas extrapiramidais (induzidos por antipsicótico). Em idosos, usar com cautela — efeito anticolinérgico, risco de confusão e retenção urinária.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, para controle de sintomas extrapiramidais (induzidos por antipsicótico).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3845,7 +3841,7 @@ const DATA = {
       "concentracao": "2mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar uso contínuo prolongado — critérios de Beers (risco de sedação, confusão, queda e dependência); reavaliar periodicamente a necessidade de manter.",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3863,7 +3859,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção). Em idosos, usar com cautela pelo risco de sedação e hipotensão postural.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3872,7 +3868,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz — risco de sedação, hipotensão postural e efeitos extrapiramidais.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3917,7 +3913,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar — critérios de Beers (risco de sedação, confusão e queda); preferir dose menor ou benzodiazepínico de meia-vida mais curta.",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3926,7 +3922,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar uso contínuo — critérios de Beers (risco de sedação, confusão e queda).",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3935,7 +3931,7 @@ const DATA = {
       "concentracao": "0.25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Em idosos, preferir dose menor (avaliar 1/2 comprimido) e monitorizar função renal — risco de intoxicação digitálica.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4034,7 +4030,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, antes do café da manhã, de uso contínuo. Em idosos, usar com cautela pelo risco de hipoglicemia prolongada — considerar Gliclazida como alternativa mais segura.",
+      "posologia": "Tomar 01 comprimido, antes do café da manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4061,7 +4057,7 @@ const DATA = {
       "concentracao": "1mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz pelo menor tempo possível — risco de efeitos extrapiramidais, sedação e maior mortalidade em demência (alerta de bula).",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4070,7 +4066,7 @@ const DATA = {
       "concentracao": "2mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada em gotas, conforme prescrição. Em idosos, usar a menor dose eficaz pelo menor tempo possível.",
+      "posologia": "Tomar conforme dose individualizada em gotas, conforme prescrição.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4079,7 +4075,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Em idosos, usar a menor dose eficaz pelo menor tempo possível — risco de efeitos extrapiramidais e maior mortalidade em demência (alerta de bula).",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4106,7 +4102,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos periodicamente, especialmente em idosos.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4124,7 +4120,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar com cautela pelo risco de sedação, hipotensão postural e efeitos anticolinérgicos (critérios de Beers) — considerar alternativa com menor efeito anticolinérgico.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4421,7 +4417,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, considerar dose menor pelo risco de sedação e hipotensão postural.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4574,7 +4570,7 @@ const DATA = {
       "concentracao": "5mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Aplicar 01 gota no(s) olho(s) acometido(s), de 12/12 horas, de uso contínuo (glaucoma). Em idosos com doença pulmonar (asma/DPOC) ou cardíaca (bradicardia/bloqueio AV), usar com cautela — absorção sistêmica pode causar broncoespasmo e bradicardia.",
+      "posologia": "Aplicar 01 gota no(s) olho(s) acometido(s), de 12/12 horas, de uso contínuo (glaucoma).",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -4772,7 +4768,7 @@ const DATA = {
       "concentracao": "50mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo — costuma ser preferida em idosos por perfil de interação mais favorável.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4781,7 +4777,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Em idosos, atenção ao risco de hiponatremia e de prolongamento de QT em doses altas.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4808,7 +4804,7 @@ const DATA = {
       "concentracao": "300mg",
       "forma": "",
       "qtde": "90 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor). Ajustar dose conforme função renal; em idosos, risco de sedação e tontura.",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor). Ajustar dose conforme função renal.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4817,7 +4813,7 @@ const DATA = {
       "concentracao": "75mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Ajustar dose conforme função renal; em idosos, risco de sedação, tontura e edema periférico.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Ajustar dose conforme função renal.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4826,7 +4822,7 @@ const DATA = {
       "concentracao": "1mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos com demência, usar a menor dose eficaz pelo menor tempo possível — alerta de bula para maior risco de AVC e mortalidade nessa população.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4835,7 +4831,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz — risco de sedação, hipotensão postural e queda.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4844,7 +4840,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos com demência, usar com extrema cautela — alerta de bula para maior risco de eventos cerebrovasculares e mortalidade.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
