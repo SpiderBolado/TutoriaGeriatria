@@ -26,7 +26,7 @@ const DATA = {
         {
           "nome": "Naproxeno 500 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, se dor, por no máximo 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, se dor, por no máximo 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
           "via": "Oral",
           "fator": null
         }
@@ -51,7 +51,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 08/08 horas, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
           "via": "Oral",
           "fator": null
         },
@@ -76,7 +76,7 @@ const DATA = {
           "qtde": "01 Caixa",
           "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
-          "fator": 0.6
+          "fator": null
         },
         {
           "nome": "Enterogermina Plus",
@@ -88,7 +88,7 @@ const DATA = {
         {
           "nome": "Ondansetrona 8mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias. Em idosos ou em uso de outras medicações que prolongam o intervalo QT, usar com cautela — risco de arritmia.",
           "via": "Oral",
           "fator": null
         },
@@ -111,7 +111,7 @@ const DATA = {
       "meds": [
         {
           "nome": "Omeprazol 20mg",
-          "qtde": "120 Comprimidos",
+          "qtde": "112 Comprimidos",
           "posologia": "Tomar 2 comprimidos ao dia, pela manhã, em jejum, 30 min antes de comer. Usar por 08 semanas.",
           "via": "Oral",
           "fator": null
@@ -224,14 +224,14 @@ const DATA = {
         {
           "nome": "Olopatadina 1 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, no olho acometido, de 08/08 horas, por 07 dias.",
+          "posologia": "Aplicar 01 gota, no olho acometido, de 08/08 horas, por 07 dias. Usar apenas se houver componente alérgico/prurido associado — conjuntivite viral isolada é autolimitada e não tem indicação primária de antialérgico.",
           "via": "Tópico",
           "fator": null
         },
         {
           "nome": "Loratadina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido ao dia, por 05 dias.",
+          "posologia": "Tomar 01 comprimido ao dia, por 05 dias. Usar apenas se houver componente alérgico/prurido associado.",
           "via": "Oral",
           "fator": null
         }
@@ -257,7 +257,7 @@ const DATA = {
         },
         {
           "nome": "Amoxicilina/Clavulanato 875/125 mg",
-          "qtde": "30 Comprimidos",
+          "qtde": "20 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 12/12 horas, por 10 dias.",
           "via": "Oral",
           "fator": null
@@ -265,7 +265,7 @@ const DATA = {
         {
           "nome": "Prednisona 20mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias.",
+          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias. Em idosos, usar com cautela — risco de hiperglicemia (atenção se diabético), insônia/agitação e queda mesmo em curso curto.",
           "via": "Oral",
           "fator": null
         },
@@ -316,7 +316,7 @@ const DATA = {
         },
         {
           "nome": "Pyridium 200mg",
-          "qtde": "18 Drágeas",
+          "qtde": "09 Drágeas",
           "posologia": "Tomar 01 drágea, de 08/08 horas, por 03 dias.",
           "via": "Oral",
           "fator": null
@@ -326,7 +326,8 @@ const DATA = {
         "Beba, no mínimo, 2 a 3 litros de água por dia. Isso ajuda a \"lavar\" as bactérias da bexiga",
         "A urina ficará com coloração laranja/avermelhada por causa de um dos medicamentos, isso é esperado",
         "Retorne imediatamente se:\n1. Febre (>37,8°)\n2. Sentir dor forte nas costas\n3. Vômitos ou mal estar muito intenso",
-        "Se os sintomas de dor ao urinar ou urgência não melhorarem após 48 horas do início do tratamento, retorne para reavaliação."
+        "Se os sintomas de dor ao urinar ou urgência não melhorarem após 48 horas do início do tratamento, retorne para reavaliação.",
+        "Em idosos, ITU pode se manifestar de forma atípica — confusão mental/delirium agudo em vez da disúria clássica; não tratar bacteriúria assintomática sem sintomas."
       ]
     },
     "Alergia ocular": {
@@ -365,14 +366,14 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers), risco de sedação, confusão e queda.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Cinarizina 25 mg",
-          "qtde": "06 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 03 dias.",
+          "qtde": "09 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 03 dias. Em idosos, usar com cautela — associação com parkinsonismo em uso prolongado, além de efeito sedativo.",
           "via": "Oral",
           "fator": null
         },
@@ -390,7 +391,8 @@ const DATA = {
         "Buscar avaliação em Unidade de Saúde para estudo da causa",
         "Quando a tontura começar, sente-se ou deite-se imediatamente, olhando para um ponto fixo.",
         "Evite movimentos bruscos da cabeça.",
-        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou fraqueza em um lado do corpo.\n2. Perda da consciência ou desmaios\n3. Tontura muito forte, que não melhore após 48 horas da medicação."
+        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou fraqueza em um lado do corpo.\n2. Perda da consciência ou desmaios\n3. Tontura muito forte, que não melhore após 48 horas da medicação.",
+        "Meclin, Cinarizina e Domperidona juntos têm mecanismos sobrepostos — considerar se os três são realmente necessários simultaneamente, especialmente em idosos (carga anticolinérgica cumulativa)."
       ]
     },
     "Meniere": {
@@ -398,7 +400,7 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers), risco de sedação, confusão e queda.",
           "via": "Oral",
           "fator": null
         },
@@ -581,7 +583,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
           "via": "Oral",
           "fator": null
         },
@@ -628,7 +630,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor ou mialgia importante, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor ou mialgia importante, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
           "via": "Oral",
           "fator": null
         }
@@ -676,9 +678,9 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Buscopam composto",
+          "nome": "Buscopan composto",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido de 08/08 horas, se dor.",
+          "posologia": "Tomar 01 comprimido de 08/08 horas, se dor. Contém escopolamina (anticolinérgica), que pode piorar a constipação e, em idosos, aumentar risco de retenção urinária e confusão — usar com cautela e pelo menor tempo possível.",
           "via": "Oral",
           "fator": null
         },
@@ -695,7 +697,8 @@ const DATA = {
         "Aumentar a ingestão de água (1,5 a 2 litros por dia).",
         "Praticar atividade física regular, conforme tolerado.",
         "Não segurar a vontade de evacuar.",
-        "Retorne se: sangue nas fezes, perda de peso sem explicação, dor abdominal forte, incapacidade de eliminar gases, vômitos, ou se a constipação persistir por mais de 2 semanas."
+        "Retorne se: sangue nas fezes, perda de peso sem explicação, dor abdominal forte, incapacidade de eliminar gases, vômitos, ou se a constipação persistir por mais de 2 semanas.",
+        "Em pacientes com várias medicações, vale revisar se algum remédio de uso contínuo (opioide, anticolinérgico, ferro, bloqueador de canal de cálcio, anti-histamínico) está contribuindo para a constipação."
       ]
     },
     "Costocondrite": {
@@ -740,7 +743,7 @@ const DATA = {
         {
           "nome": "Prometazina 25mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Em idosos, usar com cautela — anticolinérgico/sedativo de primeira geração (critérios de Beers), risco de sonolência, confusão, retenção urinária e queda.",
           "via": "Oral",
           "fator": null
         },
@@ -778,7 +781,7 @@ const DATA = {
         {
           "nome": "Ciprofloxacino 500mg",
           "qtde": "14 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias. Em idosos, usar com cautela — fluoroquinolonas têm alerta de bula para risco de tendinopatia/ruptura de tendão, efeitos no SNC e risco aumentado de aneurisma/dissecção de aorta.",
           "via": "Oral",
           "fator": null
         },
@@ -816,14 +819,14 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor abdominal, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas (máximo 3x/dia, conforme bula), se dor abdominal, por 05 dias. Contém 3 substâncias anticolinérgicas (além da dipirona) — em idosos, usar com cautela pelo risco de confusão, retenção urinária, constipação e glaucoma de ângulo fechado.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Metoclopramida 10 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se náuseas ou vômitos.",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se náuseas ou vômitos. Usar por no máximo 5 dias — risco de efeitos extrapiramidais e discinesia tardia (mais grave e por vezes irreversível em idosos) com uso prolongado.",
           "via": "Oral",
           "fator": null
         }
@@ -854,7 +857,7 @@ const DATA = {
         {
           "nome": "Flurbiprofeno 8,75mg",
           "qtde": "01 Caixa",
-          "posologia": "Consumir 01 pastilha de 08/08 horas, até melhora do desconforto",
+          "posologia": "Consumir 01 pastilha de 08/08 horas, até melhora do desconforto por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -894,13 +897,6 @@ const DATA = {
           "posologia": "Tomar 01 comprimido, pela manhã em jejum, se queimação ou desconforto estomacal.",
           "via": "Oral",
           "fator": null
-        },
-        {
-          "nome": "Otociriax",
-          "qtde": "01 Frasco",
-          "posologia": "Não usar se houver suspeita de perfuração timpânica com secreção. Aplicar 03 gotas no ouvido acometido de 12/12 horas, por 07 dias.",
-          "via": "Tópico",
-          "fator": null
         }
       ],
       "orientacoes": [
@@ -914,7 +910,7 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias.",
+          "posologia": "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias. Contém 3 substâncias anticolinérgicas (além da dipirona) — em idosos, usar com cautela pelo risco de confusão, retenção urinária, constipação e glaucoma de ângulo fechado.",
           "via": "Oral",
           "fator": null
         },
@@ -942,14 +938,15 @@ const DATA = {
         {
           "nome": "Levonogestrel 150 mcg + Etinilestradiol 30 mcg",
           "qtde": "Contínuo",
-          "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 03 meses",
+          "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 03 meses Em mulheres mais velhas ou com fatores de risco cardiovascular/tabagismo, avaliar risco de trombose antes de manter o estrogênio combinado — Ácido Tranexâmico isolado pode ser opção mais segura conforme a idade.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
         "Realizar acompanhamento longitudinal em unidade de saúde para estudo da causa do sangramento.",
-        "Se piora do sangramento, sonolência ou tontura, procurar o pronto socorro imediatamente."
+        "Se piora do sangramento, sonolência ou tontura, procurar o pronto socorro imediatamente.",
+        "Sangramento em mulher na pós-menopausa é sinal de alarme e exige avaliação ginecológica prioritária (investigação de neoplasia endometrial), mesmo que o sangramento melhore com o tratamento."
       ]
     },
     "Herpes Zoster": {
@@ -970,7 +967,7 @@ const DATA = {
         },
         {
           "nome": "Aciclovir 400mg",
-          "qtde": "60 Comprimidos",
+          "qtde": "70 Comprimidos",
           "posologia": "Tomar 02 comprimidos, de 4/4 horas (5 vezes ao dia, respeitando o intervalo noturno), por 07 dias.",
           "via": "Oral",
           "fator": null
@@ -992,7 +989,7 @@ const DATA = {
         {
           "nome": "Tramadol 50mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima.",
+          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima. Atenção: uso concomitante com Amitriptilina (abaixo) aumenta risco de síndrome serotoninérgica e de sedação — avaliar necessidade real de manter os dois ao mesmo tempo.",
           "via": "Oral",
           "fator": null
         },
@@ -1126,13 +1123,13 @@ const DATA = {
         {
           "nome": "Meloxicam 7,5mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, uma vez ao dia, por até 10 dias, se a dor impedir a movimentação das pernas",
+          "posologia": "Tomar 01 comprimido, uma vez ao dia, por até 10 dias, se a dor impedir a movimentação das pernas Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante; considerar gastroproteção se uso prolongado.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Meias de Compressão Graduada 3/4 - 20 a 30 mmHg",
-          "qtde": "01 Unidade",
+          "qtde": "01 Par",
           "posologia": "Iniciar o uso pela manhã, antes de iniciar a movimentação e retirar no período da noite.",
           "via": "Externo",
           "fator": null
@@ -1277,7 +1274,8 @@ const DATA = {
         "Não ingerir álcool, reduzir ingesta de carne vermelha, frutos do mar e bebidas açucaradas.",
         "Use apenas um dos anti-inflamatórios (Naproxeno, Colchicina ou Prednisolona) na maioria dos casos — associar mais de um aumenta o risco de efeitos colaterais sem necessariamente melhorar mais rápido; combinações ficam reservadas para casos mais intensos, a critério médico.",
         "Não inicie nem suspenda o alopurinol (se já em uso) durante a crise — mantenha a dose habitual.",
-        "Torne a buscar atendimento médico de dor intensa, febre ou mudança no padrão da inflamação."
+        "Torne a buscar atendimento médico de dor intensa, febre ou mudança no padrão da inflamação.",
+        "A Colchicina tem interações relevantes que aumentam o risco de toxicidade/rabdomiólise — cautela se em uso de estatina, macrolídeo (ex.: Azitromicina, Claritromicina), Diltiazem ou Verapamil."
       ]
     },
     "Nefrolitíase": {
@@ -1292,7 +1290,7 @@ const DATA = {
         {
           "nome": "Trometamol Cetorolaco 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor importante, por no máximo 05 dias.",
+          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor importante, por no máximo 05 dias. Evitar ou reduzir a dose se houver função renal reduzida, desidratação ou suspeita de obstrução — Cetorolaco reduz o fluxo sanguíneo renal e é um dos AINEs mais nefrotóxicos, especialmente relevante numa condição que já é renal.",
           "via": "Oral",
           "fator": null
         },
@@ -1306,7 +1304,7 @@ const DATA = {
         {
           "nome": "Tansulozina 0.4mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, após o café da manhã, por 04 semanas.",
+          "posologia": "Tomar 01 comprimido, após o café da manhã, por 04 semanas. Risco de hipotensão postural/síncope, principalmente na primeira dose — orientar a levantar-se devagar, sobretudo à noite.",
           "via": "Oral",
           "fator": null
         }
@@ -1386,7 +1384,7 @@ const DATA = {
         {
           "nome": "Budesonida 50mcg",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 02 jatos em cada narina, de 08/08 horas, por 02 semanas, para descongestão.",
+          "posologia": "Aplicar 02 jatos em cada narina, de 08/08 horas, por 05 a 07 dias, para descongestão.",
           "via": "Tópico",
           "fator": null
         },
@@ -1401,7 +1399,9 @@ const DATA = {
       "orientacoes": [
         "Manter hidratação abundante e repouso relativo",
         "Evitar exposição ao frio e mudanças bruscas de temperatura",
-        "Procurar avaliação médica se febre persistente por mais de 72 horas, dificuldade para respirar ou secreção nasal purulenta"
+        "Procurar avaliação médica se febre persistente por mais de 72 horas, dificuldade para respirar ou secreção nasal purulenta",
+        "Em idosos com sintomas há menos de 48 horas, considerar oseltamivir (grupo de risco para complicações de influenza).",
+        "Em idosos, a gripe pode se manifestar de forma atípica — confusão mental súbita, quedas, baixa diurese ou piora de doença crônica de base (DPOC, insuficiência cardíaca) podem ser os únicos sinais de gravidade, mesmo sem falta de ar evidente."
       ]
     },
     "Queimadura": {
@@ -1441,7 +1441,7 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou tonturas",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, apenas se náusea leve isolada, sem vômitos — vômitos recorrentes/persistentes NÃO devem ser \"tratados\" com este medicamento; são sinal de alarme para retorno imediato. Em idosos, usar com cautela — risco de sedação e queda.",
           "via": "Oral",
           "fator": null
         }
@@ -1449,8 +1449,8 @@ const DATA = {
       "orientacoes": [
         "Manter repouso relativo nas primeiras 24 horas",
         "Evitar atividades físicas intensas, uso de bebidas alcoólicas e medicações aqui não prescritas",
-        "Retornar para reavaliação se",
-        "Sonolência excessiva // Confusão // Vômitos persistentes // Fraqueza em membros // Convulsões // Saída de líquido pelo ouvido ou nariz"
+        "Se em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), procurar avaliação de EMERGÊNCIA imediatamente, mesmo sem sintomas — risco de hemorragia intracraniana tardia mesmo em trauma leve.",
+        "Retornar para reavaliação imediata se: sonolência excessiva, confusão, vômitos persistentes, fraqueza em membros, convulsões, ou saída de líquido pelo ouvido ou nariz."
       ]
     },
     "Ferimento": {
@@ -1497,7 +1497,7 @@ const DATA = {
         {
           "nome": "Terbinafina 250mg (Se resistente)",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido ao dia, por 30 dias.",
+          "posologia": "Tomar 01 comprimido ao dia, por 30 dias. Monitorizar função hepática em uso prolongado, especialmente em idosos com polifarmácia ou uso de outras medicações hepatotóxicas.",
           "via": "Oral",
           "fator": null
         }
@@ -1537,7 +1537,8 @@ const DATA = {
         "Aplicar compressas de gazes, banhadas em soro fisiológico morno, na região, de 06/06 horas por 15 minutos.",
         "Manter local limpo e seco.",
         "NÃO MANIPULAR O LOCAL",
-        "Procurar atendimento médico se aumento rápido do volume, febre ou dor intensa."
+        "Procurar atendimento médico se aumento rápido do volume, febre ou dor intensa.",
+        "Se houver flutuação (coleção de pus palpável), a drenagem é o tratamento principal — antibiótico isolado pode não ser suficiente; encaminhar para drenagem."
       ]
     },
     "Escabiose": {
@@ -1559,7 +1560,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, pelas próximas 02 noites, se coceira",
+          "posologia": "Tomar 01 comprimido, antes de dormir, pelas próximas 02 noites, se coceira Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers); considerar Loratadina como alternativa menos sedativa.",
           "via": "Oral",
           "fator": null
         }
@@ -1614,7 +1615,7 @@ const DATA = {
         },
         {
           "nome": "Dextrometorfano 15mg/5mL (Xarope)",
-          "qtde": "01 Frasco",
+          "qtde": "02 Frascos",
           "posologia": "Tomar 10mL, de 08/08 horas, se tosse seca importante que atrapalhe o sono ou as atividades diárias, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
@@ -1668,13 +1669,6 @@ const DATA = {
           "posologia": "Aplicar 01 vez ao dia, preferencialmente à noite, para lubrificação prolongada",
           "via": "Oftálmico",
           "fator": null
-        },
-        {
-          "nome": "Olopatadina 1 mg/mL",
-          "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 vez no olho acometido, de 08/08 horas, por 05 dias.",
-          "via": "Oftálmico",
-          "fator": null
         }
       ],
       "orientacoes": [
@@ -1692,7 +1686,8 @@ const DATA = {
         "Evitar aplicar pressão sobre o pé afetado",
         "Higienizar o pé diariamente com água morna e sabão neutro",
         "Manter pele seca e protegida",
-        "Buscar imediatamente acompanhamento longitudinal em Unidade Básica de Saúde"
+        "Buscar imediatamente acompanhamento longitudinal em Unidade Básica de Saúde",
+        "Sinais de infecção grave (emergência, risco de amputação): febre, secreção purulenta, odor fétido, exposição de osso ou tendão, vermelhidão que se espalha rapidamente — nesses casos, não é só \"acompanhamento\", é emergência."
       ]
     },
     "Prurido Inespecífico": {
@@ -1707,7 +1702,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, se coceira intensa que interfere no sono.",
+          "posologia": "Tomar 01 comprimido, se coceira intensa que interfere no sono. Em idosos, usar com cautela — anticolinérgico/sedativo (critérios de Beers); considerar Loratadina como alternativa menos sedativa.",
           "via": "Oral",
           "fator": null
         },
@@ -1729,7 +1724,7 @@ const DATA = {
       "meds": [
         {
           "nome": "Fluconazol 150 mg",
-          "qtde": "16 Comprimidos",
+          "qtde": "22 Comprimidos",
           "posologia": "Tomar 02 comprimidos (300mg) no primeiro dia e, a partir do segundo dia, 01 comprimido (150mg) por dia, por 14 a 21 dias — manter por pelo menos 14 dias após o desaparecimento dos sintomas. Esofagite por cândida costuma sinalizar alguma imunossupressão de base (HIV, diabetes descompensado, uso de corticoide/imunossupressor) — vale investigar a causa.",
           "via": "Oral",
           "fator": null
@@ -1737,7 +1732,7 @@ const DATA = {
         {
           "nome": "Omeprazol 20mg",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, pela manhã em jejum, por 30 dias.",
+          "posologia": "Tomar 01 comprimido, pela manhã em jejum, por 30 dias. Incluir apenas se houver sintomas concomitantes de DRGE/pirose — supressão ácida crônica pode favorecer o próprio crescimento fúngico e não é indicação padrão isolada para esofagite por Candida.",
           "via": "Oral",
           "fator": null
         }
@@ -1775,14 +1770,15 @@ const DATA = {
       "orientacoes": [
         "Evitar estresse, manter boa higiene do sono e postura.",
         "Utilizar compressas mornas na região cervical/têmporas",
-        "Retornar se sintomas de alerta (os mesmos listados para Enxaqueca)"
+        "Evite usar analgésicos por mais de 10 dias no mês — uso excessivo pode causar cefaleia por abuso de medicação.",
+        "Retornar imediatamente se: pior dor de cabeça da vida; mudança de consciência; fraqueza súbita; alteração de fala; perda de visão; convulsão; febre alta inexplicável; dor que piora ao tossir, fazer esforço ou deitar."
       ]
     },
     "Crise Hipertensiva": {
       "meds": [
         {
           "nome": "Captopril 25mg",
-          "qtde": "05 Comprimidos",
+          "qtde": "02 Comprimidos",
           "posologia": "Tomar 01 comprimido. Repetir após 30 minutos se pressão arterial ainda elevada (acima de 160x100 mmHg).",
           "via": "Oral",
           "fator": null
@@ -1800,7 +1796,8 @@ const DATA = {
         "Tomar o Captopril conforme prescrito e medir a pressão novamente após 30 minutos. Se a pressão continuar acima de 160x100 mmHg mesmo após a segunda dose, procurar atendimento de emergência — não repetir uma terceira dose por conta própria.",
         "Evitar esforços físicos intensos e situações de estresse até a reavaliação.",
         "Agendar consulta em até poucos dias em Unidade de Saúde para ajuste da medicação anti-hipertensiva de uso contínuo.",
-        "Procurar atendimento de EMERGÊNCIA a qualquer momento se surgir: falta de ar, dor no peito, alteração da visão, fraqueza ou formigamento em um lado do corpo, dificuldade para falar, ou dor de cabeça muito intensa e súbita."
+        "Procurar atendimento de EMERGÊNCIA a qualquer momento se surgir: falta de ar, dor no peito, alteração da visão, fraqueza ou formigamento em um lado do corpo, dificuldade para falar, ou dor de cabeça muito intensa e súbita.",
+        "Os comprimidos fornecidos são só para este episódio — não devem ser guardados como \"estoque\" para crises futuras; crises repetidas indicam necessidade de ajustar a medicação anti-hipertensiva de uso contínuo, não de repetir Captopril por conta própria."
       ]
     },
     "Hipocalcemia": {
@@ -1814,28 +1811,30 @@ const DATA = {
         },
         {
           "nome": "Vitamina D 10.000 UI",
-          "qtde": "04 Cápsulas",
-          "posologia": "Tomar 01 cápsula, 01 vez por semana, por 04 semanas.",
+          "qtde": "20 Cápsulas",
+          "posologia": "Tomar 05 cápsulas (50.000 UI), 01 vez por semana, por 04 semanas — dose de reposição para corrigir deficiência importante (a dose anterior era de manutenção, insuficiente para repor deficiência sintomática). Reavaliar dose de manutenção contínua após controle laboratorial.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
         "Manter dieta rica em laticínios.",
-        "Realizar acompanhamento laboratorial (Cálcio iônico) em 07 dias."
+        "Realizar acompanhamento laboratorial (Cálcio iônico) em 07 dias.",
+        "Considerar checar magnésio sérico — hipomagnesemia é causa comum de hipocalcemia que não responde à reposição de cálcio isolada.",
+        "Procure atendimento de urgência IMEDIATAMENTE se surgir formigamento ao redor da boca, cãibras ou espasmos musculares importantes (tetania), convulsão, ou palpitações — sinais de hipocalcemia grave."
       ]
     },
     "Dismenorreia Secundária": {
       "meds": [
         {
           "nome": "Ibuprofeno 600 mg",
-          "qtde": "10 Comprimidos",
+          "qtde": "15 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, iniciando 01 dia antes do ciclo, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
-          "nome": "Buscopam composto",
+          "nome": "Buscopan composto",
           "qtde": "01 Caixa",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor abdominal intensa.",
           "via": "Oral",
@@ -1880,7 +1879,8 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter dieta leve, evitando laticínios e alimentos gordurosos.",
-        "Procurar atendimento médico se febre, sangramento retal ou dor intensa e progressiva."
+        "Procurar atendimento médico se febre, sangramento retal ou dor intensa e progressiva.",
+        "Manter boa hidratação oral — diarreia predispõe a desidratação, especialmente em idosos."
       ]
     },
     "Alopecia Areata": {
@@ -1910,7 +1910,7 @@ const DATA = {
         {
           "nome": "Ciclopentolato 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota no olho acometido, 01 vez ao dia, ao deitar, por 05 dias.",
+          "posologia": "Aplicar 01 gota no olho acometido, 02 a 03 vezes ao dia (ajustar conforme gravidade/dor), por 05 dias — esquema definitivo deve ser ajustado pelo oftalmologista no encaminhamento.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -1923,15 +1923,19 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Encaminhamento **IMEDIATO** para avaliação oftalmológica especializada (acompanhamento de PIO)."
+        "Encaminhamento **IMEDIATO** para avaliação oftalmológica especializada (acompanhamento de PIO).",
+        "Usar óculos escuros — a fotofobia costuma ser importante.",
+        "Não usar lentes de contato durante o tratamento.",
+        "Não interromper o colírio de corticoide abruptamente por conta própria — o desmame deve ser orientado pelo oftalmologista.",
+        "Uso prolongado do colírio de corticoide pode aumentar a pressão intraocular — monitorização é necessária."
       ]
     },
     "Dedo em Gatilho": {
       "meds": [
         {
           "nome": "Ibuprofeno 600 mg",
-          "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
           "via": "Oral",
           "fator": null
         },
@@ -1953,7 +1957,7 @@ const DATA = {
         {
           "nome": "Cetoprofeno 100mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido de 12/12 horas, por 05 dias.",
+          "posologia": "Tomar 01 comprimido de 12/12 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular.",
           "via": "Oral",
           "fator": null
         },
@@ -1973,7 +1977,8 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Evitar apoiar o cotovelo em superfícies rígidas."
+        "Evitar apoiar o cotovelo em superfícies rígidas.",
+        "Procurar atendimento imediato se houver vermelhidão intensa, calor local, febre ou saída de secreção — pode indicar bursite infectada, que exige antibiótico e possível drenagem."
       ]
     },
     "Sinusite Odontogênica": {
@@ -2089,15 +2094,15 @@ const DATA = {
       "meds": [
         {
           "nome": "Aciclovir 400mg",
-          "qtde": "35 Comprimidos",
-          "posologia": "Tomar 01 comprimido, 05 vezes ao dia, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias — esquema padrão para herpes labial em imunocompetente (dose menor que a usada em zóster).",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Aciclovir 5% - Pomada",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar fina camada, de 04/04 horas, sobre as lesões.",
+          "posologia": "Aplicar fina camada, de 04/04 horas, sobre as lesões. Uso opcional/alternativo ao comprimido oral — associar os dois não tem benefício adicional bem estabelecido.",
           "via": "Tópico",
           "fator": null
         },
@@ -2117,29 +2122,38 @@ const DATA = {
       "meds": [
         {
           "nome": "Prednisona 20mg",
-          "qtde": "15 Comprimidos",
-          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias. Depois 01 comprimido por 05 dias. Depois meio comprimido por 05 dias.",
+          "qtde": "30 Comprimidos",
+          "posologia": "Tomar 03 comprimidos (60mg), em dose única pela manhã, por 10 dias. Iniciar o quanto antes, idealmente em até 72 horas do início dos sintomas (maior benefício).",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Aciclovir 400mg",
-          "qtde": "35 Comprimidos",
-          "posologia": "Tomar 01 comprimido, 05 vezes ao dia, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Reservar para suspeita de Síndrome de Ramsay Hunt (vesículas/otalgia associadas) — uso rotineiro em Paralisia de Bell idiopática típica tem benefício incerto pela evidência atual. Se indicado: 01 comprimido, 03 vezes ao dia, por 07 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, de 04/04 horas, e Pomada Oftálmica à noite (se lagoftalmo/olho seco).",
+          "posologia": "Aplicar 01 gota, de 04/04 horas, para proteção da córnea (olho pode não fechar completamente).",
           "via": "Tópico",
+          "fator": null
+        },
+        {
+          "nome": "Pomada Lubrificante Oftálmica",
+          "qtde": "01 Bisnaga",
+          "posologia": "Aplicar à noite, ao deitar, se lagoftalmo/olho seco (não fechar bem o olho durante o sono).",
+          "via": "Oftálmico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Proteger o olho (óculos escuros, óculos de natação à noite).",
-        "Iniciar fisioterapia facial precoce."
+        "Atenção: se houver fraqueza também em braço/perna, dificuldade de fala, ou a testa NÃO for afetada (só a parte inferior do rosto), suspeitar de AVC — encaminhar para emergência com urgência, não é Paralisia de Bell típica.",
+        "Proteger o olho (óculos escuros durante o dia, tampão ou óculos de natação à noite) — risco de lesão de córnea se o olho não fechar bem.",
+        "Iniciar fisioterapia facial precoce.",
+        "A maioria recupera em semanas a poucos meses; buscar reavaliação se não houver início de melhora em 3 semanas."
       ]
     },
     "Transtorno de Pânico": {
@@ -2147,14 +2161,14 @@ const DATA = {
         {
           "nome": "Clonazepam 0,5mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, sublingual, somente se crise de ansiedade intensa e isolada.",
-          "via": "Oral",
+          "posologia": "Tomar 01 comprimido, sublingual, somente se crise de ansiedade intensa e isolada. Em idosos, usar com cautela pelo risco de sedação, queda e confusão (critérios de Beers) — preferir menor dose e uso pontual, não contínuo.",
+          "via": "Sublingual",
           "fator": null
         },
         {
           "nome": "Fluoxetina 20mg",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, pela manhã, por 30 dias.",
+          "posologia": "Tomar 01 comprimido, pela manhã, por 30 dias. Em idosos, considerar Sertralina ou Escitalopram como alternativa — Fluoxetina tem meia-vida longa e maior potencial de interação medicamentosa.",
           "via": "Oral",
           "fator": null
         }
@@ -2198,7 +2212,11 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter dieta pastosa ou líquida se dor à mastigação.",
-        "Retornar se: Visão dupla, dor intensa, sangramento nasal/oral persistente, ou dormência de face."
+        "Encaminhar para avaliação de imagem (RX/TC de face) e cirurgia buco-maxilo-facial se suspeita de fratura, deformidade, má oclusão dentária ou os sinais de alarme abaixo.",
+        "Em idosos, investigar a causa da queda/trauma (risco de queda, revisão de medicações) — trauma de face costuma ser secundário a uma queda.",
+        "Se paciente em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), encaminhar para avaliação de imagem (TC de crânio) mesmo em trauma leve, pelo risco de hematoma intracraniano.",
+        "Se houver ferimento associado, avaliar/atualizar profilaxia antitetânica.",
+        "Retornar se: visão dupla, dor intensa, sangramento nasal/oral persistente, ou dormência de face."
       ]
     },
     "Amigdalite Crônica Agudizada": {
@@ -2281,30 +2299,31 @@ const DATA = {
         },
         {
           "nome": "Ibuprofeno 600 mg",
-          "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Amoxicilina 500mg",
           "qtde": "21 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 07 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 07 dias. Considerar reservar para extrações complicadas, fatores de risco de infecção ou risco de endocardite — não é indicação universal para toda extração simples.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
         "Aplicar gelo na região da bochecha (face) nas primeiras 24 horas.",
-        "Evitar bochechos nas primeiras 24 horas."
+        "Evitar bochechos nas primeiras 24 horas.",
+        "Evitar fumar, usar canudo ou cuspir com força nas primeiras 48-72h — risco de alveolite seca."
       ]
     },
     "Disfunção Temporomandibular": {
       "meds": [
         {
           "nome": "Ibuprofeno 600 mg",
-          "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
           "via": "Oral",
           "fator": null
         },
@@ -2341,21 +2360,22 @@ const DATA = {
         {
           "nome": "Ciclopentolato 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, 01 vez ao dia, ao deitar (se dor intensa).",
+          "posologia": "Aplicar 01 gota, 01 vez ao dia, ao deitar (se dor intensa). Pode precipitar glaucoma de ângulo fechado, mais comum em idosos — suspender e procurar atendimento se dor ocular intensa, halos visuais ou embaçamento súbito após o uso.",
           "via": "Oftálmico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Repouso ocular, evitar luz intensa."
+        "Repouso ocular, evitar luz intensa.",
+        "Procurar avaliação oftalmológica se não houver melhora em 24-48h, ou se surgir secreção purulenta/piora da dor e vermelhidão."
       ]
     },
     "Tireoidite Subaguda": {
       "meds": [
         {
           "nome": "Prednisona 20mg",
-          "qtde": "15 Comprimidos",
-          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias. Depois 01 comprimido por 05 dias. Depois meio comprimido por 05 dias.",
+          "qtde": "35 Comprimidos",
+          "posologia": "Tomar 02 comprimidos (40mg), pela manhã, por 07 dias. Depois 01 comprimido e meio (30mg) por 07 dias. Depois 01 comprimido (20mg) por 07 dias. Depois meio comprimido (10mg) por 07 dias — desmame total de 4 a 6 semanas (mais lento que em outras indicações, para evitar rebote da dor). Considerar AINE isolado como primeira linha em dor leve a moderada, reservando o corticoide para dor moderada-severa refratária.",
           "via": "Oral",
           "fator": null
         },
@@ -2369,15 +2389,16 @@ const DATA = {
       ],
       "orientacoes": [
         "Agendar controle laboratorial (TSH, T4L) e avaliação com Endocrinologista.",
-        "Evitar exercícios extenuantes."
+        "Evitar exercícios extenuantes.",
+        "A doença costuma evoluir em fases: hipertireoidismo transitório (pode causar palpitação/tremor, às vezes precisando de betabloqueador) seguido de possível hipotireoidismo temporário (pode precisar de reposição hormonal por um tempo) até a recuperação — por isso o acompanhamento com TSH/T4L é importante."
       ]
     },
     "Síndrome do Túnel do Carpo": {
       "meds": [
         {
           "nome": "Ibuprofeno 600 mg",
-          "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Em idosos, usar pelo menor tempo possível — risco renal, gástrico e cardiovascular, especialmente se em uso de IECA/BRA, diurético ou anticoagulante.",
           "via": "Oral",
           "fator": null
         },
@@ -2420,7 +2441,8 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter higiene local rigorosa.",
-        "Retornar se dor intensa, febre ou aumento do volume."
+        "Retornar se dor intensa, febre ou aumento do volume.",
+        "Se houver flutuação (coleção de pus), a drenagem é o tratamento principal — antibiótico isolado pode não ser suficiente."
       ]
     },
     "Exposição a Agente Químico (Pele/Olho)": {
@@ -3345,8 +3367,8 @@ const DATA = {
       "nome": "Prednisona",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "01 Caixa",
-      "posologia": "Tomar 02 comprimidos, pela manhã, durante 05 dias.",
+      "qtde": "10 Comprimidos",
+      "posologia": "Tomar conforme esquema prescrito (dose e duração variam conforme a indicação clínica — curso curto ou desmame gradual).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3543,8 +3565,8 @@ const DATA = {
       "nome": "Ácido Acetilsalicílico",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, após uma refeição, de uso contínuo (prevenção cardiovascular).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3552,8 +3574,8 @@ const DATA = {
       "nome": "Ácido Fólico (vitamina B9)",
       "concentracao": "0.2mg",
       "forma": "",
-      "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3561,8 +3583,8 @@ const DATA = {
       "nome": "Ácido Fólico (vitamina B9)",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia (ou 01 vez por semana, em dia diferente, se em uso concomitante de Metotrexato), conforme indicação.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3570,8 +3592,8 @@ const DATA = {
       "nome": "Agulha Para Caneta Aplicadora De Insulina Nph/Regular/Ação Rápida/Ação Prolongada",
       "concentracao": "",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "100 Unidades",
+      "posologia": "Trocar a agulha a cada aplicação de insulina; não reutilizar.",
       "tempo": "",
       "via": "Externo"
     },
@@ -3615,8 +3637,8 @@ const DATA = {
       "nome": "Alopurinol",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Não iniciar durante crise aguda de gota; se já em uso, manter a dose habitual durante a crise.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3624,8 +3646,8 @@ const DATA = {
       "nome": "Alopurinol",
       "concentracao": "300mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção habitual). Ajustar conforme função renal e ácido úrico sérico; não iniciar durante crise aguda de gota.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3633,8 +3655,8 @@ const DATA = {
       "nome": "Amiodarona",
       "concentracao": "200mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção). Monitorizar função tireoidiana e hepática periodicamente; risco de toxicidade pulmonar em uso prolongado.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3642,8 +3664,8 @@ const DATA = {
       "nome": "Amitriptilina Cloridrato",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, considerar dose menor (12,5mg) pelo risco de sedação, hipotensão postural e efeitos anticolinérgicos (critérios de Beers).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3660,8 +3682,8 @@ const DATA = {
       "nome": "Anlodipino Besilato",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3669,8 +3691,8 @@ const DATA = {
       "nome": "Anlodipino Besilato",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3678,8 +3700,8 @@ const DATA = {
       "nome": "Atenolol",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3714,8 +3736,8 @@ const DATA = {
       "nome": "Biperideno Cloridrato",
       "concentracao": "2mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, para controle de sintomas extrapiramidais (induzidos por antipsicótico). Em idosos, usar com cautela — efeito anticolinérgico, risco de confusão e retenção urinária.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3723,8 +3745,8 @@ const DATA = {
       "nome": "Caneta Reutilizável Para Aplicação De Insulina C/ Sist. De Aplicação -",
       "concentracao": "3ml",
       "forma": "",
-      "qtde": "____",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "01 Unidade",
+      "posologia": "Dispositivo para aplicação de insulina com refil; trocar a agulha a cada uso.",
       "tempo": "",
       "via": "Outro"
     },
@@ -3732,8 +3754,8 @@ const DATA = {
       "nome": "Captopril",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "90 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3742,7 +3764,7 @@ const DATA = {
       "concentracao": "20mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo — ajustar conforme peso/resposta/nível sérico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3750,8 +3772,8 @@ const DATA = {
       "nome": "Carbamazepina",
       "concentracao": "200mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose de manutenção habitual — ajustar conforme resposta/nível sérico). Monitorizar hemograma e função hepática periodicamente.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3759,8 +3781,8 @@ const DATA = {
       "nome": "Carvedilol",
       "concentracao": "12.5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3768,8 +3790,8 @@ const DATA = {
       "nome": "Carvedilol",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose-alvo, conforme tolerância).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3777,8 +3799,8 @@ const DATA = {
       "nome": "Carvedilol",
       "concentracao": "3.125mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas — dose inicial de titulação em insuficiência cardíaca; aumentar gradualmente conforme tolerância.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3786,8 +3808,8 @@ const DATA = {
       "nome": "Carvedilol",
       "concentracao": "6.25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3822,8 +3844,8 @@ const DATA = {
       "nome": "Clonazepam",
       "concentracao": "2mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar uso contínuo prolongado — critérios de Beers (risco de sedação, confusão, queda e dependência); reavaliar periodicamente a necessidade de manter.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3840,8 +3862,8 @@ const DATA = {
       "nome": "Clorpromazina Cloridrato",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção). Em idosos, usar com cautela pelo risco de sedação e hipotensão postural.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3849,8 +3871,8 @@ const DATA = {
       "nome": "Clorpromazina Cloridrato",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz — risco de sedação, hipotensão postural e efeitos extrapiramidais.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3894,8 +3916,8 @@ const DATA = {
       "nome": "Diazepam",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar — critérios de Beers (risco de sedação, confusão e queda); preferir dose menor ou benzodiazepínico de meia-vida mais curta.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3903,8 +3925,8 @@ const DATA = {
       "nome": "Diazepam",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, pelo menor tempo possível. Em idosos, evitar uso contínuo — critérios de Beers (risco de sedação, confusão e queda).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3912,8 +3934,8 @@ const DATA = {
       "nome": "Digoxina",
       "concentracao": "0.25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Em idosos, preferir dose menor (avaliar 1/2 comprimido) e monitorizar função renal — risco de intoxicação digitálica.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3939,8 +3961,8 @@ const DATA = {
       "nome": "Enalapril Maleato",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3948,8 +3970,8 @@ const DATA = {
       "nome": "Enalapril Maleato",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose-alvo, conforme tolerância e função renal).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3957,8 +3979,8 @@ const DATA = {
       "nome": "Enalapril Maleato",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3966,8 +3988,8 @@ const DATA = {
       "nome": "Fenitoina Sódica",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "90 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo — ajustar conforme nível sérico. Monitorizar sinais de intoxicação (nistagmo, ataxia, sonolência).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3975,8 +3997,8 @@ const DATA = {
       "nome": "Fenobarbital Sodico",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo — ajustar conforme resposta/nível sérico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3985,7 +4007,7 @@ const DATA = {
       "concentracao": "40mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar conforme dose individualizada, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3993,8 +4015,8 @@ const DATA = {
       "nome": "Fluoxetina Cloridrato",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4002,8 +4024,8 @@ const DATA = {
       "nome": "Furosemida",
       "concentracao": "40mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos (potássio, sódio) e função renal periodicamente.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4011,8 +4033,8 @@ const DATA = {
       "nome": "Glibenclamida",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, antes do café da manhã, de uso contínuo. Em idosos, usar com cautela pelo risco de hipoglicemia prolongada — considerar Gliclazida como alternativa mais segura.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4020,8 +4042,8 @@ const DATA = {
       "nome": "Gliclazida",
       "concentracao": "30mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4029,8 +4051,8 @@ const DATA = {
       "nome": "Glicosímetro (monitor De Glicose)",
       "concentracao": "",
       "forma": "",
-      "qtde": "____",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "01 Unidade",
+      "posologia": "Aparelho para monitorização domiciliar da glicemia capilar.",
       "tempo": "",
       "via": "Outro"
     },
@@ -4038,8 +4060,8 @@ const DATA = {
       "nome": "Haloperidol",
       "concentracao": "1mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz pelo menor tempo possível — risco de efeitos extrapiramidais, sedação e maior mortalidade em demência (alerta de bula).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4048,7 +4070,7 @@ const DATA = {
       "concentracao": "2mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar conforme dose individualizada em gotas, conforme prescrição. Em idosos, usar a menor dose eficaz pelo menor tempo possível.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4056,8 +4078,8 @@ const DATA = {
       "nome": "Haloperidol",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Em idosos, usar a menor dose eficaz pelo menor tempo possível — risco de efeitos extrapiramidais e maior mortalidade em demência (alerta de bula).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4083,8 +4105,8 @@ const DATA = {
       "nome": "Hidroclorotiazida",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos periodicamente, especialmente em idosos.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4101,8 +4123,8 @@ const DATA = {
       "nome": "Imipramina Cloridrato",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar com cautela pelo risco de sedação, hipotensão postural e efeitos anticolinérgicos (critérios de Beers) — considerar alternativa com menor efeito anticolinérgico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4128,8 +4150,8 @@ const DATA = {
       "nome": "Isossorbida Mononitrato",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas (respeitando intervalo livre de nitrato durante a noite, para evitar tolerância), de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4137,8 +4159,8 @@ const DATA = {
       "nome": "Isossorbida Mononitrato",
       "concentracao": "40mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4146,8 +4168,8 @@ const DATA = {
       "nome": "Lanceta Descartável Estéril Para Lancetador",
       "concentracao": "",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "100 Unidades",
+      "posologia": "Uma lanceta por punção; não reutilizar.",
       "tempo": "",
       "via": "Externo"
     },
@@ -4155,8 +4177,8 @@ const DATA = {
       "nome": "Lancetador",
       "concentracao": "",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "01 Unidade",
+      "posologia": "Dispositivo para punção digital, uso domiciliar para monitorização glicêmica.",
       "tempo": "",
       "via": "Externo"
     },
@@ -4164,8 +4186,8 @@ const DATA = {
       "nome": "Levodopa + Carbidopa",
       "concentracao": "250+25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "90 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas (preferir estômago vazio — 30-60 min antes ou 1h depois das refeições, quando possível), de uso contínuo — ajustar horários e dose conforme resposta motora.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4182,8 +4204,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "100mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4191,8 +4213,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "125mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4200,8 +4222,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "150mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4209,8 +4231,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "25mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4218,8 +4240,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "50mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4227,8 +4249,8 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "75mcg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4236,8 +4258,8 @@ const DATA = {
       "nome": "Lítio Carbonato",
       "concentracao": "300mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo — ajustar conforme litemia. Monitorizar função renal e tireoidiana periodicamente; risco de toxicidade aumentado por desidratação, diuréticos e AINEs.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4263,8 +4285,8 @@ const DATA = {
       "nome": "Metildopa",
       "concentracao": "250mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4272,8 +4294,8 @@ const DATA = {
       "nome": "Metildopa",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4326,8 +4348,8 @@ const DATA = {
       "nome": "Nifedipino",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (preferir apresentação de liberação prolongada/retard quando disponível).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4335,8 +4357,8 @@ const DATA = {
       "nome": "Nifedipino",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido (retard), de 12/12 horas ou 01 vez ao dia conforme apresentação, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4389,8 +4411,8 @@ const DATA = {
       "nome": "Nortriptilina Cloridrato",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4398,8 +4420,8 @@ const DATA = {
       "nome": "Nortriptilina Cloridrato",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, considerar dose menor pelo risco de sedação e hipotensão postural.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4407,8 +4429,8 @@ const DATA = {
       "nome": "Nortriptilina Cloridrato",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4443,8 +4465,8 @@ const DATA = {
       "nome": "Prednisona",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "10 Comprimidos",
+      "posologia": "Tomar conforme esquema prescrito (dose e duração variam conforme a indicação clínica — curso curto ou desmame gradual).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4452,8 +4474,8 @@ const DATA = {
       "nome": "Prednisona",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo (dose de manutenção em doença crônica, ex.: polimialgia reumática) — não suspender abruptamente; desmame gradual conforme orientação médica.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4470,8 +4492,8 @@ const DATA = {
       "nome": "Propranolol Cloridrato",
       "concentracao": "40mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4489,7 +4511,7 @@ const DATA = {
       "concentracao": "100mcg",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Fazer ____ jato(s) por via inalatória, de ____ em ____ horas, se necessário.",
+      "posologia": "Inalar 02 jatos, se falta de ar ou chiado, até de 04/04 horas se necessário. Uso frequente (mais de 2-3x/semana) indica necessidade de reavaliar o tratamento de manutenção.",
       "tempo": "",
       "via": "Inalatório"
     },
@@ -4497,8 +4519,8 @@ const DATA = {
       "nome": "Seringa Para Aplicação De Insulina -",
       "concentracao": "0.3ml",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "100 Unidades",
+      "posologia": "Uma seringa por aplicação; não reutilizar.",
       "tempo": "",
       "via": "Externo"
     },
@@ -4506,8 +4528,8 @@ const DATA = {
       "nome": "Seringa Para Aplicação De Insulina -",
       "concentracao": "1.0ml",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "100 Unidades",
+      "posologia": "Uma seringa por aplicação; não reutilizar.",
       "tempo": "",
       "via": "Externo"
     },
@@ -4533,8 +4555,8 @@ const DATA = {
       "nome": "Sulfato Ferroso",
       "concentracao": "122.97mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, em jejum ou longe das refeições, 01 vez ao dia, por 03 a 06 meses (repor estoques) — pode causar escurecimento das fezes e desconforto gástrico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4543,7 +4565,7 @@ const DATA = {
       "concentracao": "125mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar conforme dose individualizada, 01 vez ao dia, por 03 a 06 meses.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4552,7 +4574,7 @@ const DATA = {
       "concentracao": "5mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Aplicar 01 gota no olho afetado, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Aplicar 01 gota no(s) olho(s) acometido(s), de 12/12 horas, de uso contínuo (glaucoma). Em idosos com doença pulmonar (asma/DPOC) ou cardíaca (bradicardia/bloqueio AV), usar com cautela — absorção sistêmica pode causar broncoespasmo e bradicardia.",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -4560,8 +4582,8 @@ const DATA = {
       "nome": "Tiras Reagentes Para Medição De Glicemia",
       "concentracao": "",
       "forma": "",
-      "qtde": "____ Unidades",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "50 Unidades",
+      "posologia": "Uma tira por medição de glicemia capilar, conforme frequência orientada.",
       "tempo": "",
       "via": "Externo"
     },
@@ -4569,8 +4591,8 @@ const DATA = {
       "nome": "Valproato De Sódio (ácido Valpróico)",
       "concentracao": "250mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo — ajustar conforme resposta/nível sérico. Monitorizar função hepática e hemograma periodicamente.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4579,7 +4601,7 @@ const DATA = {
       "concentracao": "50mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4587,8 +4609,8 @@ const DATA = {
       "nome": "Varfarina Sódica",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar conforme dose individualizada (ajustada por RNI/INR), 01 vez ao dia, sempre no mesmo horário, de uso contínuo. Monitorizar RNI periodicamente; atenção a interações medicamentosas e alimentares (vitamina K).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4596,8 +4618,323 @@ const DATA = {
       "nome": "Verapamil Cloridrato",
       "concentracao": "80mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "90 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Losartana Potássica",
+      "concentracao": "50mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Losartana Potássica",
+      "concentracao": "100mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose-alvo).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Espironolactona",
+      "concentracao": "25mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Monitorizar potássio e função renal periodicamente — risco de hipercalemia, especialmente associado a IECA/BRA.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Clortalidona",
+      "concentracao": "25mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos periodicamente.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Metoprolol Succinato",
+      "concentracao": "25mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Metoprolol Succinato",
+      "concentracao": "50mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Sinvastatina",
+      "concentracao": "20mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Sinvastatina",
+      "concentracao": "40mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Atorvastatina",
+      "concentracao": "20mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia (qualquer horário), de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Atorvastatina",
+      "concentracao": "40mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Rosuvastatina",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Ezetimiba",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo — associado à estatina quando LDL não controlado com estatina isolada.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Metformina",
+      "concentracao": "500mg",
+      "forma": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo. Suspender temporariamente em vigência de desidratação, infecção grave ou antes de exame com contraste iodado (risco de acidose lática); ajustar/evitar se função renal muito reduzida.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Metformina",
+      "concentracao": "850mg",
+      "forma": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo. Mesmas cautelas de função renal e suspensão temporária em intercorrências agudas.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Dapagliflozina",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Orientar sinais de infecção genital/urinária (mais frequentes com esta classe) e suspender temporariamente em quadros agudos com risco de desidratação (risco de cetoacidose euglicêmica).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Sitagliptina",
+      "concentracao": "100mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Ajustar dose conforme função renal.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Sertralina",
+      "concentracao": "50mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo — costuma ser preferida em idosos por perfil de interação mais favorável.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Escitalopram",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Em idosos, atenção ao risco de hiponatremia e de prolongamento de QT em doses altas.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Mirtazapina",
+      "concentracao": "30mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo — pode ajudar em quadros com insônia/perda de apetite associados.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Venlafaxina XR",
+      "concentracao": "75mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar pressão arterial — pode elevar a PA em doses mais altas.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Gabapentina",
+      "concentracao": "300mg",
+      "forma": "",
+      "qtde": "90 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor). Ajustar dose conforme função renal; em idosos, risco de sedação e tontura.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Pregabalina",
+      "concentracao": "75mg",
+      "forma": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Ajustar dose conforme função renal; em idosos, risco de sedação, tontura e edema periférico.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Risperidona",
+      "concentracao": "1mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos com demência, usar a menor dose eficaz pelo menor tempo possível — alerta de bula para maior risco de AVC e mortalidade nessa população.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Quetiapina",
+      "concentracao": "25mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos, usar a menor dose eficaz — risco de sedação, hipotensão postural e queda.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Olanzapina",
+      "concentracao": "5mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Em idosos com demência, usar com extrema cautela — alerta de bula para maior risco de eventos cerebrovasculares e mortalidade.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Donepezila",
+      "concentracao": "5mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (doença de Alzheimer). Pode causar bradicardia, náusea e cãibras — reavaliar periodicamente.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Donepezila",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção, após titulação).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Memantina",
+      "concentracao": "10mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (demência moderada a grave).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Clopidogrel",
+      "concentracao": "75mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Rivaroxabana",
+      "concentracao": "20mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, junto a uma refeição, de uso contínuo. Ajustar dose conforme função renal; atenção a sinais de sangramento.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Alendronato de Sódio",
+      "concentracao": "70mg",
+      "forma": "",
+      "qtde": "04 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez por semana, em jejum, com um copo cheio de água, permanecendo sentado/em pé por pelo menos 30 minutos sem deitar e sem comer. Uso contínuo conforme reavaliação periódica (osteoporose).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Colecalciferol (Vitamina D3)",
+      "concentracao": "7.000 UI",
+      "forma": "",
+      "qtde": "04 Cápsulas",
+      "posologia": "Tomar 01 cápsula, 01 vez por semana, de uso contínuo (dose de manutenção).",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Carbonato de Cálcio + Colecalciferol",
+      "concentracao": "500mg/400UI",
+      "forma": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Tansulozina",
+      "concentracao": "0,4mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, após uma refeição, sempre no mesmo horário, de uso contínuo (hiperplasia prostática benigna). Risco de hipotensão postural, especialmente após a primeira dose — orientar a levantar-se devagar.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Finasterida",
+      "concentracao": "5mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (hiperplasia prostática benigna).",
       "tempo": "",
       "via": "Oral"
     }
