@@ -2489,6 +2489,78 @@ const DATA = {
         "Manter boa hidratação, dando preferência a líquidos gelados, em pequenos goles ao longo do dia.",
         "Procurar atendimento médico com urgência se: não conseguir manter líquidos por 12 a 24 horas, houver vômito com sangue, sinais de desidratação (boca seca, tontura, urina escura ou ausente), perda de peso importante ou dor abdominal intensa."
       ]
+    },
+    "Pneumonia (Adulto, sem fator de risco)": {
+      "meds": [
+        {
+          "nome": "Amoxicilina 500mg",
+          "qtde": "42 Comprimidos",
+          "posologia": "Tomar 02 comprimidos (1g), de 08/08 horas, por 07 dias.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
+          "nome": "Azitromicina 500mg",
+          "qtde": "05 Comprimidos",
+          "posologia": "Alternativa se suspeita de germe atípico (início insidioso, tosse seca arrastada, sem toxemia importante) — não usar junto com a Amoxicilina, escolher um dos dois esquemas. Tomar 01 comprimido, 01 vez ao dia, por 05 dias.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
+          "nome": "Dipirona 500mg",
+          "qtde": "01 Caixa",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
+          "via": "Oral",
+          "fator": null
+        }
+      ],
+      "orientacoes": [
+        "Complete todos os dias do antibiótico mesmo que os sintomas melhorem antes do fim do tratamento.",
+        "Mantenha repouso e boa hidratação.",
+        "Reavaliação em 48 a 72 horas é recomendada — se não houver melhora da febre ou do estado geral nesse prazo, retorne antes.",
+        "Se fumante, este é um bom momento para buscar apoio para parar de fumar.",
+        "Após a resolução do quadro, verifique com a Unidade de Saúde se a vacinação antipneumocócica e contra influenza está em dia.",
+        "Procure atendimento de urgência IMEDIATAMENTE se: falta de ar importante ou respiração muito acelerada, confusão mental, tontura forte ou desmaio, incapacidade de manter alimentação/hidratação, piora do estado geral apesar do tratamento, tosse com sangue, ou dor torácica intensa."
+      ]
+    },
+    "Pneumonia (Criança)": {
+      "meds": [
+        {
+          "nome": "Amoxicilina 50mg/mL",
+          "qtde": "01 Frasco",
+          "posologia": "Tomar DOSE mL, de 08/08 horas, por 07 a 10 dias.",
+          "via": "Oral",
+          "fator": 0.33
+        },
+        {
+          "nome": "Azitromicina 40mg/mL - 1º dia",
+          "qtde": "01 Frasco",
+          "posologia": "Alternativa se suspeita de germe atípico (criança escolar, início insidioso, tosse seca arrastada, sem toxemia) — não usar junto com a Amoxicilina. Tomar DOSE mL, 01 vez, no 1º dia.",
+          "via": "Oral",
+          "fator": 0.25
+        },
+        {
+          "nome": "Azitromicina 40mg/mL - 2º ao 5º dia",
+          "qtde": "01 Frasco",
+          "posologia": "Continuação do esquema acima. Tomar DOSE mL, 01 vez ao dia, do 2º ao 5º dia.",
+          "via": "Oral",
+          "fator": 0.125
+        },
+        {
+          "nome": "Dipirona 500 mg/mL",
+          "qtde": "01 Frasco",
+          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
+          "via": "Oral",
+          "fator": 0.6
+        }
+      ],
+      "orientacoes": [
+        "Complete todos os dias do antibiótico mesmo que a criança melhore antes do fim do tratamento.",
+        "Mantenha boa hidratação e ofereça alimentação conforme a criança tolerar.",
+        "Evite exposição à fumaça de cigarro.",
+        "Retorne para reavaliação se a febre persistir por mais de 48 a 72 horas após o início do antibiótico.",
+        "Procure atendimento de urgência IMEDIATAMENTE se surgir: respiração muito rápida ou com esforço (costelas \"afundando\" a cada respiração, batimento das asas do nariz), lábios ou unhas arroxeados, recusa de mamar ou beber líquidos, sonolência excessiva ou dificuldade para acordar, convulsão, ou piora importante do estado geral."
+      ]
     }
   },
   "ordemCondicoes": [
@@ -2573,7 +2645,9 @@ const DATA = {
     "Síndrome do Túnel do Carpo",
     "Pioderma (Abscesso Pequeno)",
     "Exposição a Agente Químico (Pele/Olho)",
-    "Hiperêmese gravídica"
+    "Hiperêmese gravídica",
+    "Pneumonia (Adulto, sem fator de risco)",
+    "Pneumonia (Criança)"
   ],
   "medicamentos": [
     {
