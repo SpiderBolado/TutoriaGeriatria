@@ -2500,9 +2500,16 @@ const DATA = {
           "fator": null
         },
         {
+          "nome": "Amoxicilina + Clavulanato 875/125mg",
+          "qtde": "14 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
           "nome": "Azitromicina 500mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Alternativa se suspeita de germe atípico (início insidioso, tosse seca arrastada, sem toxemia importante) — não usar junto com a Amoxicilina, escolher um dos dois esquemas. Tomar 01 comprimido, 01 vez ao dia, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 05 dias. Pode ser usada sozinha (se suspeita de germe atípico — início mais arrastado, tosse seca, sem toxemia importante) ou junto com um dos esquemas de Amoxicilina acima, conforme avaliação clínica.",
           "via": "Oral",
           "fator": null
         },
@@ -2512,15 +2519,41 @@ const DATA = {
           "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
+        },
+        {
+          "nome": "Paracetamol 500mg",
+          "qtde": "01 Caixa",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
+          "nome": "Ibuprofeno 600mg",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor ou febre que não melhore com Dipirona/Paracetamol, por no máximo 05 dias.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
+          "nome": "Metoclopramida 10mg",
+          "qtde": "01 Caixa",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
+          "via": "Oral",
+          "fator": null
+        },
+        {
+          "nome": "Ondansetrona 8mg",
+          "qtde": "01 Caixa",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos, por 05 dias.",
+          "via": "Oral",
+          "fator": null
         }
       ],
       "orientacoes": [
-        "Complete todos os dias do antibiótico mesmo que os sintomas melhorem antes do fim do tratamento.",
-        "Mantenha repouso e boa hidratação.",
-        "Reavaliação em 48 a 72 horas é recomendada — se não houver melhora da febre ou do estado geral nesse prazo, retorne antes.",
-        "Se fumante, este é um bom momento para buscar apoio para parar de fumar.",
-        "Após a resolução do quadro, verifique com a Unidade de Saúde se a vacinação antipneumocócica e contra influenza está em dia.",
-        "Procure atendimento de urgência IMEDIATAMENTE se: falta de ar importante ou respiração muito acelerada, confusão mental, tontura forte ou desmaio, incapacidade de manter alimentação/hidratação, piora do estado geral apesar do tratamento, tosse com sangue, ou dor torácica intensa."
+        "Fique de olho na respiração: se ficar difícil respirar, ou muito acelerada, procure ajuda na hora.",
+        "Lábios ou pontas dos dedos ficando arroxeados ou azulados é sinal de gravidade — procure ajuda imediatamente.",
+        "Confusão, muita sonolência ou desmaio também são sinais de gravidade — procure ajuda na hora.",
+        "Se a febre não passar mesmo tomando o remédio certo, ou se você perceber que está piorando de modo geral, volte para ser reavaliado antes do previsto."
       ]
     },
     "Pneumonia (Criança)": {
@@ -2552,14 +2585,41 @@ const DATA = {
           "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
           "via": "Oral",
           "fator": 0.6
+        },
+        {
+          "nome": "Paracetamol 200mg/mL",
+          "qtde": "01 Frasco",
+          "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre.",
+          "via": "Oral",
+          "fator": 1
+        },
+        {
+          "nome": "Ibuprofeno 200mg/mL",
+          "qtde": "01 Frasco",
+          "posologia": "Dar DOSE gotas, de 08/08 horas, se dor ou febre, por no máximo 05 dias.",
+          "via": "Oral",
+          "fator": 0.5
+        },
+        {
+          "nome": "Metoclopramida Gotas 4mg/mL",
+          "qtde": "01 Frasco",
+          "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos importantes.",
+          "via": "Oral",
+          "fator": 0.5
+        },
+        {
+          "nome": "Ondansetrona 4mg (Comprimido)",
+          "qtde": "06 Comprimidos",
+          "posologia": "Dose por peso: 8 a 15kg — 1/2 comprimido (2mg); 15 a 30kg — 01 comprimido (4mg); acima de 30kg — 02 comprimidos (8mg). Tomar a dose correspondente, se náuseas ou vômitos importantes, até de 08/08 horas.",
+          "via": "Oral",
+          "fator": null
         }
       ],
       "orientacoes": [
-        "Complete todos os dias do antibiótico mesmo que a criança melhore antes do fim do tratamento.",
-        "Mantenha boa hidratação e ofereça alimentação conforme a criança tolerar.",
-        "Evite exposição à fumaça de cigarro.",
-        "Retorne para reavaliação se a febre persistir por mais de 48 a 72 horas após o início do antibiótico.",
-        "Procure atendimento de urgência IMEDIATAMENTE se surgir: respiração muito rápida ou com esforço (costelas \"afundando\" a cada respiração, batimento das asas do nariz), lábios ou unhas arroxeados, recusa de mamar ou beber líquidos, sonolência excessiva ou dificuldade para acordar, convulsão, ou piora importante do estado geral."
+        "Fique de olho na respiração: se ficar muito rápida, ou aparecerem \"covinhas\" entre as costelas a cada respiração, procure ajuda na hora.",
+        "Lábios ou unhas ficando arroxeados ou azulados é sinal de gravidade — procure ajuda imediatamente.",
+        "Se a criança parar de querer mamar, comer ou beber água, procure ajuda na hora.",
+        "Se a criança ficar muito sonolenta, difícil de acordar, ou tiver uma crise (convulsão), procure ajuda imediatamente."
       ]
     }
   },
