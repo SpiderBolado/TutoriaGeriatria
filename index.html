@@ -150,6 +150,7 @@
       <button id="btnCopiar">Copiar texto</button>
       <button id="btnImprimir">Imprimir / PDF</button>
       <button id="btnDocx" class="primary">Baixar .docx</button>
+      <button id="btnEncaminhamento">Encaminhamento</button>
     </div>
     <div class="aviso-bar" id="avisoBar"></div>
     <div class="receita-paper" id="receitaPaper"></div>
@@ -204,6 +205,41 @@
   </div>
 </div>
 
+
+<!-- Modal de Encaminhamento -->
+<div class="ajuda-overlay" id="encaminhamentoOverlay">
+  <div class="ajuda-modal" style="max-width: 560px;">
+    <div class="ajuda-modal-head">
+      <h2>Encaminhamento</h2>
+      <button id="btnFecharEncaminhamento" class="btn-fechar-ajuda" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="ajuda-modal-body" style="padding: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="field">
+          <label for="encNomePaciente" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Paciente</label>
+          <input type="text" id="encNomePaciente" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
+        </div>
+        <div class="field">
+          <label for="encCondicao" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Diagnóstico / condição</label>
+          <select id="encCondicao" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px; height: 34px;"></select>
+        </div>
+        <div class="field" id="encCondicaoOutraField" style="display: none;">
+          <label for="encCondicaoOutra" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Descreva o diagnóstico</label>
+          <input type="text" id="encCondicaoOutra" placeholder="Ex: Pneumonia" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
+        </div>
+        <div class="field">
+          <label for="encTexto" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Texto do encaminhamento</label>
+          <textarea id="encTexto" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; min-height: 220px; resize: vertical; font-size: 13px; line-height: 1.55;"></textarea>
+          <div class="mini-note" style="margin-top: 6px;">Você pode editar este texto livremente antes de copiar ou imprimir.</div>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; border-top: 1px solid var(--line); padding-top: 12px;">
+          <button id="btnCopiarEncaminhamento" style="background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Copiar texto</button>
+          <button id="btnImprimirEncaminhamento" style="background: var(--teal); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Imprimir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="js/dados.js"></script>
 <script src="js/logos.js"></script>

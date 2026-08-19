@@ -743,6 +743,141 @@
     return html;
   }
 
+  // ---------- Encaminhamento ----------
+  function condicoesNaReceita(){
+    const nomes = Object.values(selected).map(it => it.origemCondicao).filter(Boolean);
+    return [...new Set(nomes)];
+  }
+
+  function medicamentosNaReceitaTexto(){
+    const nomes = Object.values(selected).map(it => it.nome).filter(Boolean);
+    if(!nomes.length) return '(nenhum medicamento selecionado na receita)';
+    return nomes.join(', ');
+  }
+
+  function condicaoEscolhidaEncaminhamento(){
+    const sel = el('encCondicao').value;
+    if(sel === '__outra__') return el('encCondicaoOutra').value.trim();
+    return sel;
+  }
+
+  function montarTextoEncaminhamento(){
+    const nomePaciente = el('encNomePaciente').value.trim() || '(nome do paciente)';
+    const condicao = condicaoEscolhidaEncaminhamento() || '(diagnóstico)';
+    const dataStr = new Date().toLocaleDateString('pt-BR');
+    const medicamentos = medicamentosNaReceitaTexto();
+    const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '(nome do médico)';
+    const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
+    const assinatura = [medicoNome, medicoCrm].filter(Boolean).join(' — ');
+
+    return `Encaminho ${nomePaciente} à atenção básica, pois esteve nesta unidade no dia ${dataStr} apresentando sinais e sintomas compatíveis com ${condicao}, tendo sido prescrito ${medicamentos}, e necessita de acompanhamento ao curso de sua doença e na convalescença, além de manejo de suas condições de base.
+
+Agradeço,
+
+
+_________________________________
+${assinatura}
+${dataStr}`;
+  }
+
+  function popularEncaminhamentoCondicoes(){
+    const select = el('encCondicao');
+    select.innerHTML = '';
+    const condicoes = condicoesNaReceita();
+    condicoes.forEach(nome => {
+      const opt = document.createElement('option');
+      opt.value = nome;
+      opt.textContent = nome;
+      select.appendChild(opt);
+    });
+    const optOutra = document.createElement('option');
+    optOutra.value = '__outra__';
+    optOutra.textContent = 'Outro (descrever)';
+    select.appendChild(optOutra);
+    if(!condicoes.length) select.value = '__outra__';
+    el('encCondicaoOutraField').style.display = select.value === '__outra__' ? '' : 'none';
+  }
+
+  function atualizarPreviaEncaminhamento(){
+    el('encTexto').value = montarTextoEncaminhamento();
+  }
+
+  function abrirEncaminhamento(){
+    el('encNomePaciente').value = el('nomePaciente').value.trim();
+    popularEncaminhamentoCondicoes();
+    atualizarPreviaEncaminhamento();
+    el('encaminhamentoOverlay').classList.add('show');
+  }
+
+  function imprimirEncaminhamento(){
+    const texto = el('encTexto').value;
+    const nomePaciente = el('encNomePaciente').value.trim();
+    const dataStr = new Date().toLocaleDateString('pt-BR');
+    const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '';
+    const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
+    const labelAssinatura = (medicoNome || medicoCrm) ? [medicoNome, medicoCrm].filter(Boolean).join(' — ') : 'Assinatura do médico';
+
+    const corpoHtml = `
+      <div class="encaminhamento-titulo">Encaminhamento</div>
+      <div class="encaminhamento-texto">${escapeHtml(texto)}</div>
+    `;
+
+    const printStyles = `
+      @page{ size: portrait; margin: 20mm 22mm; }
+      body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#16241F; padding:34px 38px; max-width:700px; margin:0 auto;}
+      .receita-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+      .receita-logos .logo-carmo{height:38px;width:auto;}
+      .receita-logos .logo-sus{height:30px;width:auto;}
+      .receita-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #16241F;padding-bottom:10px;margin-bottom:20px;}
+      .receita-head .paciente{font-size:17px;font-weight:600;}
+      .receita-head .paciente .lbl{display:block;font-size:10px;color:#4B5A55;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+      .receita-head .data{font-size:12px;color:#4B5A55;text-align:right;}
+      .encaminhamento-titulo{font-size:11.5px;font-weight:700;letter-spacing:.1em;color:#0A4F41;text-transform:uppercase;margin:0 0 14px 0;padding-bottom:4px;border-bottom:1px solid #E4EFEC;}
+      .encaminhamento-texto{font-size:13.5px;line-height:1.8;white-space:pre-wrap;}
+      @media print{ body{padding:0;} }
+    `;
+
+    const paperHtml = `
+      ${logosHtml()}
+      <div class="receita-head">
+        <div class="paciente"><span class="lbl">Paciente</span>${escapeHtml(nomePaciente || '—')}</div>
+        <div class="data">${dataStr}</div>
+      </div>
+      ${corpoHtml}
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if(!printWindow){
+      showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
+      return;
+    }
+    printWindow.document.write(
+      '<html><head><title>Encaminhamento</title><meta charset="UTF-8">' +
+      '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>'
+    );
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); }, 250);
+  }
+
+  async function copiarEncaminhamento(){
+    const texto = el('encTexto').value;
+    try{
+      await navigator.clipboard.writeText(texto);
+      showToast('Texto copiado');
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Texto copiado');
+    }
+  }
+
   function viaBoxHtml(nomePaciente, dataStr, corpoHtml, label, extraClass){
     const unidade = (el('unidadeSaude') && el('unidadeSaude').value.trim()) || 'Rua São Vicente, S/N — Bairro JK';
     const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '';
@@ -1785,6 +1920,28 @@
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
   el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
   el('btnDocx').addEventListener('click', async () => { await baixarDocx(); registrarHistorico('docx'); });
+
+  // Encaminhamento
+  el('btnEncaminhamento').addEventListener('click', abrirEncaminhamento);
+  const closeEncaminhamentoModal = () => el('encaminhamentoOverlay').classList.remove('show');
+  el('btnFecharEncaminhamento').addEventListener('click', closeEncaminhamentoModal);
+  el('encaminhamentoOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'encaminhamentoOverlay') closeEncaminhamentoModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && el('encaminhamentoOverlay').classList.contains('show')){
+      closeEncaminhamentoModal();
+    }
+  });
+  el('encNomePaciente').addEventListener('input', atualizarPreviaEncaminhamento);
+  el('encCondicao').addEventListener('change', () => {
+    el('encCondicaoOutraField').style.display = el('encCondicao').value === '__outra__' ? '' : 'none';
+    atualizarPreviaEncaminhamento();
+  });
+  el('encCondicaoOutra').addEventListener('input', atualizarPreviaEncaminhamento);
+  el('btnCopiarEncaminhamento').addEventListener('click', copiarEncaminhamento);
+  el('btnImprimirEncaminhamento').addEventListener('click', imprimirEncaminhamento);
+
   el('medicoNome').addEventListener('change', saveMedico);
   el('medicoCrm').addEventListener('change', saveMedico);
   el('unidadeSaude').addEventListener('input', renderReceita);

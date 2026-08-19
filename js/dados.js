@@ -101,10 +101,11 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Beba o Soro de Reidratação Oral e outros líquidos (água, água de coco, sucos naturais), em pequenas quantidades, mas com muita frequência. \nBeba após cada episódio de vômito ou diarreia.",
+        "Beba o Soro de Reidratação Oral e outros líquidos (água, água de coco, sucos naturais), em pequenas quantidades, mas com muita frequência. Beba após cada episódio de vômito ou diarreia.",
         "Mantenha alimentação habitual, mas evite alimentos gordurosos, condimentados ou com muito açúcar.",
-        "Retorne imediatamente se \n1. Tiver vômitos frequentes que te impeçam de beber líquidos\n2. Apresentar muita sede, com a boca seca ou com pouca urina\n3. Tiver fezes com sangue ou muco\n4. Sentir dor forte na barriga, que não passe com as medicações",
-        "A diarreia costuma durar até 07 dias. Se durar mais de 14 dias, retorne para ser reavaliado."
+        "Procure atendimento IMEDIATAMENTE se:\n1. Vômitos frequentes que impeçam de beber líquidos\n2. Muita sede, boca seca ou pouca urina\n3. Fezes com sangue ou muco\n4. Dor forte na barriga, que não passe com as medicações",
+        "A diarreia costuma durar até 07 dias. Se durar mais de 14 dias, retorne para ser reavaliado.",
+        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
       ]
     },
     "DRGE": {
@@ -1395,10 +1396,10 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Manter hidratação abundante e repouso relativo",
-        "Evitar exposição ao frio e mudanças bruscas de temperatura",
-        "Procurar avaliação médica se febre persistente por mais de 72 horas, dificuldade para respirar ou secreção nasal purulenta",
-        "Fique atento a: confusão mental súbita, quedas, urinar bem menos que o normal, ou piora de doença crônica de base (DPOC, insuficiência cardíaca) — podem ser sinais de gravidade mesmo sem falta de ar."
+        "Mantenha hidratação abundante e repouso.",
+        "Evite exposição ao frio e mudanças bruscas de temperatura.",
+        "Procure atendimento IMEDIATAMENTE se:\n1. Febre alta que não passa depois de 3 dias\n2. Dificuldade para respirar\n3. Catarro do nariz ficando amarelo/esverdeado e grosso\n4. Confusão mental repentina, quedas, urinar bem menos que o normal, ou piora de um problema de saúde que você já tem (do coração ou do pulmão, por exemplo) — mesmo sem sentir falta de ar",
+        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
       ]
     },
     "Queimadura": {
@@ -2550,10 +2551,8 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Fique de olho na respiração: se ficar difícil respirar, ou muito acelerada, procure ajuda na hora.",
-        "Lábios ou pontas dos dedos ficando arroxeados ou azulados é sinal de gravidade — procure ajuda imediatamente.",
-        "Confusão, muita sonolência ou desmaio também são sinais de gravidade — procure ajuda na hora.",
-        "Se a febre não passar mesmo tomando o remédio certo, ou se você perceber que está piorando de modo geral, volte para ser reavaliado antes do previsto."
+        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração difícil ou muito acelerada\n2. Lábios ou pontas dos dedos ficando arroxeados ou azulados\n3. Muita confusão, sonolência forte ou desmaio\n4. Febre alta que não passa mesmo com o remédio certo, ou você perceber que está piorando de modo geral",
+        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando, para ver como está evoluindo e cuidar de outras questões de saúde que você tenha."
       ]
     },
     "Pneumonia (Criança)": {
@@ -2616,10 +2615,8 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Fique de olho na respiração: se ficar muito rápida, ou aparecerem \"covinhas\" entre as costelas a cada respiração, procure ajuda na hora.",
-        "Lábios ou unhas ficando arroxeados ou azulados é sinal de gravidade — procure ajuda imediatamente.",
-        "Se a criança parar de querer mamar, comer ou beber água, procure ajuda na hora.",
-        "Se a criança ficar muito sonolenta, difícil de acordar, ou tiver uma crise (convulsão), procure ajuda imediatamente."
+        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração muito rápida, ou aparecerem \"covinhas\" entre as costelas a cada respiração\n2. Lábios ou unhas ficando arroxeados ou azulados\n3. A criança parar de querer mamar, comer ou beber água\n4. A criança ficar muito sonolenta, difícil de acordar, ou tiver uma crise (convulsão)",
+        "Leve a criança de volta na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando, para ver como está evoluindo."
       ]
     }
   },

@@ -355,6 +355,49 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- 13. Encaminhamento: preenchimento, texto gerado e impressao ----
+  {
+    const browser = await chromium.launch();
+    const { page } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Teste Encaminhamento');
+    await selectCondicao(page, 'Enxaqueca');
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(200);
+    const overlayAberto = await page.evaluate(() => document.getElementById('encaminhamentoOverlay').classList.contains('show'));
+    const dados = await page.evaluate(() => ({
+      nome: document.getElementById('encNomePaciente').value,
+      condicaoSel: document.getElementById('encCondicao').value,
+      texto: document.getElementById('encTexto').value,
+    }));
+    const textoOk = dados.texto.includes('Paciente Teste Encaminhamento')
+      && dados.texto.includes('Encaminho')
+      && dados.texto.includes('atenção básica')
+      && dados.texto.includes('Enxaqueca')
+      && !dados.texto.includes('undefined');
+    record('encaminhamento abre preenchido com paciente/condicao/texto', overlayAberto && dados.nome === 'Paciente Teste Encaminhamento' && dados.condicaoSel === 'Enxaqueca' && textoOk, JSON.stringify(dados));
+
+    const [popup] = await Promise.all([
+      page.waitForEvent('popup').catch(() => null),
+      page.click('#btnImprimirEncaminhamento'),
+    ]);
+    await page.waitForTimeout(500);
+    let popupOk = false;
+    if (popup) {
+      const conteudo = await popup.content().catch(() => '');
+      popupOk = conteudo.includes('Paciente Teste Encaminhamento') && conteudo.includes('Encaminho');
+      await popup.close().catch(() => {});
+    }
+    record('impressao de encaminhamento abre popup com texto correto', popupOk);
+
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    const fechouComEsc = await page.evaluate(() => !document.getElementById('encaminhamentoOverlay').classList.contains('show'));
+    record('encaminhamento fecha com Escape', fechouComEsc);
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;
