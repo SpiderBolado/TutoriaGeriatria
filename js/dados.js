@@ -44,7 +44,7 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor.",
+          "posologia": "Tomar 02 comprimidos, até de 06/06 horas, se dor.",
           "via": "Oral",
           "fator": null
         },
@@ -974,7 +974,7 @@ const DATA = {
         {
           "nome": "Prednisona 20mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias. Eficácia controversa para prevenção de neuralgia pós-herpética — usar com cautela em pacientes imunossuprimidos.",
+          "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -988,7 +988,7 @@ const DATA = {
         {
           "nome": "Tramadol 50mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima. Atenção: uso concomitante com Amitriptilina (abaixo) aumenta risco de síndrome serotoninérgica e de sedação — avaliar necessidade real de manter os dois ao mesmo tempo.",
+          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima.",
           "via": "Oral",
           "fator": null
         },
@@ -2304,7 +2304,7 @@ const DATA = {
         {
           "nome": "Amoxicilina 500mg",
           "qtde": "21 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 07 dias. Considerar reservar para extrações complicadas, fatores de risco de infecção ou risco de endocardite — não é indicação universal para toda extração simples.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -3692,7 +3692,7 @@ const DATA = {
       "nome": "Ácido Acetilsalicílico",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, após uma refeição, de uso contínuo (prevenção cardiovascular).",
       "tempo": "",
       "via": "Oral"
@@ -3774,7 +3774,7 @@ const DATA = {
       "concentracao": "300mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção habitual). Ajustar conforme função renal e ácido úrico sérico; não iniciar durante crise aguda de gota.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção habitual). Não iniciar durante crise aguda de gota.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3783,7 +3783,7 @@ const DATA = {
       "concentracao": "200mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção). Monitorizar função tireoidiana e hepática periodicamente; risco de toxicidade pulmonar em uso prolongado.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3809,7 +3809,7 @@ const DATA = {
       "nome": "Anlodipino Besilato",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -3818,7 +3818,7 @@ const DATA = {
       "nome": "Anlodipino Besilato",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -3827,7 +3827,7 @@ const DATA = {
       "nome": "Atenolol",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -3891,7 +3891,7 @@ const DATA = {
       "concentracao": "20mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo — ajustar conforme peso/resposta/nível sérico.",
+      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3899,8 +3899,8 @@ const DATA = {
       "nome": "Carbamazepina",
       "concentracao": "200mg",
       "forma": "",
-      "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose de manutenção habitual — ajustar conforme resposta/nível sérico). Monitorizar hemograma e função hepática periodicamente.",
+      "qtde": "120 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose de manutenção habitual).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4097,8 +4097,8 @@ const DATA = {
       "nome": "Enalapril Maleato",
       "concentracao": "20mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose-alvo, conforme tolerância e função renal).",
+      "qtde": "360 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose-alvo, conforme tolerância e função renal).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4116,7 +4116,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "90 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo — ajustar conforme nível sérico. Monitorizar sinais de intoxicação (nistagmo, ataxia, sonolência).",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4125,7 +4125,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo — ajustar conforme resposta/nível sérico.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4152,7 +4152,7 @@ const DATA = {
       "concentracao": "40mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos (potássio, sódio) e função renal periodicamente.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4169,7 +4169,7 @@ const DATA = {
       "nome": "Gliclazida",
       "concentracao": "30mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4187,7 +4187,7 @@ const DATA = {
       "nome": "Haloperidol",
       "concentracao": "1mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4232,7 +4232,7 @@ const DATA = {
       "nome": "Hidroclorotiazida",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4367,7 +4367,7 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "50mcg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
@@ -4376,7 +4376,7 @@ const DATA = {
       "nome": "Levotiroxina Sódica",
       "concentracao": "75mcg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
       "tempo": "",
       "via": "Oral"
@@ -4385,8 +4385,8 @@ const DATA = {
       "nome": "Lítio Carbonato",
       "concentracao": "300mg",
       "forma": "",
-      "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo — ajustar conforme litemia. Monitorizar função renal e tireoidiana periodicamente; risco de toxicidade aumentado por desidratação, diuréticos e AINEs.",
+      "qtde": "120 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4502,8 +4502,8 @@ const DATA = {
       "nome": "Nitrofurantoina",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "28 Cápsulas",
+      "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4556,7 +4556,7 @@ const DATA = {
       "nome": "Nortriptilina Cloridrato",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção).",
       "tempo": "",
       "via": "Oral"
@@ -4719,7 +4719,7 @@ const DATA = {
       "concentracao": "250mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo — ajustar conforme resposta/nível sérico. Monitorizar função hepática e hemograma periodicamente.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4737,7 +4737,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar conforme dose individualizada (ajustada por RNI/INR), 01 vez ao dia, sempre no mesmo horário, de uso contínuo. Monitorizar RNI periodicamente; atenção a interações medicamentosas e alimentares (vitamina K).",
+      "posologia": "Tomar conforme dose individualizada (ajustada por RNI/INR), 01 vez ao dia, sempre no mesmo horário, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4754,8 +4754,8 @@ const DATA = {
       "nome": "Losartana Potássica",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
+      "qtde": "360 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4772,8 +4772,8 @@ const DATA = {
       "nome": "Espironolactona",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Monitorizar potássio e função renal periodicamente — risco de hipercalemia, especialmente associado a IECA/BRA.",
+      "qtde": "180 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4782,7 +4782,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar eletrólitos periodicamente.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4817,7 +4817,7 @@ const DATA = {
       "nome": "Sinvastatina",
       "concentracao": "40mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4844,7 +4844,7 @@ const DATA = {
       "nome": "Rosuvastatina",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "180 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4862,8 +4862,8 @@ const DATA = {
       "nome": "Metformina",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo. Suspender temporariamente em vigência de desidratação, infecção grave ou antes de exame com contraste iodado (risco de acidose lática); ajustar/evitar se função renal muito reduzida.",
+      "qtde": "360 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4872,7 +4872,7 @@ const DATA = {
       "concentracao": "850mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo. Mesmas cautelas de função renal e suspensão temporária em intercorrências agudas.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4881,7 +4881,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Orientar sinais de infecção genital/urinária (mais frequentes com esta classe) e suspender temporariamente em quadros agudos com risco de desidratação (risco de cetoacidose euglicêmica).",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4890,7 +4890,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Ajustar dose conforme função renal.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4898,7 +4898,7 @@ const DATA = {
       "nome": "Sertralina",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4907,7 +4907,7 @@ const DATA = {
       "nome": "Escitalopram",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4926,7 +4926,7 @@ const DATA = {
       "concentracao": "75mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Monitorizar pressão arterial — pode elevar a PA em doses mais altas.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4935,7 +4935,7 @@ const DATA = {
       "concentracao": "300mg",
       "forma": "",
       "qtde": "90 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor). Ajustar dose conforme função renal.",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor).",
       "tempo": "",
       "via": "Oral"
     },
@@ -4944,7 +4944,7 @@ const DATA = {
       "concentracao": "75mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Ajustar dose conforme função renal.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4961,7 +4961,7 @@ const DATA = {
       "nome": "Quetiapina",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4980,7 +4980,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (doença de Alzheimer). Pode causar bradicardia, náusea e cãibras — reavaliar periodicamente.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (doença de Alzheimer).",
       "tempo": "",
       "via": "Oral"
     },
@@ -5016,7 +5016,7 @@ const DATA = {
       "concentracao": "20mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, junto a uma refeição, de uso contínuo. Ajustar dose conforme função renal; atenção a sinais de sangramento.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, junto a uma refeição, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5064,6 +5064,33 @@ const DATA = {
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (hiperplasia prostática benigna).",
       "tempo": "",
       "via": "Oral"
+    },
+    {
+      "nome": "Levetiracetam",
+      "concentracao": "500mg",
+      "forma": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Topiramato",
+      "concentracao": "50mg",
+      "forma": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
+      "tempo": "",
+      "via": "Oral"
+    },
+    {
+      "nome": "Fraldas Geriátricas",
+      "concentracao": "",
+      "forma": "",
+      "qtde": "540 Unidades",
+      "posologia": "Necessárias para higiene básica — 03 trocas diárias.",
+      "tempo": "",
+      "via": "Externo"
     }
   ]
 };
