@@ -171,6 +171,39 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- 6b. Dose pediatrica: seringa, gotas com zero, teto, idade e conferencia so na tela ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    await page.fill('#peso', '10');
+    await page.waitForTimeout(250);
+    let txt = await page.textContent('#receitaPaper');
+    record('amoxicilina em mL de seringa (10 kg: 3,5 mL)', /Dar 3,5 mL, de 08\/08 horas/.test(txt), (txt.match(/Dar [\d,]+ mL, de 08/) || [''])[0]);
+    record('gotas com zero a esquerda (dipirona 10 kg: 06 gotas)', /Dar 06 gotas, de 06\/06 horas/.test(txt));
+    record('azitromicina 1o dia 10 mg/kg (10 kg: 2,5 mL)', /Dar 2,5 mL, 01 vez, no 1/.test(txt));
+    let conf = await page.$$eval('#receitaPaper .item-conf', xs => xs.map(x => x.textContent));
+    record('conferencia em mg/kg na tela', conf.some(c => /3,5 mL = 175 mg por tomada \(17,5 mg\/kg\)/.test(c)), conf.join(' | '));
+    await page.fill('#peso', '70');
+    await page.waitForTimeout(250);
+    txt = await page.textContent('#receitaPaper');
+    conf = await page.$$eval('#receitaPaper .item-conf', xs => xs.map(x => x.textContent));
+    record('teto por tomada (paracetamol 70 kg: 35 gotas)', /Dar 35 gotas, de 06\/06 horas, se dor ou febre\./.test(txt) && conf.some(c => /35 gotas = 350 mg.*dose m.xima por tomada/.test(c)));
+    record('teto da azitromicina do 2o ao 5o dia (250 mg = 6 mL)', /Dar 06 mL, 01 vez ao dia, do 2/.test(txt), (txt.match(/Dar [\d,]+ mL, 01 vez ao dia/) || [''])[0]);
+    await page.fill('#peso', '8');
+    await page.fill('#idade', '8m');
+    await page.waitForTimeout(250);
+    conf = await page.$$eval('#receitaPaper .item-conf', xs => xs.map(x => x.textContent));
+    record('alerta de idade minima (metoclopramida < 1 ano)', conf.some(c => /contraindicada abaixo de 1 ano/.test(c)));
+    await page.emulateMedia({ media: 'print' });
+    const visivel = await page.$eval('#receitaPaper .item-conf', x => getComputedStyle(x).display !== 'none');
+    record('conferencia nao sai na impressao', visivel === false);
+    record('dose pediatrica sem erro de console', consoleErrors.length === 0, consoleErrors.join(' | '));
+    await browser.close();
+  }
+
   // ---- 7. Colisao de ID entre avulsos com mesmo nome (Grupo 5-D) ----
   {
     const browser = await chromium.launch();

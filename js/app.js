@@ -205,12 +205,71 @@
     });
   }
 
-  function calcDose(posologia, fator, peso){
-    if(!posologia) return posologia;
-    if(fator === null || fator === undefined || fator === '' || !peso) return posologia;
-    const valor = Math.round(parseFloat(peso) * parseFloat(fator));
-    if(isNaN(valor)) return posologia;
-    return posologia.replace(/DOSE/g, String(valor));
+  // ---------- Dose por peso ----------
+  // O fator (unidades por kg, por tomada) continua sendo a escolha do médico. Em volta dele:
+  // - arredondamento de seringa (0,1 mL abaixo de 2 mL; 0,5 mL até 10 mL; 1 mL acima) e gotas inteiras, com zero à esquerda;
+  // - teto por tomada e idade mínima da bula, pelo nome do item, com a concentração lida do nome (mg/mL; 20 gotas = 1 mL);
+  // - na tela (nunca na impressão), a conferência em mg e mg/kg e os alertas.
+  const PED = [
+    { re: /dipirona/i, maxMg: 1000, idadeMinM: 3, pesoMin: 5, aviso: 'bula: não usar abaixo de 3 meses ou de 5 kg' },
+    { re: /paracetamol/i, maxGotas: 35 },                       // gotas 200 mg/mL: até 35 gotas por tomada
+    { re: /ibuprofeno/i, maxMg: 400, idadeMinM: 6, aviso: 'bula: a partir de 6 meses' },
+    { re: /metoclopramida/i, maxMg: 10, idadeMinM: 12, aviso: 'contraindicada abaixo de 1 ano' },
+    { re: /prednisolona/i, maxMg: 40 },
+    { re: /amoxicilina(?!.*clavul)/i, maxMg: 500 },
+    { re: /azitromicina/i, maxMg: 500, maxMgSe: [/2.{0,3}\s*ao\s*5|d2/i, 250], idadeMinM: 6, aviso: 'bula: a partir de 6 meses' }
+  ];
+  const semAcento = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  function concDoNome(nome){
+    const m = semAcento(nome).match(/(\d+(?:[.,]\d+)?)\s*mg\s*\/\s*(\d+(?:[.,]\d+)?)?\s*ml/i);
+    if(!m) return null;
+    const mg = parseFloat(m[1].replace(',', '.')), ml = m[2] ? parseFloat(m[2].replace(',', '.')) : 1;
+    return mg > 0 && ml > 0 ? mg / ml : null;
+  }
+  function unidadeDose(pos){ return /DOSE\s*gotas?/i.test(pos || '') ? 'gotas' : /DOSE\s*ml/i.test(pos || '') ? 'mL' : ''; }
+  function passoMl(v){ return v < 2 ? 0.1 : v <= 10 ? 0.5 : 1; }
+  function arredondaDose(v, un, teto){
+    if(un !== 'mL') return Math.max(1, teto ? Math.floor(v) : Math.round(v));
+    const p = passoMl(v), r = (teto ? Math.floor(v / p + 1e-9) : Math.round(v / p)) * p;
+    return Math.max(p, Math.round(r * 10) / 10);
+  }
+  const fmtNum = v => String(Math.round(v * 10) / 10).replace('.', ',');
+  function fmtDose(v, un){
+    if(un !== 'mL' || Number.isInteger(v)){ const n = Math.round(v); return n < 10 ? '0' + n : String(n); }
+    return fmtNum(v);
+  }
+  function idadeMeses(txt){
+    const m = semAcento(txt).toLowerCase().trim().match(/^(\d+(?:[.,]\d+)?)\s*(a|anos?|m|mes|meses|d|dias?)?$/);
+    if(!m) return null;
+    const n = parseFloat(m[1].replace(',', '.')), u = (m[2] || 'a')[0];
+    return u === 'm' ? n : u === 'd' ? n / 30 : n * 12;
+  }
+  function doseInfo(posologia, fator, peso, nome, idadeTxt){
+    const out = { texto: posologia, conf: '', alertas: [] };
+    if(!posologia || fator === null || fator === undefined || fator === '' || !peso) return out;
+    const kg = parseFloat(String(peso).replace(',', '.')), f = parseFloat(String(fator).replace(',', '.'));
+    if(!(kg > 0) || isNaN(f)) return out;
+    const un = unidadeDose(posologia), regra = PED.find(r => r.re.test(semAcento(nome)));
+    const conc = concDoNome(nome), porUn = conc && un ? (un === 'gotas' ? conc / 20 : conc) : null;
+    let v = kg * f, teto = false;
+    if(regra && porUn){
+      let maxMg = regra.maxMg;
+      if(regra.maxMgSe && regra.maxMgSe[0].test(semAcento(nome + ' ' + posologia))) maxMg = regra.maxMgSe[1];
+      const maxUn = regra.maxGotas && un === 'gotas' ? regra.maxGotas : maxMg ? maxMg / porUn : null;
+      if(maxUn && v > maxUn){ v = maxUn; teto = true; }
+    }
+    const r = arredondaDose(v, un, teto);
+    out.texto = posologia.replace(/DOSE/g, fmtDose(r, un));
+    if(porUn){ const mg = r * porUn; out.conf = fmtDose(r, un) + ' ' + un + ' = ' + fmtNum(mg) + ' mg por tomada (' + fmtNum(mg / kg) + ' mg/kg)'; }
+    if(teto) out.alertas.push('dose máxima por tomada');
+    const im = idadeMeses(idadeTxt);
+    if(regra && regra.idadeMinM && im !== null && im < regra.idadeMinM) out.alertas.push(regra.aviso || 'abaixo da idade mínima da bula');
+    else if(regra && regra.pesoMin && kg < regra.pesoMin) out.alertas.push(regra.aviso || 'abaixo do peso mínimo da bula');
+    if(kg > 150 || kg < 1) out.alertas.push('confira o peso (' + fmtNum(kg) + ' kg)');
+    return out;
+  }
+  function calcDose(posologia, fator, peso, nome){
+    return doseInfo(posologia, fator, peso, nome, el('idade') ? el('idade').value : '').texto;
   }
 
   function anySelectedNeedsPeso(){
@@ -716,9 +775,11 @@
     viaOrder.forEach(via => {
       html += `<div class="via-titulo">Uso ${via}</div>`;
       grupos[via].forEach(([id, it], idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const di = doseInfo(it.posologiaBase, it.fator, peso, it.nome, el('idade') ? el('idade').value : '');
+        const posologia = di.texto;
         const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
         const posVazia = !posologia && !precisaPeso;
+        const conf = (di.conf || di.alertas.length) ? `<div class="item-conf screen-only">${escapeHtml(di.conf)}${di.alertas.map(a => ` <span class="conf-alerta">&#9888; ${escapeHtml(a)}</span>`).join('')}</div>` : '';
         html += `
           <div class="item-linha">
             <span class="num mono">${String(idx+1).padStart(2,'0')}.</span>
@@ -728,7 +789,7 @@
             <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item">&#x270E;</button>
             <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita">&times;</button>
           </div>
-          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
+          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>${conf}
         `;
       });
     });
@@ -1108,6 +1169,7 @@ ${dataStr}`;
         ids: idsAtuais,
         paciente: el('nomePaciente').value.trim(),
         peso: el('peso').value || '',
+        idade: el('idade') ? el('idade').value || '' : '',
         resumo: resumoSelecao(),
         selected: JSON.parse(JSON.stringify(selected)),
         selectedOrient: JSON.parse(JSON.stringify(selectedOrient))
@@ -1148,6 +1210,7 @@ ${dataStr}`;
         selected = JSON.parse(JSON.stringify(h.selected));
         selectedOrient = JSON.parse(JSON.stringify(h.selectedOrient));
         el('peso').value = h.peso || '';
+        if(el('idade')) el('idade').value = h.idade || '';
         renderTudo();
         showToast('Receita restaurada — confira o nome do paciente');
       });
@@ -1287,7 +1350,7 @@ ${dataStr}`;
     viaOrder.forEach(via => {
       out += `USO ${via.toUpperCase()}\n`;
       grupos[via].forEach((it, idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.nome);
         out += `${String(idx+1).padStart(2,'0')}. ${it.nome} ......... ${it.qtde||''}\n${posologia||''}\n\n`;
       });
     });
@@ -1381,7 +1444,7 @@ ${dataStr}`;
       grupos[via].push({
         nome: it.nome,
         qtde: it.qtde || '',
-        posologia: calcDose(it.posologiaBase, it.fator, peso) || ''
+        posologia: calcDose(it.posologiaBase, it.fator, peso, it.nome) || ''
       });
     });
 
@@ -1916,6 +1979,7 @@ ${dataStr}`;
 
   el('nomePaciente').addEventListener('input', renderReceita);
   el('peso').addEventListener('input', () => { renderReceita(); atualizarDestaquePeso(); });
+  if(el('idade')) el('idade').addEventListener('input', renderReceita);
   document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', renderReceita));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
   el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
@@ -2081,7 +2145,7 @@ ${dataStr}`;
         html += `<div class="via-titulo">Uso ${e.via}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.nome);
         const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
@@ -2271,7 +2335,7 @@ ${dataStr}`;
   });
   el('btnLimpar').addEventListener('click', () => {
     selected = {}; selectedOrient = {};
-    el('nomePaciente').value=''; el('peso').value='';
+    el('nomePaciente').value=''; el('peso').value=''; if(el('idade')) el('idade').value='';
     renderTudo();
   });
 

@@ -199,6 +199,11 @@
   .field-paciente{flex:1.4;}
   .field-peso{flex:1;}
   .field-peso input{width:100%;}
+  .field-idade{flex:0 0 84px;}
+  .field-idade input{width:100%;}
+  /* conferência da dose por peso: só na tela */
+  .item-conf{margin:2px 0 0 24px;font-size:11.5px;color:var(--teal-dark,#0A4F41);font-family:'IBM Plex Mono',Consolas,Menlo,'Courier New',monospace;}
+  .item-conf .conf-alerta{color:var(--amber);font-weight:600;font-family:inherit;}
   .field-peso.peso-necessario label{color:var(--amber);}
   .field-peso.peso-necessario input{border-color:var(--amber);background:var(--amber-wash);}
   .peso-hint{

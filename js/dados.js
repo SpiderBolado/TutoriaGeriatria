@@ -432,7 +432,7 @@ const DATA = {
         {
           "nome": "Amoxicilina 50mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE mL, de 08/08 horas, por 10 dias.",
+          "posologia": "Dar DOSE mL, de 08/08 horas, por 10 dias.",
           "via": "Oral",
           "fator": 0.33
         },
@@ -446,7 +446,7 @@ const DATA = {
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Caixa",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
+          "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
           "via": "Oral",
           "fator": 0.6
         }
@@ -464,16 +464,16 @@ const DATA = {
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
+          "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
           "via": "Oral",
           "fator": 0.6
         },
         {
           "nome": "Prednisolona 3mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE mL, pela manhã, por 05 dias",
+          "posologia": "Dar DOSE mL, pela manhã, por 05 dias",
           "via": "Oral",
-          "fator": 0.3
+          "fator": 0.33
         },
         {
           "nome": "Salbutamol 100mcg Spray",
@@ -2560,28 +2560,28 @@ const DATA = {
         {
           "nome": "Amoxicilina 50mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE mL, de 08/08 horas, por 07 a 10 dias.",
+          "posologia": "Dar DOSE mL, de 08/08 horas, por 07 a 10 dias.",
           "via": "Oral",
           "fator": 0.33
         },
         {
           "nome": "Azitromicina 40mg/mL - 1º dia",
           "qtde": "01 Frasco",
-          "posologia": "Alternativa se suspeita de germe atípico (criança escolar, início insidioso, tosse seca arrastada, sem toxemia) — não usar junto com a Amoxicilina. Tomar DOSE mL, 01 vez, no 1º dia.",
+          "posologia": "Alternativa se suspeita de germe atípico (criança escolar, início insidioso, tosse seca arrastada, sem toxemia) — não usar junto com a Amoxicilina. Dar DOSE mL, 01 vez, no 1º dia.",
           "via": "Oral",
           "fator": 0.25
         },
         {
           "nome": "Azitromicina 40mg/mL - 2º ao 5º dia",
           "qtde": "01 Frasco",
-          "posologia": "Continuação do esquema acima. Tomar DOSE mL, 01 vez ao dia, do 2º ao 5º dia.",
+          "posologia": "Continuação do esquema acima. Dar DOSE mL, 01 vez ao dia, do 2º ao 5º dia.",
           "via": "Oral",
           "fator": 0.125
         },
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
+          "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
           "via": "Oral",
           "fator": 0.6
         },
