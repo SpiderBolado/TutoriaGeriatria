@@ -692,6 +692,10 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 }
 .receita-logos .logo-carmo{height:38px;width:auto;}
 .receita-logos .logo-sus{height:30px;width:auto;}
+.receita-logos .logo-muni{display:flex;align-items:center;gap:10px;min-width:0;}
+.receita-logos .logo-muni-brasao{height:46px;width:auto;flex:none;}
+.receita-logos .logo-muni-texto{font-size:10px;line-height:1.3;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;}
+.receita-logos .logo-muni-texto b{display:block;font-size:15px;line-height:1.2;color:var(--ink);letter-spacing:.03em;}
 
 .receita-head{
   display:flex;

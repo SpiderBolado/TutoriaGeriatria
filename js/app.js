@@ -676,6 +676,19 @@
 
   // ---------- Receita (painel direito) ----------
   function logosHtml(){
+    const muni = municipioDoLocal(localAtual());
+    if(muni && muni.nomeNoCabecalho){
+      const brasao = muni.brasao();
+      return `
+        <div class="receita-logos">
+          <div class="logo-muni">
+            ${brasao ? `<img src="data:image/png;base64,${brasao}" class="logo-muni-brasao" alt="Brasão de ${escapeHtml(muni.nome)}">` : ''}
+            <div class="logo-muni-texto">Prefeitura Municipal de <b>${escapeHtml(muni.nome)}</b></div>
+          </div>
+          <img src="data:image/png;base64,${LOGO_SUS_B64}" class="logo-sus" alt="SUS">
+        </div>
+      `;
+    }
     if(localAtual() === 'patos'){
       return `
         <div class="receita-logos">
@@ -700,6 +713,47 @@
   function localAtual(){
     const r = document.querySelector('input[name=localReceita]:checked');
     return r ? r.value : 'carmo';
+  }
+
+  // Municípios no modelo "brasão + nome da prefeitura + SUS". Carmo do
+  // Paranaíba usa o logotipo próprio (LOGO_COMUM_B64) e segue nas funções
+  // originais (viaBoxHtml, blocoViaDocx...).
+  const MUNICIPIOS = {
+    patos: {
+      nome: 'Patos de Minas',
+      prefeitura: 'Prefeitura de Patos de Minas',
+      prefeituraDocx: 'PREFEITURA DE PATOS DE MINAS',
+      brasao: () => LOGO_PATOS_ICON_B64,
+      nomeNoCabecalho: false, // receita comum: só brasão + SUS
+      unidadePadrao: 'Secretaria Municipal de Saúde',
+      fornecedor: [
+        'Prefeitura de Patos de Minas — Secretaria Municipal de Saúde',
+        'Rua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900'
+      ]
+    },
+    rio: {
+      nome: 'Rio Paranaíba',
+      prefeitura: 'Prefeitura Municipal de Rio Paranaíba',
+      prefeituraDocx: 'PREFEITURA MUNICIPAL DE RIO PARANAÍBA',
+      // Brasão em js/logos.js (LOGO_RIO_ICON_B64). Sem ele, o cabeçalho sai só com o nome.
+      brasao: () => (typeof LOGO_RIO_ICON_B64 === 'string' && LOGO_RIO_ICON_B64) || null,
+      nomeNoCabecalho: true,
+      unidadePadrao: 'Secretaria Municipal de Saúde',
+      fornecedor: [
+        'Prefeitura Municipal de Rio Paranaíba — Secretaria Municipal de Saúde'
+      ]
+    }
+  };
+  function municipioDoLocal(local){
+    return Object.prototype.hasOwnProperty.call(MUNICIPIOS, local) ? MUNICIPIOS[local] : null;
+  }
+
+  // Largura x altura de um PNG em base64 (lidas do cabeçalho IHDR), para
+  // manter a proporção do brasão no .docx.
+  function dimensoesPng(b64){
+    const bin = atob(b64.slice(0, 44));
+    const u32 = i => ((bin.charCodeAt(i) << 24) | (bin.charCodeAt(i+1) << 16) | (bin.charCodeAt(i+2) << 8) | bin.charCodeAt(i+3)) >>> 0;
+    return { w: u32(16), h: u32(20) };
   }
 
   // Monta o HTML dos medicamentos + orientações (compartilhado pelos dois layouts)
@@ -829,6 +883,10 @@ ${dataStr}`;
       .receita-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
       .receita-logos .logo-carmo{height:38px;width:auto;}
       .receita-logos .logo-sus{height:30px;width:auto;}
+      .receita-logos .logo-muni{display:flex;align-items:center;gap:10px;}
+      .receita-logos .logo-muni-brasao{height:46px;width:auto;}
+      .receita-logos .logo-muni-texto{font-size:10px;line-height:1.3;color:#4B5A55;text-transform:uppercase;letter-spacing:.06em;}
+      .receita-logos .logo-muni-texto b{display:block;font-size:15px;line-height:1.2;color:#16241F;letter-spacing:.03em;}
       .receita-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #16241F;padding-bottom:10px;margin-bottom:20px;}
       .receita-head .paciente{font-size:17px;font-weight:600;}
       .receita-head .paciente .lbl{display:block;font-size:10px;color:#4B5A55;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
@@ -924,8 +982,9 @@ ${dataStr}`;
     `;
   }
 
-  function viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, label, extraClass){
-    const unidade = (el('unidadeSaude') && el('unidadeSaude').value.trim()) || 'Secretaria Municipal de Saúde';
+  function viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, label, extraClass){
+    const unidade = (el('unidadeSaude') && el('unidadeSaude').value.trim()) || muni.unidadePadrao;
+    const brasao = muni.brasao();
     const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '';
     const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
     const labelAssinatura = (medicoNome || medicoCrm) ? [medicoNome, medicoCrm].filter(Boolean).join(' — ') : 'Assinatura do médico';
@@ -933,8 +992,8 @@ ${dataStr}`;
       <div class="via-box ${extraClass||''}">
         <div class="via-box-header">
           <div class="muni">
-            <img src="data:image/png;base64,${LOGO_PATOS_ICON_B64}" class="muni-logo" alt="Prefeitura de Patos de Minas">
-            <div class="muni-text"><b>Prefeitura de Patos de Minas</b><br>${escapeHtml(unidade)}</div>
+            ${brasao ? `<img src="data:image/png;base64,${brasao}" class="muni-logo" alt="${escapeHtml(muni.prefeitura)}">` : ''}
+            <div class="muni-text"><b>${escapeHtml(muni.prefeitura)}</b><br>${escapeHtml(unidade)}</div>
             <img src="data:image/png;base64,${LOGO_SUS_B64}" class="muni-sus-logo" alt="SUS">
           </div>
           <div class="via-label">${label || '1ª VIA FARMÁCIA'}</div>
@@ -962,8 +1021,7 @@ ${dataStr}`;
           </div>
           <div>
             <b>Identificação do fornecedor</b><br>
-            Prefeitura de Patos de Minas — Secretaria Municipal de Saúde<br>
-            Rua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900<br><br>
+${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<br>
             _________________________________<br>
             Assinatura do farmacêutico &nbsp;&nbsp;&nbsp; Data
           </div>
@@ -987,11 +1045,12 @@ ${dataStr}`;
       : corpoReceitaHtml(medEntries, orientEntries, peso);
 
     if(tipo === 'controle'){
-      paper.innerHTML = local === 'patos'
+      const muni = municipioDoLocal(local);
+      paper.innerHTML = muni
         ? `
           <div class="vias-lado-a-lado">
-            ${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}
-            ${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}
+            ${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}
+            ${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}
           </div>
         `
         : `
@@ -1353,7 +1412,7 @@ ${dataStr}`;
     }catch(e){ console.error('Falha ao salvar dados do médico', e); }
   }
 
-  // ---------- Local (Carmo do Paranaíba / Patos de Minas), persistido localmente ----------
+  // ---------- Local (Carmo do Paranaíba / Patos de Minas / Rio Paranaíba), persistido localmente ----------
   async function loadLocal(){
     try{
       const r = await storage.get('local-receita', false);
@@ -1454,20 +1513,23 @@ ${dataStr}`;
 
   function gerarDocComum(dados){
     const { Document, Paragraph, TextRun, AlignmentType, ImageRun, BorderStyle } = docx;
-    const isPatos = localAtual() === 'patos';
-    const cabecalho = isPatos ? [
+    const muni = municipioDoLocal(localAtual());
+    const brasao = muni && muni.brasao();
+    const cabecalho = muni ? [
       new Paragraph({
         alignment: AlignmentType.CENTER,
         children: [
-          new ImageRun({ data: base64ParaBytes(LOGO_PATOS_ICON_B64), transformation: { width: 46, height: 61 }, type: 'png' }),
-          new TextRun({ text: '   ' }),
+          ...(brasao ? [
+            new ImageRun({ data: base64ParaBytes(brasao), transformation: (() => { const d = dimensoesPng(brasao); return { width: Math.round(61 * d.w / d.h), height: 61 }; })(), type: 'png' }),
+            new TextRun({ text: '   ' })
+          ] : []),
           new ImageRun({ data: base64ParaBytes(LOGO_SUS_B64), transformation: { width: 46, height: 24 }, type: 'png' })
         ]
       }),
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 200 },
-        children: [ new TextRun({ text: 'PREFEITURA DE PATOS DE MINAS', bold: true, size: 20, color: '666666' }) ]
+        children: [ new TextRun({ text: muni.prefeituraDocx, bold: true, size: 20, color: '666666' }) ]
       })
     ] : [
       new Paragraph({
@@ -1595,13 +1657,13 @@ ${dataStr}`;
     });
   }
 
-  // ---------- Modelo Patos de Minas: Receituário de Controle Especial (2 vias) ----------
-  function blocoViaDocxPatos(dados, viaLabel){
+  // ---------- Modelo município (Patos de Minas, Rio Paranaíba): Receituário de Controle Especial (2 vias) ----------
+  function blocoViaDocxMunicipio(muni, dados, viaLabel){
     const { Table, TableRow, WidthType, Paragraph } = docx;
-    const unidade = dados.unidade || 'Secretaria Municipal de Saúde';
+    const unidade = dados.unidade || muni.unidadePadrao;
     const rows = [];
     rows.push(new TableRow({ children: [
-      celulaDocx('Prefeitura de Patos de Minas\n' + unidade, { width: 55, bold: true }),
+      celulaDocx(muni.prefeitura + '\n' + unidade, { width: 55, bold: true }),
       celulaDocx(viaLabel, { width: 45, bold: true, shaded: true })
     ]}));
     rows.push(new TableRow({ children: [
@@ -1626,7 +1688,7 @@ ${dataStr}`;
       rows: [
         new TableRow({ children: [
           celulaDocx('Identificação do comprador\nNome:\nIdent.:                    Órgão emissor:\nEndereço:\nCidade:                     Estado:\nTelefone:', { width: 50, size: 16 }),
-          celulaDocx('Identificação do fornecedor\nPrefeitura de Patos de Minas — Secretaria Municipal de Saúde\nRua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900\n\n_______________________________\nAssinatura do farmacêutico        Data', { width: 50, size: 16 })
+          celulaDocx(['Identificação do fornecedor', ...muni.fornecedor, '', '_______________________________', 'Assinatura do farmacêutico        Data'].join('\n'), { width: 50, size: 16 })
         ]})
       ]
     });
@@ -1634,10 +1696,10 @@ ${dataStr}`;
     return [ table, new Paragraph({ spacing: { before: 100 } }), ...receitaParas, dataPar, new Paragraph({ spacing: { before: 200 } }), rodapeTable ];
   }
 
-  function gerarDocControleEspecialPatos(dados){
+  function gerarDocControleEspecialMunicipio(muni, dados){
     const { Document, Table, TableRow, TableCell, WidthType, VerticalAlign } = docx;
-    const via1 = blocoViaDocxPatos(dados, '1ª VIA FARMÁCIA');
-    const via2 = blocoViaDocxPatos(dados, '2ª VIA PACIENTE');
+    const via1 = blocoViaDocxMunicipio(muni, dados, '1ª VIA FARMÁCIA');
+    const via2 = blocoViaDocxMunicipio(muni, dados, '2ª VIA PACIENTE');
 
     const masterTable = new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
@@ -1698,7 +1760,7 @@ ${dataStr}`;
     try{
       await garantirDocxCarregado();
       const doc = tipo === 'controle'
-        ? (localAtual() === 'patos' ? gerarDocControleEspecialPatos(dados) : gerarDocControleEspecial(dados))
+        ? (municipioDoLocal(localAtual()) ? gerarDocControleEspecialMunicipio(municipioDoLocal(localAtual()), dados) : gerarDocControleEspecial(dados))
         : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
@@ -2141,8 +2203,9 @@ ${dataStr}`;
 
   function calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr){
     try{
-      const buildVia = corpoHtml => local === 'patos'
-        ? viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
+      const muni = municipioDoLocal(local);
+      const buildVia = corpoHtml => muni
+        ? viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
         : viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA');
 
       const entradas = construirEntradasReceita(medEntries, orientEntries);
@@ -2200,8 +2263,9 @@ ${dataStr}`;
       } else {
         const encaixe = calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr);
         fitScale = encaixe.scale;
-        const montarFolha = corpoHtml => local === 'patos'
-          ? `<div class="vias-lado-a-lado">${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
+        const muni = municipioDoLocal(local);
+        const montarFolha = corpoHtml => muni
+          ? `<div class="vias-lado-a-lado">${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
           : `<div class="vias-lado-a-lado">${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`;
         paperHtml = encaixe.paginas.map((corpo, i) => {
           const folha = montarFolha(corpo);
@@ -2221,6 +2285,10 @@ ${dataStr}`;
       .receita-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
       .receita-logos .logo-carmo{height:38px;width:auto;}
       .receita-logos .logo-sus{height:30px;width:auto;}
+      .receita-logos .logo-muni{display:flex;align-items:center;gap:10px;}
+      .receita-logos .logo-muni-brasao{height:46px;width:auto;}
+      .receita-logos .logo-muni-texto{font-size:10px;line-height:1.3;color:#4B5A55;text-transform:uppercase;letter-spacing:.06em;}
+      .receita-logos .logo-muni-texto b{display:block;font-size:15px;line-height:1.2;color:#16241F;letter-spacing:.03em;}
       .via-box{border:1.5px solid #16241F;border-radius:4px;margin-bottom:22px;overflow:hidden;}
       .via-box-header{display:flex;border-bottom:1.5px solid #16241F;}
       .via-box-header .muni{flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-right:1.5px solid #16241F;min-width:0;}

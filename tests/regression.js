@@ -467,6 +467,42 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Local Rio Paranaiba: cabecalho, controle especial, .docx e persistencia ----
+  {
+    const browser = await chromium.launch();
+    const context = await browser.newContext({ acceptDownloads: true });
+    const page = await context.newPage();
+    const consoleErrors = [];
+    page.on('pageerror', (err) => consoleErrors.push(err.message));
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.click('label.tipo-opt:has(input[name="localReceita"][value="rio"])');
+    await selectCondicao(page, 'Dor Muscular');
+    const comum = await page.evaluate(() => {
+      const head = document.querySelector('#receitaPaper .receita-logos');
+      const temBrasao = typeof LOGO_RIO_ICON_B64 === 'string' && !!LOGO_RIO_ICON_B64;
+      return {
+        texto: head ? head.textContent.replace(/\s+/g, ' ').trim() : '',
+        brasaoOk: temBrasao === !!document.querySelector('#receitaPaper .logo-muni-brasao'),
+        semCarmo: !document.querySelector('#receitaPaper img[alt*="Carmo"]'),
+      };
+    });
+    const [dl1] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }).catch(() => null), page.click('#btnDocx')]);
+    await page.click('label.tipo-opt:has(input[name="tipoReceita"][value="controle"])');
+    await page.waitForTimeout(200);
+    const vias = await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .via-box .muni-text b')].map((b) => b.textContent));
+    const [dl2] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }).catch(() => null), page.click('#btnDocx')]);
+    await page.reload();
+    await page.waitForTimeout(400);
+    const persistiu = await page.evaluate(() => document.querySelector('input[name="localReceita"]:checked').value);
+    const ok = /Prefeitura Municipal de Rio Paranaíba/.test(comum.texto) && comum.brasaoOk && comum.semCarmo
+      && vias.length === 2 && vias.every((v) => v === 'Prefeitura Municipal de Rio Paranaíba')
+      && !!dl1 && !!dl2 && persistiu === 'rio' && consoleErrors.length === 0;
+    record('local Rio Paranaiba: cabecalho, 2 vias, .docx e persistencia', ok,
+      JSON.stringify({ comum, vias, docx: [!!dl1, !!dl2], persistiu, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;
