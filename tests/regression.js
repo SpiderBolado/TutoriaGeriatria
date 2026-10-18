@@ -503,6 +503,72 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Pediatria: sugestao, conversao automatica, desfazer, idoso de baixo peso ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const nomes = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()));
+
+    // idoso de 38 kg: sem sugestao de conversao
+    await page.fill('#idade', '82');
+    await page.fill('#peso', '38');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(500);
+    const idoso = await barra();
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+
+    // crianca so com peso: sugestao com botao, sem converter sozinha
+    await page.fill('#peso', '20');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(500);
+    const sugestao = await barra();
+    const antes = await nomes();
+    await page.click('#avisoBar button[data-acao="converter-ped"]');
+    await page.waitForTimeout(250);
+    const depois = await nomes();
+    // peso muda depois da conversao: avisos acompanham
+    await page.fill('#peso', '24');
+    await page.waitForTimeout(600);
+    const recalculado = await barra();
+    await page.click('#avisoBar button[data-acao="desfazer-ped"]');
+    await page.waitForTimeout(250);
+    const desfeito = await nomes();
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+
+    // modo automatico com idade < 12 anos
+    await page.fill('#idade', '5a');
+    await page.fill('#peso', '20');
+    await page.waitForTimeout(500);
+    await selectCondicao(page, 'Enxaqueca');
+    await page.waitForTimeout(300);
+    await page.click('#avisoBar input[data-acao="auto-ped"]');
+    await page.waitForTimeout(400);
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '5a');
+    await page.fill('#peso', '20');
+    await page.waitForTimeout(500);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(400);
+    const auto = await nomes();
+    const autoPersistiu = await page.evaluate(() => localStorage.getItem('auto-pediatria'));
+
+    const ok = !/Paciente pediátrico/.test(idoso)
+      && /Paciente pediátrico \(20 kg\)/.test(sugestao) && antes.includes('Ciclobenzaprina 10mg')
+      && depois.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL'
+      && /14 gotas/.test(recalculado) && /peso 24 kg/.test(recalculado)
+      && desfeito.includes('Ciclobenzaprina 10mg')
+      && auto.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL' && autoPersistiu === '1'
+      && consoleErrors.length === 0;
+    record('pediatria: sugestao, conversao automatica, desfazer e idoso sem sugestao', ok,
+      JSON.stringify({ idoso: idoso.slice(0, 80), sugestao: sugestao.slice(0, 120), antes, depois, recalculado: recalculado.slice(0, 160), desfeito, auto, autoPersistiu, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

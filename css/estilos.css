@@ -268,7 +268,10 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 .input-full{margin-bottom:10px;}
 
 .field-paciente{flex:1 1 auto;}
-.field-peso{flex:0 0 118px;}
+.field-idade{flex:0 0 92px;}
+.field-peso{flex:0 0 104px;}
+.field.campo-invalido label{color:var(--danger);}
+.field.campo-invalido input{border-color:var(--danger);}
 .field-peso.peso-necessario label{color:var(--amber);}
 .field-peso.peso-necessario input{border-color:var(--amber);background:var(--amber-wash);}
 .peso-hint{
@@ -649,6 +652,13 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   border-radius:var(--radius-sm);padding:8px 12px;line-height:1.45;
 }
 .aviso.amber{background:var(--amber-wash);border:1px solid var(--amber-line);color:var(--amber-ink);}
+.aviso.teal{background:var(--teal-wash);border:1px solid var(--teal);color:var(--teal-dark);}
+.aviso.teal button{border-color:var(--teal);color:var(--teal-dark);}
+.aviso.teal button:hover{background:var(--primary);border-color:var(--primary);color:var(--on-primary);}
+.aviso button:disabled{opacity:.5;cursor:not-allowed;}
+.aviso button:disabled:hover{background:transparent;color:inherit;}
+.aviso-check{display:flex;align-items:center;gap:6px;margin-top:6px;font-weight:400;cursor:pointer;}
+.aviso-check input{margin:0;}
 .aviso-ic{flex:none;}
 .aviso-corpo{min-width:0;}
 .aviso-corpo ul{margin:4px 0 0;padding-left:18px;}
@@ -1068,7 +1078,9 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 @media (max-width: 480px){
   /* 16px evita o zoom automático do iOS ao focar um campo */
   input[type=text], input[type=number], select, textarea, #search{font-size:16px;}
-  .field-peso{flex-basis:100px;}
+  .field-row{flex-wrap:wrap;}
+  .field-paciente{flex-basis:100%;}
+  .field-idade, .field-peso{flex:1 1 0;}
   .form-grid, .form-grid-3, .ed-grid-3{grid-template-columns:1fr;}
   header.top .tag{font-size:11.5px;}
   .ajuda-overlay{padding:0;align-items:flex-end;}

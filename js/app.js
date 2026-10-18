@@ -9,7 +9,9 @@
   let usoCondicoes = {}; // contagem de uso por condição (mais usadas sobem)
   let historico = [];    // últimas receitas geradas
   let customCondicoes = {}; // nome -> { meds: [...], orientacoes: [...] }
-  let avisosPediatria = []; // avisos/remoções da última conversão para pediátrica
+  let conversaoPed = null; // {motivos, fixos} acumulados das conversões pediátricas desta receita
+  let desfazerPediatria = null; // seleção anterior à última conversão (para "Desfazer")
+  let autoPedSuspensa = false; // "Desfazer" pausa a conversão automática até a próxima receita
   let overridesMedicamentos = {}; // avulsoId -> {qtde, via, fator, posologia} (edição permanente de um item avulso)
 
   const el = id => document.getElementById(id);
@@ -178,6 +180,9 @@
         posologia: o.posologia !== undefined ? o.posologia : m.posologia,
         via: o.via !== undefined ? o.via : m.via,
         fator: o.fator !== undefined ? o.fator : m.fator,
+        // teto e idade mínima valem para o item original; editar nome ou fator os descarta
+        max: (o.nome === undefined && o.fator === undefined) ? m.max : undefined,
+        idadeMinMeses: o.nome === undefined ? m.idadeMinMeses : undefined,
         editado: o.nome!==undefined || o.qtde!==undefined || o.posologia!==undefined || o.via!==undefined || o.fator!==undefined
       };
     }).filter(Boolean);
@@ -196,7 +201,8 @@
       const id = 'cond:'+nome+':med:'+m.idx;
       if(selected[id]){
         selected[id] = Object.assign({}, selected[id], {
-          nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia, via: m.via || 'Outro', fator: m.fator, origemCondicao: nome
+          nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia, via: m.via || 'Outro', fator: m.fator,
+          max: m.max, idadeMinMeses: m.idadeMinMeses, origemCondicao: nome
         });
       }
     });
@@ -206,12 +212,18 @@
     });
   }
 
-  function calcDose(posologia, fator, peso){
+  // Dose por peso: round(peso x fator), limitada ao teto por dose do item (max), se houver.
+  function doseCalculada(fator, peso, max){
+    if(fator === null || fator === undefined || fator === '' || !peso) return null;
+    const valor = Math.round(parseFloat(String(peso).replace(',', '.')) * parseFloat(fator));
+    if(isNaN(valor)) return null;
+    return { valor: (max && valor > max) ? max : valor, semTeto: valor, limitada: !!(max && valor > max) };
+  }
+  function calcDose(posologia, fator, peso, max){
     if(!posologia) return posologia;
-    if(fator === null || fator === undefined || fator === '' || !peso) return posologia;
-    const valor = Math.round(parseFloat(peso) * parseFloat(fator));
-    if(isNaN(valor)) return posologia;
-    return posologia.replace(/DOSE/g, String(valor));
+    const d = doseCalculada(fator, peso, max);
+    if(!d) return posologia;
+    return posologia.replace(/DOSE/g, String(d.valor));
   }
 
   function anySelectedNeedsPeso(){
@@ -641,7 +653,7 @@
     if(ligar){
       selected[id] = {
         nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia,
-        via: m.via || 'Outro', fator: m.fator, origemCondicao: nomeCondicao
+        via: m.via || 'Outro', fator: m.fator, max: m.max, idadeMinMeses: m.idadeMinMeses, origemCondicao: nomeCondicao
       };
     } else {
       delete selected[id];
@@ -666,7 +678,8 @@
       const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
       selected[id] = {
         nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
-        via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null, origemCondicao: null
+        via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null,
+        max: (efetivo.fator === m.fator) ? m.max : undefined, idadeMinMeses: m.idadeMinMeses, origemCondicao: null
       };
     } else {
       delete selected[id];
@@ -771,7 +784,7 @@
     viaOrder.forEach(via => {
       html += `<div class="via-titulo">Uso ${via}</div>`;
       grupos[via].forEach(([id, it], idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
         const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
@@ -1114,7 +1127,63 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     });
   }
 
-  // ---------- Avisos (duplicidade de princípio ativo) ----------
+  // ---------- Paciente pediátrico (peso / idade) ----------
+  const numBR = n => String(n).replace('.', ',');
+  const AUTO_PED_KEY = 'auto-pediatria';
+  function pesoAtualKg(){
+    const v = parseFloat(String(el('peso').value).replace(',', '.'));
+    return v > 0 ? v : null;
+  }
+  function idadeAtualMeses(){ return window.PEDIATRIA.idadeEmMeses(el('idade').value); }
+  // Criança: idade informada < 12 anos; sem idade, peso < 40 kg (só sugere, não converte sozinho)
+  function pacientePediatrico(){
+    const meses = idadeAtualMeses();
+    if(meses !== null) return meses < 144;
+    const kg = pesoAtualKg();
+    return kg !== null && kg < window.PEDIATRIA.PESO_MAX_KG;
+  }
+  function autoPediatriaAtiva(){
+    try{ return localStorage.getItem(AUTO_PED_KEY) === '1'; }catch(e){ return false; }
+  }
+
+  function executarConversao(automatica){
+    const entradas = Object.entries(selected);
+    if(!entradas.length){ if(!automatica) showToast('Selecione os medicamentos antes de converter'); return false; }
+    const r = window.PEDIATRIA.converterParaPediatrico(entradas, el('peso').value, { idadeMeses: idadeAtualMeses() });
+    if(r.erro){ if(!automatica){ showToast(r.erro); el('peso').focus(); } return false; }
+    if(!r.convertidos && !r.removidos.length){
+      if(!automatica) showToast('Nenhum item com versão pediátrica cadastrada');
+      return false;
+    }
+    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
+    selected = Object.fromEntries(r.entries);
+    const acum = conversaoPed || { motivos: [], fixos: [] };
+    r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
+    r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
+    conversaoPed = acum;
+    renderTudo();
+    if(automatica) showToast('Receita convertida para pediátrica — confira os avisos');
+    return true;
+  }
+  function desfazerConversao(){
+    if(!desfazerPediatria) return;
+    selected = desfazerPediatria.selected;
+    conversaoPed = desfazerPediatria.conversaoPed;
+    desfazerPediatria = null;
+    autoPedSuspensa = true;
+    renderTudo();
+    showToast('Conversão desfeita');
+  }
+
+  function avisoHtml(classe, icone, corpoHtml, acaoHtml){
+    const div = document.createElement('div');
+    div.className = 'aviso ' + classe;
+    div.innerHTML = `<span class="aviso-ic" aria-hidden="true">${icone}</span><div class="aviso-corpo">${corpoHtml}</div>${acaoHtml || ''}`;
+    return div;
+  }
+  const listaHtml = itens => itens.length ? '<ul>' + itens.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '';
+
+  // ---------- Avisos (pediatria, teto de dose, duplicidade de princípio ativo) ----------
   function renderAvisos(){
     const bar = el('avisoBar');
     bar.innerHTML = '';
@@ -1125,15 +1194,45 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(!porToken[token]) porToken[token] = [];
       porToken[token].push(it.nome);
     });
-    if(avisosPediatria.length){
-      const [titulo, ...itens] = avisosPediatria;
-      const div = document.createElement('div');
-      div.className = 'aviso amber';
-      div.innerHTML = '<span class="aviso-ic" aria-hidden="true">&#9888;</span><div class="aviso-corpo"><b>' + escapeHtml(titulo) + '</b>'
-        + (itens.length ? '<ul>' + itens.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '')
-        + '</div>';
-      bar.appendChild(div);
+    const entradas = Object.entries(selected);
+    const kg = pesoAtualKg(), idade = idadeAtualMeses();
+
+    // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
+    const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas) : 0;
+    if(conversiveis && pacientePediatrico()){
+      const quem = idade !== null ? window.PEDIATRIA.formatarIdade(idade) + (kg ? ', ' + numBR(kg) + ' kg' : '') : numBR(kg) + ' kg';
+      bar.appendChild(avisoHtml('teal', '&#9432;',
+        `<b>Paciente pediátrico (${escapeHtml(quem)}): ${conversiveis} ${conversiveis === 1 ? 'item de adulto pode' : 'itens de adulto podem'} ir para a versão pediátrica.</b>`
+        + (kg ? '' : '<br>Informe o peso para converter.')
+        + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
+        `<button type="button" data-acao="converter-ped" ${kg ? '' : 'disabled'}>Converter agora</button>`));
     }
+
+    // 2) Resultado da conversão, recalculado com o peso/idade atuais
+    const convertidos = entradas.filter(([, it]) => it.convertidoPediatrico);
+    if(conversaoPed && (convertidos.length || conversaoPed.motivos.length || conversaoPed.fixos.length)){
+      const itens = [];
+      const alto = window.PEDIATRIA.avisoPesoAlto(kg || 0);
+      if(alto) itens.push(alto);
+      itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
+      convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
+      const titulo = 'Receita convertida automaticamente para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
+      bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
+        + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
+        desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
+    }
+
+    // 3) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
+    const soltos = [];
+    entradas.forEach(([, it]) => {
+      if(it.convertidoPediatrico) return;
+      const d = doseCalculada(it.fator, kg, it.max);
+      if(d && d.limitada) soltos.push(`${it.nome}: dose calculada (${d.semTeto}) excede o máximo de ${it.max} por dose; a receita sai com ${it.max}.`);
+      if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){
+        soltos.push(`ATENÇÃO — ${it.nome}: paciente com ${window.PEDIATRIA.formatarIdade(idade)}, abaixo da idade mínima de ${window.PEDIATRIA.formatarIdade(it.idadeMinMeses)}. Revise.`);
+      }
+    });
+    if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Doses por peso</b>' + listaHtml(soltos)));
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2){
         const div = document.createElement('div');
@@ -1322,13 +1421,25 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   function atualizarDestaquePeso(){
+    el('idadeField').classList.toggle('campo-invalido', el('idade').value.trim() !== '' && idadeAtualMeses() === null);
     const precisa = anySelectedNeedsPeso();
     const pesoPreenchido = el('peso').value.trim() !== '';
     el('pesoField').classList.toggle('peso-necessario', precisa && !pesoPreenchido);
     el('pesoHint').classList.toggle('show', precisa && !pesoPreenchido);
   }
 
+  let convertendoAuto = false;
   function renderTudo(){
+    // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido
+    if(!convertendoAuto && autoPediatriaAtiva() && !autoPedSuspensa){
+      const meses = idadeAtualMeses();
+      if(meses !== null && meses < 144 && pesoAtualKg() && window.PEDIATRIA.contarConversiveis(Object.entries(selected))){
+        convertendoAuto = true;
+        let converteu = false;
+        try{ converteu = executarConversao(true); } finally { convertendoAuto = false; }
+        if(converteu) return;
+      }
+    }
     renderLista(el('search').value);
     renderReceita();
     renderChips();
@@ -1356,7 +1467,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     viaOrder.forEach(via => {
       out += `USO ${via.toUpperCase()}\n`;
       grupos[via].forEach((it, idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
         out += `${String(idx+1).padStart(2,'0')}. ${it.nome} ......... ${it.qtde||''}\n${posologia||''}\n\n`;
       });
     });
@@ -1450,7 +1561,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       grupos[via].push({
         nome: it.nome,
         qtde: it.qtde || '',
-        posologia: calcDose(it.posologiaBase, it.fator, peso) || ''
+        posologia: calcDose(it.posologiaBase, it.fator, peso, it.max) || ''
       });
     });
 
@@ -1938,6 +2049,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         showToast('O nome do medicamento não pode ficar vazio');
         return;
       }
+      if(selected[id].nome !== nome || selected[id].fator !== fator){ delete selected[id].max; }
+      if(selected[id].nome !== nome){ delete selected[id].idadeMinMeses; }
       selected[id].nome = nome;
       selected[id].qtde = qtde || null;
       selected[id].via = via;
@@ -2011,7 +2124,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   });
 
   el('nomePaciente').addEventListener('input', renderReceita);
-  el('peso').addEventListener('input', () => { renderReceita(); atualizarDestaquePeso(); });
+  let pacienteDebounceId = null;
+  const aoMudarPesoOuIdade = () => {
+    renderReceita(); atualizarDestaquePeso();
+    clearTimeout(pacienteDebounceId);
+    pacienteDebounceId = setTimeout(renderTudo, 400); // espera terminar de digitar ("2" → "25")
+  };
+  el('peso').addEventListener('input', aoMudarPesoOuIdade);
+  el('idade').addEventListener('input', aoMudarPesoOuIdade);
   document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', renderReceita));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
   el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
@@ -2177,7 +2297,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         html += `<div class="via-titulo">Uso ${e.via}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
         const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
@@ -2371,22 +2491,21 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     setTimeout(() => { printWindow.print(); }, 250);
     registrarHistorico('impresso');
   });
-  el('btnPediatrica').addEventListener('click', () => {
-    const entradas = Object.entries(selected);
-    if(!entradas.length){ showToast('Selecione os medicamentos antes de converter'); return; }
-    const r = window.PEDIATRIA.converterParaPediatrico(entradas, el('peso').value);
-    if(r.erro){ showToast(r.erro); el('peso').focus(); return; }
-    selected = Object.fromEntries(r.entries);
-    avisosPediatria = [
-      'Receita convertida automaticamente para pediátrica (peso ' + el('peso').value + ' kg). Confira cada dose antes de imprimir.',
-      ...r.removidos.map(x => x.motivo),
-      ...r.avisos
-    ];
-    renderTudo();
+  el('btnPediatrica').addEventListener('click', () => executarConversao(false));
+  el('avisoBar').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-acao]');
+    if(!b) return;
+    if(b.dataset.acao === 'converter-ped') executarConversao(false);
+    if(b.dataset.acao === 'desfazer-ped') desfazerConversao();
+  });
+  el('avisoBar').addEventListener('change', (e) => {
+    if(!e.target.matches('input[data-acao="auto-ped"]')) return;
+    try{ localStorage.setItem(AUTO_PED_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
+    if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
   });
   el('btnLimpar').addEventListener('click', () => {
-    selected = {}; selectedOrient = {}; avisosPediatria = [];
-    el('nomePaciente').value=''; el('peso').value='';
+    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
   });
 
