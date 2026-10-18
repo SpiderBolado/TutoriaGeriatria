@@ -429,6 +429,44 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Tema claro/escuro alterna e persiste ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const estado = () => page.evaluate(() => [document.documentElement.getAttribute('data-tema-pref'), document.documentElement.getAttribute('data-theme')]);
+    const inicial = await estado();
+    await page.click('#btnTema');
+    const claro = await estado();
+    await page.click('#btnTema');
+    const escuro = await estado();
+    await page.reload();
+    await page.waitForTimeout(300);
+    const aposReload = await estado();
+    await page.click('#btnTema');
+    const volta = await estado();
+    const ok = JSON.stringify([inicial, claro, escuro, aposReload, volta]) === JSON.stringify([
+      ['auto', null], ['claro', 'light'], ['escuro', 'dark'], ['escuro', 'dark'], ['auto', null]
+    ]) && consoleErrors.length === 0;
+    record('tema alterna (auto/claro/escuro) e persiste apos reload', ok, JSON.stringify([inicial, claro, escuro, aposReload, volta]));
+    await browser.close();
+  }
+
+  // ---- Celular: sem rolagem horizontal da pagina ----
+  {
+    const browser = await chromium.launch();
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Com Nome Bem Comprido Para Testar Quebra');
+    await selectCondicao(page, 'Dor Muscular');
+    const larguras = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vw: window.innerWidth }));
+    record('celular sem rolagem horizontal (390px)', larguras.doc <= 390 && larguras.vw <= 390, JSON.stringify(larguras));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

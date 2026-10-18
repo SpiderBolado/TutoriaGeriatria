@@ -305,10 +305,10 @@
     const head = document.createElement('div');
     head.className = 'card-head';
     head.innerHTML = `
-      <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check">
+      <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check" aria-label="Adicionar todos os itens de ${escapeHtml(nome)}">
       <span class="nome">${escapeHtml(nome)}</span>
       <span class="count">${eff.meds.length} item${eff.meds.length!==1?'s':''}</span>
-      <span class="chev">&#9656;</span>
+      <span class="chev" aria-hidden="true">&#9656;</span>
     `;
     const chk = head.querySelector('input');
     if(state === 'partial') chk.indeterminate = true;
@@ -391,12 +391,12 @@
     }
 
     wrap.innerHTML = `
-      <input type="checkbox" ${selected[id] ? 'checked':''}>
+      <input type="checkbox" ${selected[id] ? 'checked':''} aria-label="${escapeHtml(m.nome)}">
       <div class="sub-text"><b>${escapeHtml(m.nome)}</b> — ${escapeHtml(m.qtde||'')}${m.fator ? ' <span class="tag-peso">(dose por peso)</span>' : ''}${m.editado ? ' <span class="tag-editado">editado</span>' : ''}
       <span class="pos">${escapeHtml(m.posologia||'')}</span></div>
       <div class="row-actions">
-        <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
-        <button class="icon-btn ef-remove" title="Remover desta condição">&times;</button>
+        <button class="icon-btn ef-edit" title="Editar" aria-label="Editar ${escapeHtml(m.nome)}">&#9998;</button>
+        <button class="icon-btn ef-remove" title="Remover desta condição" aria-label="Remover ${escapeHtml(m.nome)} desta condição">&times;</button>
       </div>
     `;
     wrap.querySelector('input[type=checkbox]').addEventListener('click', (e) => {
@@ -458,11 +458,11 @@
     }
 
     wrap.innerHTML = `
-      <input type="checkbox" ${selectedOrient[id] ? 'checked':''}>
+      <input type="checkbox" ${selectedOrient[id] ? 'checked':''} aria-label="Orientação">
       <div class="sub-text">${escapeHtml(o.texto)}${o.editado ? ' <span class="tag-editado">editado</span>' : ''}</div>
       <div class="row-actions">
-        <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
-        <button class="icon-btn ef-remove" title="Remover">&times;</button>
+        <button class="icon-btn ef-edit" title="Editar" aria-label="Editar orientação">&#9998;</button>
+        <button class="icon-btn ef-remove" title="Remover" aria-label="Remover orientação">&times;</button>
       </div>
     `;
     wrap.querySelector('input[type=checkbox]').addEventListener('click', (e) => {
@@ -600,13 +600,13 @@
     const head = document.createElement('div');
     head.className = 'card-head';
     head.innerHTML = `
-      <input type="checkbox" ${isSel ? 'checked':''}>
+      <input type="checkbox" ${isSel ? 'checked':''} aria-label="${escapeHtml(displayNome)}">
       <div class="avulso-texto">
         <span class="nome">${escapeHtml(displayNome)}</span>
         <span class="meta">${escapeHtml(efetivo.via||'')}${editado ? ' <span class="tag-editado">editado</span>' : ''}</span>
         ${efetivo.posologia ? `<div class="pos">${escapeHtml(efetivo.qtde ? efetivo.qtde + ' — ' : '')}${escapeHtml(efetivo.posologia)}</div>` : ''}
       </div>
-      <button type="button" class="icon-btn avulso-edit" title="Editar permanentemente no catálogo">&#9998;</button>
+      <button type="button" class="icon-btn avulso-edit" title="Editar permanentemente no catálogo" aria-label="Editar ${escapeHtml(displayNome)} no catálogo">&#9998;</button>
     `;
     head.querySelector('input').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -726,8 +726,8 @@
             <span class="nome-med">${escapeHtml(it.nome)}</span>
             <span class="dots"></span>
             <span class="qtde">${escapeHtml(it.qtde||'')}</span>
-            <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item">&#x270E;</button>
-            <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita">&times;</button>
+            <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item" aria-label="Editar ${escapeHtml(it.nome)}">&#x270E;</button>
+            <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita" aria-label="Remover ${escapeHtml(it.nome)} da receita">&times;</button>
           </div>
           <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
         `;
@@ -1066,18 +1066,21 @@ ${dataStr}`;
       if(!porToken[token]) porToken[token] = [];
       porToken[token].push(it.nome);
     });
-    avisosPediatria.forEach(txt => {
+    if(avisosPediatria.length){
+      const [titulo, ...itens] = avisosPediatria;
       const div = document.createElement('div');
       div.className = 'aviso amber';
-      div.innerHTML = '&#9888; ' + escapeHtml(txt);
+      div.innerHTML = '<span class="aviso-ic" aria-hidden="true">&#9888;</span><div class="aviso-corpo"><b>' + escapeHtml(titulo) + '</b>'
+        + (itens.length ? '<ul>' + itens.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '')
+        + '</div>';
       bar.appendChild(div);
-    });
+    }
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2){
         const div = document.createElement('div');
         div.className = 'aviso amber';
         const nomeExib = token.charAt(0).toUpperCase() + token.slice(1);
-        div.innerHTML = `&#9888; Possível duplicidade: <b>${escapeHtml(nomeExib)}</b> aparece em ${porToken[token].length} itens (${escapeHtml(porToken[token].join(' · '))}). Confira se é intencional.`;
+        div.innerHTML = `<span class="aviso-ic" aria-hidden="true">&#9888;</span><div class="aviso-corpo">Possível duplicidade: <b>${escapeHtml(nomeExib)}</b> aparece em ${porToken[token].length} itens (${escapeHtml(porToken[token].join(' · '))}). Confira se é intencional.</div>`;
         bar.appendChild(div);
       }
     });
@@ -1212,7 +1215,7 @@ ${dataStr}`;
     }
     const dias = Math.floor((Date.now() - new Date(r.value).getTime()) / 86400000);
     if(dias >= 7){
-      nota.innerHTML = base + ` <b style="color:var(--amber);">Já fazem ${dias} dias desde o último backup — considere exportar de novo.</b>`;
+      nota.innerHTML = base + ` <b style="color:var(--amber);">Já se passaram ${dias} dias desde o último backup — considere exportar de novo.</b>`;
     } else {
       nota.textContent = base;
     }
@@ -1910,6 +1913,30 @@ ${dataStr}`;
     }
   });
 
+  // Tema: automático (segue o sistema) → claro → escuro. A receita impressa é sempre clara.
+  const TEMAS = ['auto', 'claro', 'escuro'];
+  const TEMA_ROTULO = { auto: 'automático', claro: 'claro', escuro: 'escuro' };
+  function aplicarTema(pref){
+    const root = document.documentElement;
+    root.setAttribute('data-tema-pref', pref);
+    if(pref === 'claro') root.setAttribute('data-theme', 'light');
+    else if(pref === 'escuro') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+    const rotulo = 'Tema: ' + TEMA_ROTULO[pref] + ' (clique para alternar)';
+    el('btnTema').title = rotulo;
+    el('btnTema').setAttribute('aria-label', rotulo);
+  }
+  aplicarTema(TEMAS.includes(document.documentElement.getAttribute('data-tema-pref')) ? document.documentElement.getAttribute('data-tema-pref') : 'auto');
+  el('btnTema').addEventListener('click', () => {
+    const atual = document.documentElement.getAttribute('data-tema-pref');
+    const prox = TEMAS[(TEMAS.indexOf(atual) + 1) % TEMAS.length];
+    aplicarTema(prox);
+    try{
+      if(prox === 'auto') localStorage.removeItem('tema'); else localStorage.setItem('tema', prox);
+    }catch(e){ /* sem armazenamento: vale só nesta sessão */ }
+    showToast('Tema ' + TEMA_ROTULO[prox]);
+  });
+
   // Histórico
   el('btnLimparHist').addEventListener('click', () => {
     historico = [];
@@ -2448,15 +2475,13 @@ ${dataStr}`;
       const isEdited = !!customCondicoes[nome] && !isCustom;
       
       if(isCustom){
-        el('editorBtnExcluir').style.display = 'block';
+        el('editorBtnExcluir').style.display = '';
         el('editorBtnExcluir').textContent = 'Excluir Condição';
-        el('editorBtnExcluir').style.borderColor = 'var(--danger)';
-        el('editorBtnExcluir').style.color = 'var(--danger)';
+        el('editorBtnExcluir').classList.remove('is-restore');
       } else if(isEdited){
-        el('editorBtnExcluir').style.display = 'block';
+        el('editorBtnExcluir').style.display = '';
         el('editorBtnExcluir').textContent = 'Restaurar Padrão';
-        el('editorBtnExcluir').style.borderColor = 'var(--amber)';
-        el('editorBtnExcluir').style.color = 'var(--amber)';
+        el('editorBtnExcluir').classList.add('is-restore');
       } else {
         el('editorBtnExcluir').style.display = 'none';
       }
@@ -2469,16 +2494,16 @@ ${dataStr}`;
     const box = document.createElement('div');
     box.className = 'editor-med-box';
     box.innerHTML = `
-      <button type="button" class="btn-remove-row" title="Remover">&times;</button>
-      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" value="${med ? escapeHtml(med.nome) : ''}" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;" list="datalistMedicamentosEditor">
-      <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 6px;">
-        <input type="text" class="ed-med-qtde" placeholder="Qtde" value="${med ? escapeHtml(med.qtde || '') : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
-        <select class="ed-med-via" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
+      <button type="button" class="btn-remove-row" title="Remover medicamento" aria-label="Remover medicamento">&times;</button>
+      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" aria-label="Nome do medicamento" value="${med ? escapeHtml(med.nome) : ''}" list="datalistMedicamentosEditor">
+      <div class="ed-grid-3">
+        <input type="text" class="ed-med-qtde" placeholder="Qtde" aria-label="Quantidade" value="${med ? escapeHtml(med.qtde || '') : ''}">
+        <select class="ed-med-via" aria-label="Via">
           ${renderViaOptions(med ? med.via : null)}
         </select>
-        <input type="text" class="ed-med-fator" placeholder="Fator/kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
+        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}">
       </div>
-      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" style="width: 100%; margin-top: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
+      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" aria-label="Posologia">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
     `;
     
     const inputNome = box.querySelector('.ed-med-nome');
@@ -2517,10 +2542,9 @@ ${dataStr}`;
     
     const row = document.createElement('div');
     row.className = 'editor-orient-row';
-    row.style.marginBottom = '6px';
     row.innerHTML = `
-      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" style="width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${escapeHtml(texto)}</textarea>
-      <button type="button" class="btn-remove-row" title="Remover">&times;</button>
+      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" aria-label="Orientação para o paciente">${escapeHtml(texto)}</textarea>
+      <button type="button" class="btn-remove-row" title="Remover orientação" aria-label="Remover orientação">&times;</button>
     `;
     
     row.querySelector('.btn-remove-row').addEventListener('click', () => {
