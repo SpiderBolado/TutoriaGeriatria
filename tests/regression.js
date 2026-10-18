@@ -398,6 +398,37 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Conversao adulto -> pediatrica ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const achou = await selectCondicao(page, 'Dor Muscular');
+    await page.click('#btnPediatrica');
+    await page.waitForTimeout(150);
+    const semPeso = await page.evaluate(() => document.querySelectorAll('#receitaPaper .nome-med').length);
+    await page.fill('#peso', '20');
+    await page.click('#btnPediatrica');
+    await page.waitForTimeout(250);
+    const r = await page.evaluate(() => ({
+      nomes: [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()),
+      pos: [...document.querySelectorAll('#receitaPaper .item-pos')].map((e) => e.textContent.trim()),
+      avisos: document.getElementById('avisoBar').textContent,
+    }));
+    const ok = achou && semPeso === 3
+      && r.nomes.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL'
+      && r.pos[0].includes('Tomar 12 gotas') && r.pos[1].includes('Tomar 20 gotas')
+      && /Ciclobenzaprina/.test(r.avisos) && /Confira cada dose/.test(r.avisos)
+      && consoleErrors.length === 0;
+    record('converte receita de adulto para pediatrica pelo peso', ok, JSON.stringify(r));
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(150);
+    const limpou = await page.evaluate(() => document.getElementById('avisoBar').textContent.trim() === '');
+    record('nova receita limpa avisos da conversao pediatrica', limpou);
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

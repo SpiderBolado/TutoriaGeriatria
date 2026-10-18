@@ -9,6 +9,7 @@
   let usoCondicoes = {}; // contagem de uso por condição (mais usadas sobem)
   let historico = [];    // últimas receitas geradas
   let customCondicoes = {}; // nome -> { meds: [...], orientacoes: [...] }
+  let avisosPediatria = []; // avisos/remoções da última conversão para pediátrica
   let overridesMedicamentos = {}; // avulsoId -> {qtde, via, fator, posologia} (edição permanente de um item avulso)
 
   const el = id => document.getElementById(id);
@@ -1064,6 +1065,12 @@ ${dataStr}`;
       if(!token) return;
       if(!porToken[token]) porToken[token] = [];
       porToken[token].push(it.nome);
+    });
+    avisosPediatria.forEach(txt => {
+      const div = document.createElement('div');
+      div.className = 'aviso amber';
+      div.innerHTML = '&#9888; ' + escapeHtml(txt);
+      bar.appendChild(div);
     });
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2){
@@ -2269,8 +2276,21 @@ ${dataStr}`;
     setTimeout(() => { printWindow.print(); }, 250);
     registrarHistorico('impresso');
   });
+  el('btnPediatrica').addEventListener('click', () => {
+    const entradas = Object.entries(selected);
+    if(!entradas.length){ showToast('Selecione os medicamentos antes de converter'); return; }
+    const r = window.PEDIATRIA.converterParaPediatrico(entradas, el('peso').value);
+    if(r.erro){ showToast(r.erro); el('peso').focus(); return; }
+    selected = Object.fromEntries(r.entries);
+    avisosPediatria = [
+      'Receita convertida automaticamente para pediátrica (peso ' + el('peso').value + ' kg). Confira cada dose antes de imprimir.',
+      ...r.removidos.map(x => x.motivo),
+      ...r.avisos
+    ];
+    renderTudo();
+  });
   el('btnLimpar').addEventListener('click', () => {
-    selected = {}; selectedOrient = {};
+    selected = {}; selectedOrient = {}; avisosPediatria = [];
     el('nomePaciente').value=''; el('peso').value='';
     renderTudo();
   });
