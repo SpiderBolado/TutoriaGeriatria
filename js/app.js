@@ -9,6 +9,9 @@
   let usoCondicoes = {}; // contagem de uso por condição (mais usadas sobem)
   let historico = [];    // últimas receitas geradas
   let customCondicoes = {}; // nome -> { meds: [...], orientacoes: [...] }
+  let conversaoPed = null; // {motivos, fixos} acumulados das conversões pediátricas desta receita
+  let desfazerPediatria = null; // seleção anterior à última conversão (para "Desfazer")
+  let autoPedSuspensa = false; // "Desfazer" pausa a conversão automática até a próxima receita
   let overridesMedicamentos = {}; // avulsoId -> {qtde, via, fator, posologia} (edição permanente de um item avulso)
 
   const el = id => document.getElementById(id);
@@ -79,11 +82,44 @@
     return obj;
   }
 
+  // Edições de condição são guardadas pelo índice do item (overrides[cond].meds[i]);
+  // quando um item sai do catálogo, os índices seguintes mudam. Cada versão lista,
+  // por condição, o novo índice de cada item antigo (null = item removido).
+  const CATALOGO_VERSAO = 2;
+  const REMAP_CATALOGO = {
+    2: { 'Vertigem': { meds: [null, 0, 1] } }   // saiu o Meclin 25mg
+  };
+  function migrarIndicesCatalogo(obj, versao){
+    for(let v = (versao || 1) + 1; v <= CATALOGO_VERSAO; v++){
+      Object.entries(REMAP_CATALOGO[v] || {}).forEach(([cond, mapa]) => {
+        const ov = obj && obj[cond];
+        if(!ov) return;
+        Object.keys(mapa).forEach(campo => {
+          if(!ov[campo]) return;
+          const novo = {};
+          Object.keys(ov[campo]).forEach(i => {
+            const j = mapa[campo][i];
+            if(j !== null && j !== undefined) novo[j] = ov[campo][i];
+          });
+          ov[campo] = novo;
+        });
+      });
+    }
+    return obj;
+  }
+
   async function loadOverrides(){
     try{
       const r = await storage.get('overrides-condicoes', false);
       overrides = r && r.value ? JSON.parse(r.value) : {};
       migrarChaveConstipacao(overrides);
+      const rv = await storage.get('overrides-catalogo', false);
+      const versao = rv && rv.value ? parseInt(rv.value, 10) : 1;
+      if(versao < CATALOGO_VERSAO){
+        migrarIndicesCatalogo(overrides, versao);
+        await saveOverrides();
+        await storage.set('overrides-catalogo', String(CATALOGO_VERSAO), false);
+      }
     }catch(e){ overrides = {}; }
   }
   async function saveOverrides(){
@@ -177,6 +213,11 @@
         posologia: o.posologia !== undefined ? o.posologia : m.posologia,
         via: o.via !== undefined ? o.via : m.via,
         fator: o.fator !== undefined ? o.fator : m.fator,
+        // teto e idade mínima valem para o item original; editar nome ou fator os descarta
+        max: (o.nome === undefined && o.fator === undefined) ? m.max : undefined,
+        faixas: (o.nome === undefined && o.fator === undefined) ? m.faixas : undefined,
+        idadeMinMeses: o.nome === undefined ? m.idadeMinMeses : undefined,
+        pesoMinKg: o.nome === undefined ? m.pesoMinKg : undefined,
         editado: o.nome!==undefined || o.qtde!==undefined || o.posologia!==undefined || o.via!==undefined || o.fator!==undefined
       };
     }).filter(Boolean);
@@ -195,7 +236,8 @@
       const id = 'cond:'+nome+':med:'+m.idx;
       if(selected[id]){
         selected[id] = Object.assign({}, selected[id], {
-          nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia, via: m.via || 'Outro', fator: m.fator, origemCondicao: nome
+          nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia, via: m.via || 'Outro', fator: m.fator,
+          max: m.max, faixas: m.faixas, idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: nome
         });
       }
     });
@@ -205,16 +247,19 @@
     });
   }
 
-  function calcDose(posologia, fator, peso){
+  // Dose por peso do item (fator com teto, ou faixa de peso) — cálculo único em js/pediatria.js.
+  // Peso fora das faixas sai como "____" para preencher à mão (com aviso).
+  function calcDoseItem(it, peso){
+    const posologia = it.posologiaBase;
     if(!posologia) return posologia;
-    if(fator === null || fator === undefined || fator === '' || !peso) return posologia;
-    const valor = Math.round(parseFloat(peso) * parseFloat(fator));
-    if(isNaN(valor)) return posologia;
-    return posologia.replace(/DOSE/g, String(valor));
+    const d = window.PEDIATRIA.doseDoItem(it, peso);
+    if(!d) return posologia;
+    return posologia.replace(/DOSE/g, d.valor === null ? '____' : String(d.valor));
   }
+  const itemPorPeso = it => window.PEDIATRIA.itemPorPeso(it);
 
   function anySelectedNeedsPeso(){
-    return Object.values(selected).some(it => it.fator !== null && it.fator !== undefined && it.fator !== '');
+    return Object.values(selected).some(itemPorPeso);
   }
 
   // Converte o texto digitado em "Fator dose/kg" pra número, ou null se vazio
@@ -304,10 +349,10 @@
     const head = document.createElement('div');
     head.className = 'card-head';
     head.innerHTML = `
-      <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check">
+      <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check" aria-label="Adicionar todos os itens de ${escapeHtml(nome)}">
       <span class="nome">${escapeHtml(nome)}</span>
       <span class="count">${eff.meds.length} item${eff.meds.length!==1?'s':''}</span>
-      <span class="chev">&#9656;</span>
+      <span class="chev" aria-hidden="true">&#9656;</span>
     `;
     const chk = head.querySelector('input');
     if(state === 'partial') chk.indeterminate = true;
@@ -390,12 +435,12 @@
     }
 
     wrap.innerHTML = `
-      <input type="checkbox" ${selected[id] ? 'checked':''}>
+      <input type="checkbox" ${selected[id] ? 'checked':''} aria-label="${escapeHtml(m.nome)}">
       <div class="sub-text"><b>${escapeHtml(m.nome)}</b> — ${escapeHtml(m.qtde||'')}${m.fator ? ' <span class="tag-peso">(dose por peso)</span>' : ''}${m.editado ? ' <span class="tag-editado">editado</span>' : ''}
       <span class="pos">${escapeHtml(m.posologia||'')}</span></div>
       <div class="row-actions">
-        <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
-        <button class="icon-btn ef-remove" title="Remover desta condição">&times;</button>
+        <button class="icon-btn ef-edit" title="Editar" aria-label="Editar ${escapeHtml(m.nome)}">&#9998;</button>
+        <button class="icon-btn ef-remove" title="Remover desta condição" aria-label="Remover ${escapeHtml(m.nome)} desta condição">&times;</button>
       </div>
     `;
     wrap.querySelector('input[type=checkbox]').addEventListener('click', (e) => {
@@ -457,11 +502,11 @@
     }
 
     wrap.innerHTML = `
-      <input type="checkbox" ${selectedOrient[id] ? 'checked':''}>
+      <input type="checkbox" ${selectedOrient[id] ? 'checked':''} aria-label="Orientação">
       <div class="sub-text">${escapeHtml(o.texto)}${o.editado ? ' <span class="tag-editado">editado</span>' : ''}</div>
       <div class="row-actions">
-        <button class="icon-btn ef-edit" title="Editar">&#9998;</button>
-        <button class="icon-btn ef-remove" title="Remover">&times;</button>
+        <button class="icon-btn ef-edit" title="Editar" aria-label="Editar orientação">&#9998;</button>
+        <button class="icon-btn ef-remove" title="Remover" aria-label="Remover orientação">&times;</button>
       </div>
     `;
     wrap.querySelector('input[type=checkbox]').addEventListener('click', (e) => {
@@ -599,13 +644,13 @@
     const head = document.createElement('div');
     head.className = 'card-head';
     head.innerHTML = `
-      <input type="checkbox" ${isSel ? 'checked':''}>
+      <input type="checkbox" ${isSel ? 'checked':''} aria-label="${escapeHtml(displayNome)}">
       <div class="avulso-texto">
         <span class="nome">${escapeHtml(displayNome)}</span>
         <span class="meta">${escapeHtml(efetivo.via||'')}${editado ? ' <span class="tag-editado">editado</span>' : ''}</span>
         ${efetivo.posologia ? `<div class="pos">${escapeHtml(efetivo.qtde ? efetivo.qtde + ' — ' : '')}${escapeHtml(efetivo.posologia)}</div>` : ''}
       </div>
-      <button type="button" class="icon-btn avulso-edit" title="Editar permanentemente no catálogo">&#9998;</button>
+      <button type="button" class="icon-btn avulso-edit" title="Editar permanentemente no catálogo" aria-label="Editar ${escapeHtml(displayNome)} no catálogo">&#9998;</button>
     `;
     head.querySelector('input').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -640,7 +685,7 @@
     if(ligar){
       selected[id] = {
         nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia,
-        via: m.via || 'Outro', fator: m.fator, origemCondicao: nomeCondicao
+        via: m.via || 'Outro', fator: m.fator, max: m.max, faixas: m.faixas, idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: nomeCondicao
       };
     } else {
       delete selected[id];
@@ -665,7 +710,9 @@
       const displayNome = [m.nome, m.concentracao].filter(Boolean).join(' ');
       selected[id] = {
         nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
-        via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null, origemCondicao: null
+        via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null,
+        max: (efetivo.fator === m.fator) ? m.max : undefined, faixas: (efetivo.fator === m.fator) ? m.faixas : undefined,
+        idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: null
       };
     } else {
       delete selected[id];
@@ -675,6 +722,19 @@
 
   // ---------- Receita (painel direito) ----------
   function logosHtml(){
+    const muni = municipioDoLocal(localAtual());
+    if(muni && muni.nomeNoCabecalho){
+      const brasao = muni.brasao();
+      return `
+        <div class="receita-logos">
+          <div class="logo-muni">
+            ${brasao ? `<img src="data:image/png;base64,${brasao}" class="logo-muni-brasao" alt="Brasão de ${escapeHtml(muni.nome)}">` : ''}
+            <div class="logo-muni-texto">Prefeitura Municipal de <b>${escapeHtml(muni.nome)}</b></div>
+          </div>
+          <img src="data:image/png;base64,${LOGO_SUS_B64}" class="logo-sus" alt="SUS">
+        </div>
+      `;
+    }
     if(localAtual() === 'patos'){
       return `
         <div class="receita-logos">
@@ -701,6 +761,47 @@
     return r ? r.value : 'carmo';
   }
 
+  // Municípios no modelo "brasão + nome da prefeitura + SUS". Carmo do
+  // Paranaíba usa o logotipo próprio (LOGO_COMUM_B64) e segue nas funções
+  // originais (viaBoxHtml, blocoViaDocx...).
+  const MUNICIPIOS = {
+    patos: {
+      nome: 'Patos de Minas',
+      prefeitura: 'Prefeitura de Patos de Minas',
+      prefeituraDocx: 'PREFEITURA DE PATOS DE MINAS',
+      brasao: () => LOGO_PATOS_ICON_B64,
+      nomeNoCabecalho: false, // receita comum: só brasão + SUS
+      unidadePadrao: 'Secretaria Municipal de Saúde',
+      fornecedor: [
+        'Prefeitura de Patos de Minas — Secretaria Municipal de Saúde',
+        'Rua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900'
+      ]
+    },
+    rio: {
+      nome: 'Rio Paranaíba',
+      prefeitura: 'Prefeitura Municipal de Rio Paranaíba',
+      prefeituraDocx: 'PREFEITURA MUNICIPAL DE RIO PARANAÍBA',
+      // Brasão em js/logos.js (LOGO_RIO_ICON_B64). Sem ele, o cabeçalho sai só com o nome.
+      brasao: () => (typeof LOGO_RIO_ICON_B64 === 'string' && LOGO_RIO_ICON_B64) || null,
+      nomeNoCabecalho: true,
+      // Endereço da Secretaria (mesmo prédio da Prefeitura), conforme o site oficial e o CNES.
+      // O campo "Unidade de Saúde" substitui este padrão quando preenchido.
+      unidadePadrao: 'Secretaria Municipal de Saúde — Rua Capitão Franklin de Castro, 1065 — CEP 38810-000',
+      fornecedor: [] // em branco: a farmácia que dispensa preenche
+    }
+  };
+  function municipioDoLocal(local){
+    return Object.prototype.hasOwnProperty.call(MUNICIPIOS, local) ? MUNICIPIOS[local] : null;
+  }
+
+  // Largura x altura de um PNG em base64 (lidas do cabeçalho IHDR), para
+  // manter a proporção do brasão no .docx.
+  function dimensoesPng(b64){
+    const bin = atob(b64.slice(0, 44));
+    const u32 = i => ((bin.charCodeAt(i) << 24) | (bin.charCodeAt(i+1) << 16) | (bin.charCodeAt(i+2) << 8) | bin.charCodeAt(i+3)) >>> 0;
+    return { w: u32(16), h: u32(20) };
+  }
+
   // Monta o HTML dos medicamentos + orientações (compartilhado pelos dois layouts)
   // Recebe entries [id, item] para permitir remoção direta pelo papel
   function corpoReceitaHtml(medEntries, orientEntries, peso){
@@ -716,8 +817,8 @@
     viaOrder.forEach(via => {
       html += `<div class="via-titulo">Uso ${via}</div>`;
       grupos[via].forEach(([id, it], idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
-        const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
+        const posologia = calcDoseItem(it, peso);
+        const precisaPeso = itemPorPeso(it) && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
           <div class="item-linha">
@@ -725,8 +826,8 @@
             <span class="nome-med">${escapeHtml(it.nome)}</span>
             <span class="dots"></span>
             <span class="qtde">${escapeHtml(it.qtde||'')}</span>
-            <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item">&#x270E;</button>
-            <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita">&times;</button>
+            <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item" aria-label="Editar ${escapeHtml(it.nome)}">&#x270E;</button>
+            <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita" aria-label="Remover ${escapeHtml(it.nome)} da receita">&times;</button>
           </div>
           <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
         `;
@@ -828,6 +929,10 @@ ${dataStr}`;
       .receita-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
       .receita-logos .logo-carmo{height:38px;width:auto;}
       .receita-logos .logo-sus{height:30px;width:auto;}
+      .receita-logos .logo-muni{display:flex;align-items:center;gap:10px;}
+      .receita-logos .logo-muni-brasao{height:46px;width:auto;}
+      .receita-logos .logo-muni-texto{font-size:10px;line-height:1.3;color:#4B5A55;text-transform:uppercase;letter-spacing:.06em;}
+      .receita-logos .logo-muni-texto b{display:block;font-size:15px;line-height:1.2;color:#16241F;letter-spacing:.03em;}
       .receita-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #16241F;padding-bottom:10px;margin-bottom:20px;}
       .receita-head .paciente{font-size:17px;font-weight:600;}
       .receita-head .paciente .lbl{display:block;font-size:10px;color:#4B5A55;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
@@ -923,8 +1028,9 @@ ${dataStr}`;
     `;
   }
 
-  function viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, label, extraClass){
-    const unidade = (el('unidadeSaude') && el('unidadeSaude').value.trim()) || 'Secretaria Municipal de Saúde';
+  function viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, label, extraClass){
+    const unidade = (el('unidadeSaude') && el('unidadeSaude').value.trim()) || muni.unidadePadrao;
+    const brasao = muni.brasao();
     const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '';
     const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
     const labelAssinatura = (medicoNome || medicoCrm) ? [medicoNome, medicoCrm].filter(Boolean).join(' — ') : 'Assinatura do médico';
@@ -932,8 +1038,8 @@ ${dataStr}`;
       <div class="via-box ${extraClass||''}">
         <div class="via-box-header">
           <div class="muni">
-            <img src="data:image/png;base64,${LOGO_PATOS_ICON_B64}" class="muni-logo" alt="Prefeitura de Patos de Minas">
-            <div class="muni-text"><b>Prefeitura de Patos de Minas</b><br>${escapeHtml(unidade)}</div>
+            ${brasao ? `<img src="data:image/png;base64,${brasao}" class="muni-logo" alt="${escapeHtml(muni.prefeitura)}">` : ''}
+            <div class="muni-text"><b>${escapeHtml(muni.prefeitura)}</b><br>${escapeHtml(unidade)}</div>
             <img src="data:image/png;base64,${LOGO_SUS_B64}" class="muni-sus-logo" alt="SUS">
           </div>
           <div class="via-label">${label || '1ª VIA FARMÁCIA'}</div>
@@ -961,8 +1067,7 @@ ${dataStr}`;
           </div>
           <div>
             <b>Identificação do fornecedor</b><br>
-            Prefeitura de Patos de Minas — Secretaria Municipal de Saúde<br>
-            Rua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900<br><br>
+${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<br>
             _________________________________<br>
             Assinatura do farmacêutico &nbsp;&nbsp;&nbsp; Data
           </div>
@@ -986,11 +1091,12 @@ ${dataStr}`;
       : corpoReceitaHtml(medEntries, orientEntries, peso);
 
     if(tipo === 'controle'){
-      paper.innerHTML = local === 'patos'
+      const muni = municipioDoLocal(local);
+      paper.innerHTML = muni
         ? `
           <div class="vias-lado-a-lado">
-            ${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}
-            ${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}
+            ${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}
+            ${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}
           </div>
         `
         : `
@@ -1054,7 +1160,63 @@ ${dataStr}`;
     });
   }
 
-  // ---------- Avisos (duplicidade de princípio ativo) ----------
+  // ---------- Paciente pediátrico (peso / idade) ----------
+  const numBR = n => String(n).replace('.', ',');
+  const AUTO_PED_KEY = 'auto-pediatria';
+  function pesoAtualKg(){
+    const v = parseFloat(String(el('peso').value).replace(',', '.'));
+    return v > 0 ? v : null;
+  }
+  function idadeAtualMeses(){ return window.PEDIATRIA.idadeEmMeses(el('idade').value); }
+  // Criança: idade informada < 12 anos; sem idade, peso < 40 kg (só sugere, não converte sozinho)
+  function pacientePediatrico(){
+    const meses = idadeAtualMeses();
+    if(meses !== null) return meses < 144;
+    const kg = pesoAtualKg();
+    return kg !== null && kg < window.PEDIATRIA.PESO_MAX_KG;
+  }
+  function autoPediatriaAtiva(){
+    try{ return localStorage.getItem(AUTO_PED_KEY) === '1'; }catch(e){ return false; }
+  }
+
+  function executarConversao(automatica){
+    const entradas = Object.entries(selected);
+    if(!entradas.length){ if(!automatica) showToast('Selecione os medicamentos antes de converter'); return false; }
+    const r = window.PEDIATRIA.converterParaPediatrico(entradas, el('peso').value, { idadeMeses: idadeAtualMeses() });
+    if(r.erro){ if(!automatica){ showToast(r.erro); el('peso').focus(); } return false; }
+    if(!r.convertidos && !r.removidos.length){
+      if(!automatica) showToast('Nenhum item com versão pediátrica cadastrada');
+      return false;
+    }
+    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
+    selected = Object.fromEntries(r.entries);
+    const acum = conversaoPed || { motivos: [], fixos: [] };
+    r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
+    r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
+    conversaoPed = acum;
+    renderTudo();
+    if(automatica) showToast('Receita convertida para pediátrica — confira os avisos');
+    return true;
+  }
+  function desfazerConversao(){
+    if(!desfazerPediatria) return;
+    selected = desfazerPediatria.selected;
+    conversaoPed = desfazerPediatria.conversaoPed;
+    desfazerPediatria = null;
+    autoPedSuspensa = true;
+    renderTudo();
+    showToast('Conversão desfeita');
+  }
+
+  function avisoHtml(classe, icone, corpoHtml, acaoHtml){
+    const div = document.createElement('div');
+    div.className = 'aviso ' + classe;
+    div.innerHTML = `<span class="aviso-ic" aria-hidden="true">${icone}</span><div class="aviso-corpo">${corpoHtml}</div>${acaoHtml || ''}`;
+    return div;
+  }
+  const listaHtml = itens => itens.length ? '<ul>' + itens.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '';
+
+  // ---------- Avisos (pediatria, teto de dose, duplicidade de princípio ativo) ----------
   function renderAvisos(){
     const bar = el('avisoBar');
     bar.innerHTML = '';
@@ -1065,12 +1227,53 @@ ${dataStr}`;
       if(!porToken[token]) porToken[token] = [];
       porToken[token].push(it.nome);
     });
+    const entradas = Object.entries(selected);
+    const kg = pesoAtualKg(), idade = idadeAtualMeses();
+
+    // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
+    const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas, idade) : 0;
+    if(conversiveis && pacientePediatrico()){
+      const quem = idade !== null ? window.PEDIATRIA.formatarIdade(idade) + (kg ? ', ' + numBR(kg) + ' kg' : '') : numBR(kg) + ' kg';
+      bar.appendChild(avisoHtml('teal', '&#9432;',
+        `<b>Paciente pediátrico (${escapeHtml(quem)}): ${conversiveis} ${conversiveis === 1 ? 'item de adulto pode' : 'itens de adulto podem'} ir para a versão pediátrica.</b>`
+        + (kg ? '' : '<br>Informe o peso para converter.')
+        + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
+        `<button type="button" data-acao="converter-ped" ${kg ? '' : 'disabled'}>Converter agora</button>`));
+    }
+
+    // 2) Resultado da conversão, recalculado com o peso/idade atuais
+    const convertidos = entradas.filter(([, it]) => it.convertidoPediatrico);
+    if(conversaoPed && (convertidos.length || conversaoPed.motivos.length || conversaoPed.fixos.length)){
+      const itens = [];
+      const alto = window.PEDIATRIA.avisoPesoAlto(kg || 0);
+      if(alto) itens.push(alto);
+      itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
+      convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
+      const titulo = 'Receita convertida automaticamente para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
+      bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
+        + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
+        desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
+    }
+
+    // 3) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
+    const soltos = [];
+    entradas.forEach(([, it]) => {
+      if(it.convertidoPediatrico) return;
+      const d = window.PEDIATRIA.doseDoItem(it, kg);
+      if(d && d.limitada) soltos.push(`${it.nome}: dose calculada (${d.semTeto}) excede o máximo de ${it.max} por dose; a receita sai com ${it.max}.`);
+      if(d && d.valor === null) soltos.push(`ATENÇÃO — ${it.nome}: peso fora das faixas de dose (mínimo ${it.pesoMinKg || '?'} kg). Preencha à mão ou revise.`);
+      if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)) soltos.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
+      if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){
+        soltos.push(`ATENÇÃO — ${it.nome}: paciente com ${window.PEDIATRIA.formatarIdade(idade)}, abaixo da idade mínima de ${window.PEDIATRIA.formatarIdade(it.idadeMinMeses)}. Revise.`);
+      }
+    });
+    if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Confira doses e idade mínima</b>' + listaHtml(soltos)));
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2){
         const div = document.createElement('div');
         div.className = 'aviso amber';
         const nomeExib = token.charAt(0).toUpperCase() + token.slice(1);
-        div.innerHTML = `&#9888; Possível duplicidade: <b>${escapeHtml(nomeExib)}</b> aparece em ${porToken[token].length} itens (${escapeHtml(porToken[token].join(' · '))}). Confira se é intencional.`;
+        div.innerHTML = `<span class="aviso-ic" aria-hidden="true">&#9888;</span><div class="aviso-corpo">Possível duplicidade: <b>${escapeHtml(nomeExib)}</b> aparece em ${porToken[token].length} itens (${escapeHtml(porToken[token].join(' · '))}). Confira se é intencional.</div>`;
         bar.appendChild(div);
       }
     });
@@ -1171,6 +1374,7 @@ ${dataStr}`;
     const payload = {
       app: 'gerador-receitas',
       versao: 1,
+      catalogo: CATALOGO_VERSAO,
       exportadoEm: new Date().toISOString(),
       customMeds, overrides, overridesMedicamentos, usoCondicoes, historico, customCondicoes,
       medico: { nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }
@@ -1205,7 +1409,7 @@ ${dataStr}`;
     }
     const dias = Math.floor((Date.now() - new Date(r.value).getTime()) / 86400000);
     if(dias >= 7){
-      nota.innerHTML = base + ` <b style="color:var(--amber);">Já fazem ${dias} dias desde o último backup — considere exportar de novo.</b>`;
+      nota.innerHTML = base + ` <b style="color:var(--amber);">Já se passaram ${dias} dias desde o último backup — considere exportar de novo.</b>`;
     } else {
       nota.textContent = base;
     }
@@ -1227,6 +1431,8 @@ ${dataStr}`;
       customMeds = Array.isArray(payload.customMeds) ? payload.customMeds : [];
       customCondicoes = payload.customCondicoes && typeof payload.customCondicoes === 'object' ? payload.customCondicoes : {};
       overrides = payload.overrides && typeof payload.overrides === 'object' ? payload.overrides : {};
+      migrarChaveConstipacao(overrides);
+      migrarIndicesCatalogo(overrides, payload.catalogo);
       overridesMedicamentos = payload.overridesMedicamentos && typeof payload.overridesMedicamentos === 'object' ? payload.overridesMedicamentos : {};
       usoCondicoes = payload.usoCondicoes && typeof payload.usoCondicoes === 'object' ? payload.usoCondicoes : {};
       historico = Array.isArray(payload.historico) ? payload.historico : [];
@@ -1253,13 +1459,25 @@ ${dataStr}`;
   }
 
   function atualizarDestaquePeso(){
+    el('idadeField').classList.toggle('campo-invalido', el('idade').value.trim() !== '' && idadeAtualMeses() === null);
     const precisa = anySelectedNeedsPeso();
     const pesoPreenchido = el('peso').value.trim() !== '';
     el('pesoField').classList.toggle('peso-necessario', precisa && !pesoPreenchido);
     el('pesoHint').classList.toggle('show', precisa && !pesoPreenchido);
   }
 
+  let convertendoAuto = false;
   function renderTudo(){
+    // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido
+    if(!convertendoAuto && autoPediatriaAtiva() && !autoPedSuspensa){
+      const meses = idadeAtualMeses();
+      if(meses !== null && meses < 144 && pesoAtualKg() && window.PEDIATRIA.contarConversiveis(Object.entries(selected), meses)){
+        convertendoAuto = true;
+        let converteu = false;
+        try{ converteu = executarConversao(true); } finally { convertendoAuto = false; }
+        if(converteu) return;
+      }
+    }
     renderLista(el('search').value);
     renderReceita();
     renderChips();
@@ -1287,7 +1505,7 @@ ${dataStr}`;
     viaOrder.forEach(via => {
       out += `USO ${via.toUpperCase()}\n`;
       grupos[via].forEach((it, idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
+        const posologia = calcDoseItem(it, peso);
         out += `${String(idx+1).padStart(2,'0')}. ${it.nome} ......... ${it.qtde||''}\n${posologia||''}\n\n`;
       });
     });
@@ -1343,7 +1561,7 @@ ${dataStr}`;
     }catch(e){ console.error('Falha ao salvar dados do médico', e); }
   }
 
-  // ---------- Local (Carmo do Paranaíba / Patos de Minas), persistido localmente ----------
+  // ---------- Local (Carmo do Paranaíba / Patos de Minas / Rio Paranaíba), persistido localmente ----------
   async function loadLocal(){
     try{
       const r = await storage.get('local-receita', false);
@@ -1381,7 +1599,7 @@ ${dataStr}`;
       grupos[via].push({
         nome: it.nome,
         qtde: it.qtde || '',
-        posologia: calcDose(it.posologiaBase, it.fator, peso) || ''
+        posologia: calcDoseItem(it, peso) || ''
       });
     });
 
@@ -1444,20 +1662,23 @@ ${dataStr}`;
 
   function gerarDocComum(dados){
     const { Document, Paragraph, TextRun, AlignmentType, ImageRun, BorderStyle } = docx;
-    const isPatos = localAtual() === 'patos';
-    const cabecalho = isPatos ? [
+    const muni = municipioDoLocal(localAtual());
+    const brasao = muni && muni.brasao();
+    const cabecalho = muni ? [
       new Paragraph({
         alignment: AlignmentType.CENTER,
         children: [
-          new ImageRun({ data: base64ParaBytes(LOGO_PATOS_ICON_B64), transformation: { width: 46, height: 61 }, type: 'png' }),
-          new TextRun({ text: '   ' }),
+          ...(brasao ? [
+            new ImageRun({ data: base64ParaBytes(brasao), transformation: (() => { const d = dimensoesPng(brasao); return { width: Math.round(61 * d.w / d.h), height: 61 }; })(), type: 'png' }),
+            new TextRun({ text: '   ' })
+          ] : []),
           new ImageRun({ data: base64ParaBytes(LOGO_SUS_B64), transformation: { width: 46, height: 24 }, type: 'png' })
         ]
       }),
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 200 },
-        children: [ new TextRun({ text: 'PREFEITURA DE PATOS DE MINAS', bold: true, size: 20, color: '666666' }) ]
+        children: [ new TextRun({ text: muni.prefeituraDocx, bold: true, size: 20, color: '666666' }) ]
       })
     ] : [
       new Paragraph({
@@ -1585,13 +1806,13 @@ ${dataStr}`;
     });
   }
 
-  // ---------- Modelo Patos de Minas: Receituário de Controle Especial (2 vias) ----------
-  function blocoViaDocxPatos(dados, viaLabel){
+  // ---------- Modelo município (Patos de Minas, Rio Paranaíba): Receituário de Controle Especial (2 vias) ----------
+  function blocoViaDocxMunicipio(muni, dados, viaLabel){
     const { Table, TableRow, WidthType, Paragraph } = docx;
-    const unidade = dados.unidade || 'Secretaria Municipal de Saúde';
+    const unidade = dados.unidade || muni.unidadePadrao;
     const rows = [];
     rows.push(new TableRow({ children: [
-      celulaDocx('Prefeitura de Patos de Minas\n' + unidade, { width: 55, bold: true }),
+      celulaDocx(muni.prefeitura + '\n' + unidade, { width: 55, bold: true }),
       celulaDocx(viaLabel, { width: 45, bold: true, shaded: true })
     ]}));
     rows.push(new TableRow({ children: [
@@ -1616,7 +1837,7 @@ ${dataStr}`;
       rows: [
         new TableRow({ children: [
           celulaDocx('Identificação do comprador\nNome:\nIdent.:                    Órgão emissor:\nEndereço:\nCidade:                     Estado:\nTelefone:', { width: 50, size: 16 }),
-          celulaDocx('Identificação do fornecedor\nPrefeitura de Patos de Minas — Secretaria Municipal de Saúde\nRua Dr. José Olympio de Melo, 151 — Bairro Eldorado — CEP 38.700-900\n\n_______________________________\nAssinatura do farmacêutico        Data', { width: 50, size: 16 })
+          celulaDocx(['Identificação do fornecedor', ...(muni.fornecedor.length ? muni.fornecedor : ['']), '', '_______________________________', 'Assinatura do farmacêutico        Data'].join('\n'), { width: 50, size: 16 })
         ]})
       ]
     });
@@ -1624,10 +1845,10 @@ ${dataStr}`;
     return [ table, new Paragraph({ spacing: { before: 100 } }), ...receitaParas, dataPar, new Paragraph({ spacing: { before: 200 } }), rodapeTable ];
   }
 
-  function gerarDocControleEspecialPatos(dados){
+  function gerarDocControleEspecialMunicipio(muni, dados){
     const { Document, Table, TableRow, TableCell, WidthType, VerticalAlign } = docx;
-    const via1 = blocoViaDocxPatos(dados, '1ª VIA FARMÁCIA');
-    const via2 = blocoViaDocxPatos(dados, '2ª VIA PACIENTE');
+    const via1 = blocoViaDocxMunicipio(muni, dados, '1ª VIA FARMÁCIA');
+    const via2 = blocoViaDocxMunicipio(muni, dados, '2ª VIA PACIENTE');
 
     const masterTable = new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
@@ -1688,7 +1909,7 @@ ${dataStr}`;
     try{
       await garantirDocxCarregado();
       const doc = tipo === 'controle'
-        ? (localAtual() === 'patos' ? gerarDocControleEspecialPatos(dados) : gerarDocControleEspecial(dados))
+        ? (municipioDoLocal(localAtual()) ? gerarDocControleEspecialMunicipio(municipioDoLocal(localAtual()), dados) : gerarDocControleEspecial(dados))
         : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
@@ -1866,6 +2087,8 @@ ${dataStr}`;
         showToast('O nome do medicamento não pode ficar vazio');
         return;
       }
+      if(selected[id].nome !== nome || selected[id].fator !== fator){ delete selected[id].max; delete selected[id].faixas; }
+      if(selected[id].nome !== nome){ delete selected[id].idadeMinMeses; delete selected[id].pesoMinKg; }
       selected[id].nome = nome;
       selected[id].qtde = qtde || null;
       selected[id].via = via;
@@ -1903,6 +2126,30 @@ ${dataStr}`;
     }
   });
 
+  // Tema: automático (segue o sistema) → claro → escuro. A receita impressa é sempre clara.
+  const TEMAS = ['auto', 'claro', 'escuro'];
+  const TEMA_ROTULO = { auto: 'automático', claro: 'claro', escuro: 'escuro' };
+  function aplicarTema(pref){
+    const root = document.documentElement;
+    root.setAttribute('data-tema-pref', pref);
+    if(pref === 'claro') root.setAttribute('data-theme', 'light');
+    else if(pref === 'escuro') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+    const rotulo = 'Tema: ' + TEMA_ROTULO[pref] + ' (clique para alternar)';
+    el('btnTema').title = rotulo;
+    el('btnTema').setAttribute('aria-label', rotulo);
+  }
+  aplicarTema(TEMAS.includes(document.documentElement.getAttribute('data-tema-pref')) ? document.documentElement.getAttribute('data-tema-pref') : 'auto');
+  el('btnTema').addEventListener('click', () => {
+    const atual = document.documentElement.getAttribute('data-tema-pref');
+    const prox = TEMAS[(TEMAS.indexOf(atual) + 1) % TEMAS.length];
+    aplicarTema(prox);
+    try{
+      if(prox === 'auto') localStorage.removeItem('tema'); else localStorage.setItem('tema', prox);
+    }catch(e){ /* sem armazenamento: vale só nesta sessão */ }
+    showToast('Tema ' + TEMA_ROTULO[prox]);
+  });
+
   // Histórico
   el('btnLimparHist').addEventListener('click', () => {
     historico = [];
@@ -1915,7 +2162,14 @@ ${dataStr}`;
   });
 
   el('nomePaciente').addEventListener('input', renderReceita);
-  el('peso').addEventListener('input', () => { renderReceita(); atualizarDestaquePeso(); });
+  let pacienteDebounceId = null;
+  const aoMudarPesoOuIdade = () => {
+    renderReceita(); atualizarDestaquePeso();
+    clearTimeout(pacienteDebounceId);
+    pacienteDebounceId = setTimeout(renderTudo, 400); // espera terminar de digitar ("2" → "25")
+  };
+  el('peso').addEventListener('input', aoMudarPesoOuIdade);
+  el('idade').addEventListener('input', aoMudarPesoOuIdade);
   document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', renderReceita));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
   el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
@@ -1951,8 +2205,10 @@ ${dataStr}`;
   const FIT_SCALE_MAX = 1;
   const FIT_SCALE_MIN = 0.62;
   const FIT_SCALE_STEP = 0.04;
-  const FIT_COLUMN_WIDTH = 480; // px — largura aproximada de cada via lado a lado em A4 paisagem
-  const FIT_MAX_HEIGHT = 620;   // px — altura aproximada disponível por folha (A4 paisagem, margens 12mm)
+  // A4 paisagem (1123 x 794 px a 96 dpi) com margem de 12 mm: ~1032 x 703 px úteis. O corpo da
+  // janela de impressão tem max-width 1000px e as duas vias têm 16px entre si: (1000-16)/2 = 492px.
+  const FIT_COLUMN_WIDTH = 492; // px — largura de cada via lado a lado na impressão
+  const FIT_MAX_HEIGHT = 680;   // px — altura útil da folha (703px) com folga para diferença de fonte
 
   function fitChromeCss(){
     return `
@@ -2028,7 +2284,8 @@ ${dataStr}`;
     if(!probe){
       probe = document.createElement('div');
       probe.id = 'fitProbe';
-      probe.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;width:' + FIT_COLUMN_WIDTH + 'px;';
+      probe.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;width:' + FIT_COLUMN_WIDTH + 'px;'
+        + "font-size:16px;line-height:normal;font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#16241F;";
       document.body.appendChild(probe);
       const style = document.createElement('style');
       style.id = 'fitProbeStyle';
@@ -2081,8 +2338,8 @@ ${dataStr}`;
         html += `<div class="via-titulo">Uso ${e.via}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
-        const posologia = calcDose(it.posologiaBase, it.fator, peso);
-        const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
+        const posologia = calcDoseItem(it, peso);
+        const precisaPeso = itemPorPeso(it) && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
           <div class="item-linha">
@@ -2107,8 +2364,9 @@ ${dataStr}`;
 
   function calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr){
     try{
-      const buildVia = corpoHtml => local === 'patos'
-        ? viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
+      const muni = municipioDoLocal(local);
+      const buildVia = corpoHtml => muni
+        ? viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')
         : viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA');
 
       const entradas = construirEntradasReceita(medEntries, orientEntries);
@@ -2122,24 +2380,41 @@ ${dataStr}`;
         }
       }
 
-      // 2) não coube nem no tamanho mínimo — divide em duas folhas
-      const scale = FIT_SCALE_MIN;
-      let corte = 1;
-      for(let n = entradas.length - 1; n >= 1; n--){
-        const html = renderEntradasHtml(entradas.slice(0, n), peso);
-        const altura = medirAlturaVia(buildVia(html), scale);
-        if(altura <= FIT_MAX_HEIGHT){ corte = n; break; }
+      // 2) não coube nem no tamanho mínimo — divide em quantas folhas forem precisas,
+      // cada uma medida (antes só havia 2 e o resto transbordava sem cabeçalho)
+      const notaDe = e => !e ? null
+        : e.tipo === 'item' ? 'Continuação da prescrição — Uso ' + e.it.via
+        : e.tipo === 'orientItem' ? 'Continuação — Orientações'
+        : null;
+      const paginar = (scale, limiteFolhas) => {
+        const cabe = (ini, fim) => {
+          const nota = ini > 0 ? notaDe(entradas[ini]) : null;
+          return medirAlturaVia(buildVia(renderEntradasHtml(entradas.slice(ini, fim), peso, nota)), scale) <= FIT_MAX_HEIGHT;
+        };
+        const paginas = [];
+        let ini = 0;
+        while(ini < entradas.length){
+          if(limiteFolhas && paginas.length >= limiteFolhas) return null; // já passou do mínimo
+          // maior fim que cabe (a altura cresce com o nº de entradas: busca binária)
+          let lo = ini + 1, hi = entradas.length, melhor = ini + 1;
+          while(lo <= hi){
+            const meio = (lo + hi) >> 1;
+            if(cabe(ini, meio)){ melhor = meio; lo = meio + 1; } else { hi = meio - 1; }
+          }
+          // não termina a folha num título ("Uso oral", "Orientações") sem nada embaixo
+          while(melhor - 1 > ini && melhor < entradas.length && /titulo|orientTitulo/.test(entradas[melhor - 1].tipo)) melhor--;
+          paginas.push(renderEntradasHtml(entradas.slice(ini, melhor), peso, ini > 0 ? notaDe(entradas[ini]) : null));
+          ini = melhor;
+        }
+        return paginas;
+      };
+      // menor nº de folhas possível (fonte mínima) e, com esse nº, a maior fonte que ainda cabe
+      const minimo = paginar(FIT_SCALE_MIN);
+      for(let scale = FIT_SCALE_MAX; scale > FIT_SCALE_MIN + 1e-6; scale -= FIT_SCALE_STEP){
+        const paginas = paginar(scale, minimo.length);
+        if(paginas && paginas.length <= minimo.length) return { scale: Math.round(scale * 100) / 100, paginas };
       }
-      const pagina1 = renderEntradasHtml(entradas.slice(0, corte), peso);
-      const restante = entradas.slice(corte);
-      let nota = null;
-      if(restante.length && restante[0].tipo === 'item'){
-        nota = 'Continuação da prescrição — Uso ' + restante[0].it.via;
-      } else if(restante.length && restante[0].tipo === 'orientItem'){
-        nota = 'Continuação — Orientações';
-      }
-      const pagina2 = restante.length ? renderEntradasHtml(restante, peso, nota) : null;
-      return { scale: Math.round(scale * 100) / 100, paginas: pagina2 ? [ pagina1, pagina2 ] : [ pagina1 ] };
+      return { scale: FIT_SCALE_MIN, paginas: minimo };
     } finally {
       // Sempre limpa a div/estilo de medição, mesmo que a função retorne mais
       // cedo — sem isso o vazamento de CSS pra página real persistia até o
@@ -2166,8 +2441,9 @@ ${dataStr}`;
       } else {
         const encaixe = calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr);
         fitScale = encaixe.scale;
-        const montarFolha = corpoHtml => local === 'patos'
-          ? `<div class="vias-lado-a-lado">${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlPatos(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
+        const muni = municipioDoLocal(local);
+        const montarFolha = corpoHtml => muni
+          ? `<div class="vias-lado-a-lado">${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
           : `<div class="vias-lado-a-lado">${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`;
         paperHtml = encaixe.paginas.map((corpo, i) => {
           const folha = montarFolha(corpo);
@@ -2187,6 +2463,10 @@ ${dataStr}`;
       .receita-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
       .receita-logos .logo-carmo{height:38px;width:auto;}
       .receita-logos .logo-sus{height:30px;width:auto;}
+      .receita-logos .logo-muni{display:flex;align-items:center;gap:10px;}
+      .receita-logos .logo-muni-brasao{height:46px;width:auto;}
+      .receita-logos .logo-muni-texto{font-size:10px;line-height:1.3;color:#4B5A55;text-transform:uppercase;letter-spacing:.06em;}
+      .receita-logos .logo-muni-texto b{display:block;font-size:15px;line-height:1.2;color:#16241F;letter-spacing:.03em;}
       .via-box{border:1.5px solid #16241F;border-radius:4px;margin-bottom:22px;overflow:hidden;}
       .via-box-header{display:flex;border-bottom:1.5px solid #16241F;}
       .via-box-header .muni{flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-right:1.5px solid #16241F;min-width:0;}
@@ -2269,9 +2549,21 @@ ${dataStr}`;
     setTimeout(() => { printWindow.print(); }, 250);
     registrarHistorico('impresso');
   });
+  el('btnPediatrica').addEventListener('click', () => executarConversao(false));
+  el('avisoBar').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-acao]');
+    if(!b) return;
+    if(b.dataset.acao === 'converter-ped') executarConversao(false);
+    if(b.dataset.acao === 'desfazer-ped') desfazerConversao();
+  });
+  el('avisoBar').addEventListener('change', (e) => {
+    if(!e.target.matches('input[data-acao="auto-ped"]')) return;
+    try{ localStorage.setItem(AUTO_PED_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
+    if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
+  });
   el('btnLimpar').addEventListener('click', () => {
-    selected = {}; selectedOrient = {};
-    el('nomePaciente').value=''; el('peso').value='';
+    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
   });
 
@@ -2428,15 +2720,13 @@ ${dataStr}`;
       const isEdited = !!customCondicoes[nome] && !isCustom;
       
       if(isCustom){
-        el('editorBtnExcluir').style.display = 'block';
+        el('editorBtnExcluir').style.display = '';
         el('editorBtnExcluir').textContent = 'Excluir Condição';
-        el('editorBtnExcluir').style.borderColor = 'var(--danger)';
-        el('editorBtnExcluir').style.color = 'var(--danger)';
+        el('editorBtnExcluir').classList.remove('is-restore');
       } else if(isEdited){
-        el('editorBtnExcluir').style.display = 'block';
+        el('editorBtnExcluir').style.display = '';
         el('editorBtnExcluir').textContent = 'Restaurar Padrão';
-        el('editorBtnExcluir').style.borderColor = 'var(--amber)';
-        el('editorBtnExcluir').style.color = 'var(--amber)';
+        el('editorBtnExcluir').classList.add('is-restore');
       } else {
         el('editorBtnExcluir').style.display = 'none';
       }
@@ -2449,16 +2739,16 @@ ${dataStr}`;
     const box = document.createElement('div');
     box.className = 'editor-med-box';
     box.innerHTML = `
-      <button type="button" class="btn-remove-row" title="Remover">&times;</button>
-      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" value="${med ? escapeHtml(med.nome) : ''}" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;" list="datalistMedicamentosEditor">
-      <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 6px;">
-        <input type="text" class="ed-med-qtde" placeholder="Qtde" value="${med ? escapeHtml(med.qtde || '') : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
-        <select class="ed-med-via" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
+      <button type="button" class="btn-remove-row" title="Remover medicamento" aria-label="Remover medicamento">&times;</button>
+      <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" aria-label="Nome do medicamento" value="${med ? escapeHtml(med.nome) : ''}" list="datalistMedicamentosEditor">
+      <div class="ed-grid-3">
+        <input type="text" class="ed-med-qtde" placeholder="Qtde" aria-label="Quantidade" value="${med ? escapeHtml(med.qtde || '') : ''}">
+        <select class="ed-med-via" aria-label="Via">
           ${renderViaOptions(med ? med.via : null)}
         </select>
-        <input type="text" class="ed-med-fator" placeholder="Fator/kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}" style="padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px;">
+        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}">
       </div>
-      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" style="width: 100%; margin-top: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
+      <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" aria-label="Posologia">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
     `;
     
     const inputNome = box.querySelector('.ed-med-nome');
@@ -2497,10 +2787,9 @@ ${dataStr}`;
     
     const row = document.createElement('div');
     row.className = 'editor-orient-row';
-    row.style.marginBottom = '6px';
     row.innerHTML = `
-      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" style="width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; min-height: 44px; resize: vertical;">${escapeHtml(texto)}</textarea>
-      <button type="button" class="btn-remove-row" title="Remover">&times;</button>
+      <textarea class="ed-orient-texto" placeholder="Orientação para o paciente" aria-label="Orientação para o paciente">${escapeHtml(texto)}</textarea>
+      <button type="button" class="btn-remove-row" title="Remover orientação" aria-label="Remover orientação">&times;</button>
     `;
     
     row.querySelector('.btn-remove-row').addEventListener('click', () => {

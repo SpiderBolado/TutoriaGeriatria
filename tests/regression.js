@@ -398,6 +398,283 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Conversao adulto -> pediatrica ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const achou = await selectCondicao(page, 'Dor Muscular');
+    await page.click('#btnPediatrica');
+    await page.waitForTimeout(150);
+    const semPeso = await page.evaluate(() => document.querySelectorAll('#receitaPaper .nome-med').length);
+    await page.fill('#peso', '20');
+    await page.click('#btnPediatrica');
+    await page.waitForTimeout(250);
+    const r = await page.evaluate(() => ({
+      nomes: [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()),
+      pos: [...document.querySelectorAll('#receitaPaper .item-pos')].map((e) => e.textContent.trim()),
+      avisos: document.getElementById('avisoBar').textContent,
+    }));
+    const ok = achou && semPeso === 3
+      && r.nomes.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL'
+      && r.pos[0].includes('Tomar 12 gotas') && r.pos[1].includes('Tomar 20 gotas')
+      && /Ciclobenzaprina/.test(r.avisos) && /Confira cada dose/.test(r.avisos)
+      && consoleErrors.length === 0;
+    record('converte receita de adulto para pediatrica pelo peso', ok, JSON.stringify(r));
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(150);
+    const limpou = await page.evaluate(() => document.getElementById('avisoBar').textContent.trim() === '');
+    record('nova receita limpa avisos da conversao pediatrica', limpou);
+    await browser.close();
+  }
+
+  // ---- Tema claro/escuro alterna e persiste ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const estado = () => page.evaluate(() => [document.documentElement.getAttribute('data-tema-pref'), document.documentElement.getAttribute('data-theme')]);
+    const inicial = await estado();
+    await page.click('#btnTema');
+    const claro = await estado();
+    await page.click('#btnTema');
+    const escuro = await estado();
+    await page.reload();
+    await page.waitForTimeout(300);
+    const aposReload = await estado();
+    await page.click('#btnTema');
+    const volta = await estado();
+    const ok = JSON.stringify([inicial, claro, escuro, aposReload, volta]) === JSON.stringify([
+      ['auto', null], ['claro', 'light'], ['escuro', 'dark'], ['escuro', 'dark'], ['auto', null]
+    ]) && consoleErrors.length === 0;
+    record('tema alterna (auto/claro/escuro) e persiste apos reload', ok, JSON.stringify([inicial, claro, escuro, aposReload, volta]));
+    await browser.close();
+  }
+
+  // ---- Celular: sem rolagem horizontal da pagina ----
+  {
+    const browser = await chromium.launch();
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Com Nome Bem Comprido Para Testar Quebra');
+    await selectCondicao(page, 'Dor Muscular');
+    const larguras = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vw: window.innerWidth }));
+    record('celular sem rolagem horizontal (390px)', larguras.doc <= 390 && larguras.vw <= 390, JSON.stringify(larguras));
+    await page.click('label.tipo-opt:has(input[name="tipoReceita"][value="controle"])');
+    await page.waitForTimeout(250);
+    const alturasVias = await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .via-box')].map((v) => Math.round(v.getBoundingClientRect().height)));
+    record('celular: vias do controle especial visiveis', alturasVias.length === 2 && alturasVias.every((h) => h > 200), JSON.stringify(alturasVias));
+    await browser.close();
+  }
+
+  // ---- Local Rio Paranaiba: cabecalho, controle especial, .docx e persistencia ----
+  {
+    const browser = await chromium.launch();
+    const context = await browser.newContext({ acceptDownloads: true });
+    const page = await context.newPage();
+    const consoleErrors = [];
+    page.on('pageerror', (err) => consoleErrors.push(err.message));
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.click('label.tipo-opt:has(input[name="localReceita"][value="rio"])');
+    await selectCondicao(page, 'Dor Muscular');
+    const comum = await page.evaluate(() => {
+      const head = document.querySelector('#receitaPaper .receita-logos');
+      const temBrasao = typeof LOGO_RIO_ICON_B64 === 'string' && !!LOGO_RIO_ICON_B64;
+      return {
+        texto: head ? head.textContent.replace(/\s+/g, ' ').trim() : '',
+        brasaoOk: temBrasao === !!document.querySelector('#receitaPaper .logo-muni-brasao'),
+        semCarmo: !document.querySelector('#receitaPaper img[alt*="Carmo"]'),
+      };
+    });
+    const [dl1] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }).catch(() => null), page.click('#btnDocx')]);
+    await page.click('label.tipo-opt:has(input[name="tipoReceita"][value="controle"])');
+    await page.waitForTimeout(200);
+    const vias = await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .via-box .muni-text b')].map((b) => b.textContent));
+    const [dl2] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }).catch(() => null), page.click('#btnDocx')]);
+    await page.reload();
+    await page.waitForTimeout(400);
+    const persistiu = await page.evaluate(() => document.querySelector('input[name="localReceita"]:checked').value);
+    const ok = /Prefeitura Municipal de Rio Paranaíba/.test(comum.texto) && comum.brasaoOk && comum.semCarmo
+      && vias.length === 2 && vias.every((v) => v === 'Prefeitura Municipal de Rio Paranaíba')
+      && !!dl1 && !!dl2 && persistiu === 'rio' && consoleErrors.length === 0;
+    record('local Rio Paranaiba: cabecalho, 2 vias, .docx e persistencia', ok,
+      JSON.stringify({ comum, vias, docx: [!!dl1, !!dl2], persistiu, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Pediatria: sugestao, conversao automatica, desfazer, idoso de baixo peso ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const nomes = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()));
+
+    // idoso de 38 kg: sem sugestao de conversao
+    await page.fill('#idade', '82');
+    await page.fill('#peso', '38');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(500);
+    const idoso = await barra();
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+
+    // crianca so com peso: sugestao com botao, sem converter sozinha
+    await page.fill('#peso', '20');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(500);
+    const sugestao = await barra();
+    const antes = await nomes();
+    await page.click('#avisoBar button[data-acao="converter-ped"]');
+    await page.waitForTimeout(250);
+    const depois = await nomes();
+    // peso muda depois da conversao: avisos acompanham
+    await page.fill('#peso', '24');
+    await page.waitForTimeout(600);
+    const recalculado = await barra();
+    await page.click('#avisoBar button[data-acao="desfazer-ped"]');
+    await page.waitForTimeout(250);
+    const desfeito = await nomes();
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+
+    // modo automatico com idade < 12 anos
+    await page.fill('#idade', '5a');
+    await page.fill('#peso', '20');
+    await page.waitForTimeout(500);
+    await selectCondicao(page, 'Enxaqueca');
+    await page.waitForTimeout(300);
+    await page.click('#avisoBar input[data-acao="auto-ped"]');
+    await page.waitForTimeout(400);
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '5a');
+    await page.fill('#peso', '20');
+    await page.waitForTimeout(500);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(400);
+    const auto = await nomes();
+    const autoPersistiu = await page.evaluate(() => localStorage.getItem('auto-pediatria'));
+
+    const ok = !/Paciente pediátrico/.test(idoso)
+      && /Paciente pediátrico \(20 kg\)/.test(sugestao) && antes.includes('Ciclobenzaprina 10mg')
+      && depois.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL'
+      && /14 gotas/.test(recalculado) && /peso 24 kg/.test(recalculado)
+      && desfeito.includes('Ciclobenzaprina 10mg')
+      && auto.join('|') === 'Dipirona 500 mg/mL|Ibuprofeno 50 mg/mL' && autoPersistiu === '1'
+      && consoleErrors.length === 0;
+    record('pediatria: sugestao, conversao automatica, desfazer e idoso sem sugestao', ok,
+      JSON.stringify({ idoso: idoso.slice(0, 80), sugestao: sugestao.slice(0, 120), antes, depois, recalculado: recalculado.slice(0, 160), desfeito, auto, autoPersistiu, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Catalogo pediatrico: faixas, teto e idade minima na receita; avulso com dose pronta ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const linha = (nome) => page.evaluate((n) => {
+      const it = [...document.querySelectorAll('#receitaPaper .nome-med')].find((e) => e.textContent.trim() === n);
+      const l = it && it.closest('.item-linha');
+      return l ? (l.textContent + ' ' + (l.nextElementSibling ? l.nextElementSibling.textContent : '')).replace(/\s+/g, ' ') : '';
+    }, nome);
+    await page.fill('#idade', '4m');
+    await page.fill('#peso', '10');
+    await page.waitForTimeout(500);
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    await page.waitForTimeout(400);
+    const ond10 = await linha('Ondansetrona 4mg (Comprimido)');
+    const avisos4m = await barra();
+    await page.fill('#idade', '14');
+    await page.fill('#peso', '70');
+    await page.waitForTimeout(600);
+    const amox70 = await linha('Amoxicilina 50mg/mL');
+    const avisos70 = await barra();
+    await page.click('#btnLimpar');
+    await page.fill('#peso', '20');
+    await page.waitForTimeout(500);
+    await page.fill('#search', 'Dipirona gotas');
+    await page.waitForTimeout(250);
+    await page.evaluate(() => {
+      const card = [...document.querySelectorAll('#listaContainer .card.med-avulso')]
+        .find((c) => c.querySelector('.nome')?.textContent.trim() === 'Dipirona gotas 500mg/mL');
+      card?.querySelector('input[type=checkbox]')?.click();
+    });
+    await page.waitForTimeout(300);
+    const avulso = await page.evaluate(() => document.querySelector('#receitaPaper').innerText.replace(/\s+/g, ' '));
+    const ok = /1\/2 comprimido \(2 mg\)/.test(ond10)
+      && /Metoclopramida Gotas 4mg\/mL: paciente com 4 meses, abaixo da idade mínima de 12 meses/.test(avisos4m)
+      && /Tomar 20 mL/.test(amox70) && /Amoxicilina 50mg\/mL: dose calculada \(23\) excede o máximo de 20/.test(avisos70)
+      && /Dar 12 gotas, de 06\/06 horas/.test(avulso)
+      && consoleErrors.length === 0;
+    record('catalogo pediatrico: faixa de peso, teto, idade minima e avulso por peso', ok,
+      JSON.stringify({ ond10: ond10.slice(0, 160), avisos4m: avisos4m.slice(0, 400), amox70: amox70.slice(0, 120), avisos70: avisos70.slice(0, 300), avulso: avulso.slice(0, 200), consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Edicoes salvas acompanham a remocao de item do catalogo (Vertigem sem Meclin) ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.evaluate(() => {
+      localStorage.removeItem('overrides-catalogo');
+      localStorage.setItem('overrides-condicoes', JSON.stringify({ Vertigem: { meds: { 0: { removido: true }, 1: { posologia: 'CINARIZINA EDITADA' } }, orientacoes: {} } }));
+    });
+    const ler = async () => {
+      await page.reload();
+      await page.waitForTimeout(400);
+      await page.click('#btnLimpar');
+      await selectCondicao(page, 'Vertigem');
+      await page.waitForTimeout(200);
+      return page.evaluate(() => document.querySelector('#receitaPaper').innerText.replace(/\s+/g, ' '));
+    };
+    const r1 = await ler();
+    const r2 = await ler();   // segunda carga nao pode deslocar de novo
+    const versao = await page.evaluate(() => localStorage.getItem('overrides-catalogo'));
+    const salvo = await page.evaluate(() => JSON.parse(localStorage.getItem('overrides-condicoes')).Vertigem.meds);
+    const ok = /CINARIZINA EDITADA/.test(r1) && /Domperidona/.test(r1) && r1 === r2
+      && versao === '2' && JSON.stringify(salvo) === JSON.stringify({ 0: { posologia: 'CINARIZINA EDITADA' } })
+      && consoleErrors.length === 0;
+    record('edicoes salvas acompanham a remocao do Meclin na Vertigem', ok, JSON.stringify({ r1: r1.slice(0, 300), iguais: r1 === r2, versao, salvo, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
+  {
+    const browser = await chromium.launch();
+    const { page } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.evaluate(() => { const r = document.querySelector('input[name=tipoReceita][value="controle"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
+    const resultados = [];
+    for (const conds of [['Dor Muscular'], ['Enxaqueca', 'Dor Muscular', 'GECA'], ['Dengue', 'ITU', 'Sinusite bomba', 'Vertigem', 'Gripe']]) {
+      await page.click('#btnLimpar');
+      for (const n of conds) await selectCondicao(page, n);
+      await page.click('#btnImprimir');
+      await page.waitForTimeout(500);
+      const html = (await page.evaluate(() => window.__prints)).pop();
+      const p2 = await browser.newPage();
+      await p2.setContent(html, { waitUntil: 'load' });
+      const folhas = await p2.evaluate(() => document.querySelectorAll('.vias-lado-a-lado').length);
+      const pdf = await p2.pdf({ preferCSSPageSize: true });
+      const paginas = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+      resultados.push({ conds: conds.length, folhas, paginas });
+      await p2.close();
+    }
+    const ok = resultados.every((r) => r.folhas === r.paginas) && resultados[0].folhas === 1;
+    record('controle especial: folhas montadas = paginas do PDF', ok, JSON.stringify(resultados));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

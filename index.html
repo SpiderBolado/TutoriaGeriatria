@@ -2,240 +2,343 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Gerador de receitas por condição clínica. Uso pessoal: os dados ficam salvos só neste dispositivo.">
+<meta name="theme-color" content="#0E6B58">
 <title>Gerador de Receitas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E6B58'/%3E%3Cg transform='rotate(-45 16 16)'%3E%3Crect x='5' y='11.5' width='22' height='9' rx='4.5' fill='none' stroke='white' stroke-width='2.4'/%3E%3Cpath d='M16 11.5H9.5a4.5 4.5 0 0 0 0 9H16z' fill='white'/%3E%3C/g%3E%3C/svg%3E">
+<script>
+  // Aplica o tema salvo antes de pintar a página (evita piscar claro→escuro).
+  try{
+    var temaSalvo = localStorage.getItem('tema');
+    document.documentElement.setAttribute('data-tema-pref', temaSalvo === 'claro' || temaSalvo === 'escuro' ? temaSalvo : 'auto');
+    if(temaSalvo === 'claro') document.documentElement.setAttribute('data-theme', 'light');
+    if(temaSalvo === 'escuro') document.documentElement.setAttribute('data-theme', 'dark');
+  }catch(e){ document.documentElement.setAttribute('data-tema-pref', 'auto'); }
+</script>
 <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
+<a class="skip-link" href="#search">Pular para a busca</a>
+
 <div id="app">
   <header class="top">
-    <div class="header-titles">
-      <h1>Gerador de Receitas</h1>
-      <span class="tag">Uso pessoal · dados ficam só neste dispositivo</span>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-45 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8H6.5a4 4 0 0 0 0 8H12z" fill="currentColor"/></g></svg>
+      </span>
+      <div class="header-titles">
+        <h1>Gerador de Receitas</h1>
+        <span class="tag">
+          <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          Uso pessoal · dados ficam só neste dispositivo
+        </span>
+      </div>
     </div>
-    <button id="btnAjuda" class="btn-ajuda" title="Como usar" aria-label="Como usar">?</button>
+    <div class="header-actions">
+      <button id="btnTema" class="icon-round" type="button" title="Tema: automático" aria-label="Tema: automático">
+        <svg class="ic ic-tema-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+        <svg class="ic ic-tema-claro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ic ic-tema-escuro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button id="btnAjuda" class="icon-round btn-ajuda" type="button" title="Como usar" aria-label="Como usar">?</button>
+    </div>
   </header>
 
-  <div class="ajuda-overlay" id="ajudaOverlay">
-    <div class="ajuda-modal">
-      <div class="ajuda-modal-head">
-        <h2>Como usar o Gerador de Receitas</h2>
-        <button id="btnFecharAjuda" class="btn-fechar-ajuda" aria-label="Fechar">&times;</button>
-      </div>
-      <div class="ajuda-modal-body">
-        <ol>
-          <li><b>Preencha o paciente.</b> Digite o nome completo no campo "Paciente". Se for criança, informe o peso em kg — isso calcula automaticamente a dose de medicamentos com posologia por peso.</li>
-          <li><b>Escolha o tipo de receita.</b> "Comum (1 via)" para receitas normais, ou "Controle especial (2 vias)" para medicamentos controlados (sai em duas vias lado a lado, para farmácia e paciente).</li>
-          <li><b>Busque e adicione condições/medicamentos.</b> Use a busca à esquerda para encontrar uma condição clínica (adiciona todos os medicamentos daquela condição de uma vez) ou um medicamento específico. Clique para adicionar à receita.</li>
-          <li><b>Ajuste se precisar.</b> Na prévia da receita (painel direito), você pode editar a posologia de um item só para este paciente, ou remover itens clicando no "×".</li>
-          <li><b>Preencha seus dados (nome e CRM).</b> Antes de gerar a receita, preencha seu nome e CRM na seção de dados do médico — eles ficam salvos neste computador para as próximas receitas, mas cada profissional deve conferir/preencher os seus ao usar o app pela primeira vez neste dispositivo.</li>
-          <li><b>Gere a receita.</b> Use "Imprimir / PDF" para imprimir direto, ou "Baixar .docx" para gerar um arquivo Word editável.</li>
-          <li><b>Atalhos úteis:</b> tecla "/" foca a busca; Enter na busca seleciona o primeiro resultado; teclas 1–9 aplicam as condições mais usadas; Ctrl+Enter limpa a receita para o próximo paciente.</li>
-        </ol>
-        <p class="ajuda-nota">Todos os dados (histórico, medicamentos personalizados, nome/CRM) ficam salvos apenas neste computador/navegador — nada é enviado para a internet. Use "Exportar backup" periodicamente para não perder suas personalizações.</p>
-      </div>
-    </div>
-  </div>
+  <aside class="sidebar" aria-label="Montagem da receita">
+    <section class="panel panel-paciente" aria-labelledby="tituloPaciente">
+      <h2 class="panel-title" id="tituloPaciente">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        Paciente e receita
+      </h2>
 
-  <div class="panel">
-    <div class="field-row">
-      <div class="field field-paciente">
-        <label for="nomePaciente">Paciente</label>
-        <input type="text" id="nomePaciente" placeholder="Nome completo">
-      </div>
-      <div class="field field-peso" id="pesoField">
-        <label for="peso">Peso (kg)</label>
-        <input type="number" id="peso" step="0.1" min="0" placeholder="se criança">
-      </div>
-    </div>
-    <div class="peso-hint" id="pesoHint">&#9888; Informe o peso — 1 ou mais itens selecionados calculam a dose por kg</div>
-
-    <div class="field">
-      <label>Tipo de receita</label>
-      <div class="tipo-receita">
-        <label class="tipo-opt"><input type="radio" name="tipoReceita" value="comum" checked> Comum (1 via)</label>
-        <label class="tipo-opt"><input type="radio" name="tipoReceita" value="controle"> Controle especial (2 vias)</label>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Local</label>
-      <div class="tipo-receita">
-        <label class="tipo-opt"><input type="radio" name="localReceita" value="carmo" checked> Carmo do Paranaíba</label>
-        <label class="tipo-opt"><input type="radio" name="localReceita" value="patos"> Patos de Minas</label>
-      </div>
-    </div>
-
-    <details class="add-custom" id="medicoDetails">
-      <summary>Dados do médico (aparecem na receita)</summary>
-      <div class="grid">
-        <input type="text" id="medicoNome" placeholder="Nome do médico">
-        <input type="text" id="medicoCrm" placeholder="CRM (ex: CRM-MG 000.000)">
-        <input type="text" id="unidadeSaude" placeholder="Unidade de Saúde (ex: UBS Central, PSF Bela Vista...)" style="grid-column: 1 / -1;">
-      </div>
-    </details>
-
-    <div class="chips-row" id="chipsMaisUsadas"></div>
-
-    <div class="search-wrap" id="searchWrap">
-      <input type="text" id="search" placeholder="Buscar condição ou medicamento — atalho &quot;/&quot;">
-      <button class="search-clear" id="searchClear" title="Limpar busca">&times;</button>
-    </div>
-
-    <div class="list-scroll" id="listaContainer"></div>
-
-    <details class="add-custom">
-      <summary>Adicionar medicamento avulso ao catálogo</summary>
-      <div class="grid">
-        <input type="text" id="novoNome" placeholder="Nome (ex: Paracetamol 750mg)">
-        <input type="text" id="novoQtde" placeholder="Quantidade (ex: 20 comprimidos)">
-        <select id="novoVia"></select>
-        <input type="text" id="novoFator" placeholder="Fator dose/kg (opcional, ex: 0.6)">
-      </div>
-      <textarea id="novoPosologia" placeholder="Posologia. Use a palavra DOSE onde o valor calculado pelo peso deve entrar (opcional)."></textarea>
-      <label class="save-check"><input type="checkbox" id="novoSalvar" checked> Salvar no meu catálogo permanentemente</label>
-      <button id="btnAddCustom">Adicionar à receita</button>
-    </details>
-
-    <details class="add-custom" id="editorCondicoesDetails">
-      <summary>Gerenciar Condições Clínicas</summary>
-      <div class="grid" style="grid-template-columns: 1fr; margin-top: 10px; gap: 4px;">
-        <div class="field">
-          <label for="editorSelectCond">Selecionar Condição</label>
-          <select id="editorSelectCond" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit;"></select>
+      <div class="field-row">
+        <div class="field field-paciente">
+          <label for="nomePaciente">Paciente</label>
+          <input type="text" id="nomePaciente" placeholder="Nome completo" autocomplete="off">
         </div>
-        <div class="field" id="editorNomeCondField" style="margin-top: 8px;">
-          <label for="editorNomeCond">Nome da Condição</label>
-          <input type="text" id="editorNomeCond" placeholder="Ex: Hipertensão Arterial" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit;">
+        <div class="field field-idade" id="idadeField">
+          <label for="idade">Idade</label>
+          <input type="text" id="idade" placeholder="ex.: 4a, 8m" autocomplete="off" title="Opcional. Ex.: 4, 4a, 8m, 1a6m. Ativa os avisos de idade mínima e a conversão automática.">
         </div>
-        
-        <div class="group-label" style="margin-top: 14px; border-bottom: 1px dashed var(--line); padding-bottom: 4px;">Medicamentos</div>
-        <div id="editorMedsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"></div>
-        <button id="editorBtnAddMed" style="margin-top: 8px; background: #fff; color: var(--teal); border: 1.5px solid var(--teal); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-start;">+ Adicionar Medicamento</button>
-
-        <div class="group-label" style="margin-top: 14px; border-bottom: 1px dashed var(--line); padding-bottom: 4px;">Orientações</div>
-        <div id="editorOrientsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"></div>
-        <button id="editorBtnAddOrient" style="margin-top: 8px; background: #fff; color: var(--teal); border: 1.5px solid var(--teal); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-start;">+ Adicionar Orientação</button>
-        
-        <div style="display: flex; gap: 8px; margin-top: 16px;">
-          <button id="editorBtnSalvar" style="flex: 1; background: var(--teal); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer;">Salvar</button>
-          <button id="editorBtnExcluir" style="background: #fff; color: var(--danger); border: 1.5px solid var(--danger); padding: 8px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: none;">Excluir</button>
+        <div class="field field-peso" id="pesoField">
+          <label for="peso">Peso (kg)</label>
+          <input type="number" id="peso" step="0.1" min="0" inputmode="decimal" placeholder="se criança">
         </div>
       </div>
-    </details>
+      <div class="peso-hint" id="pesoHint" role="status">&#9888; Informe o peso — 1 ou mais itens selecionados calculam a dose por kg</div>
 
-    <details class="add-custom" id="histDetails">
-      <summary>Histórico de receitas geradas</summary>
-      <input type="text" id="histBuscaPaciente" placeholder="Buscar por nome do paciente..." style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 12.5px; margin-bottom: 8px;">
-      <div id="histLista"></div>
-      <button id="btnLimparHist">Limpar histórico</button>
-      <div class="mini-note">Fica guardado apenas neste navegador. "Reaplicar" restaura os itens e o peso — não o nome do paciente.</div>
-    </details>
+      <fieldset class="field">
+        <legend>Tipo de receita</legend>
+        <div class="segmented">
+          <label class="tipo-opt"><input type="radio" name="tipoReceita" value="comum" checked><span>Comum <small>1 via</small></span></label>
+          <label class="tipo-opt"><input type="radio" name="tipoReceita" value="controle"><span>Controle especial <small>2 vias</small></span></label>
+        </div>
+      </fieldset>
 
-    <details class="add-custom">
-      <summary>Backup e ajustes</summary>
-      <div class="mini-note" id="storageNote"></div>
-      <div class="backup-btns">
-        <button id="btnExport">Exportar meus dados</button>
-        <button id="btnImport">Importar dados</button>
-        <input type="file" id="importFile" accept="application/json" style="display:none">
+      <fieldset class="field">
+        <legend>Local</legend>
+        <div class="segmented">
+          <label class="tipo-opt"><input type="radio" name="localReceita" value="carmo" checked><span>Carmo do Paranaíba</span></label>
+          <label class="tipo-opt"><input type="radio" name="localReceita" value="patos"><span>Patos de Minas</span></label>
+          <label class="tipo-opt"><input type="radio" name="localReceita" value="rio"><span>Rio Paranaíba</span></label>
+        </div>
+      </fieldset>
+
+      <details class="add-custom" id="medicoDetails">
+        <summary>Dados do médico <small>(aparecem na receita)</small></summary>
+        <div class="form-grid">
+          <div class="field">
+            <label for="medicoNome">Nome</label>
+            <input type="text" id="medicoNome" placeholder="Nome do médico" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="medicoCrm">CRM</label>
+            <input type="text" id="medicoCrm" placeholder="ex: CRM-MG 000.000">
+          </div>
+          <div class="field span-2">
+            <label for="unidadeSaude">Unidade de Saúde</label>
+            <input type="text" id="unidadeSaude" placeholder="ex: UBS Central, PSF Bela Vista...">
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="panel panel-prescrever" aria-labelledby="tituloPrescrever">
+      <h2 class="panel-title" id="tituloPrescrever">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/></svg>
+        Prescrever
+      </h2>
+
+      <div class="chips-block">
+        <span class="chips-label">Mais usadas <span class="kbd-hint">teclas <kbd>1</kbd>–<kbd>9</kbd></span></span>
+        <div class="chips-row" id="chipsMaisUsadas"></div>
       </div>
-      <div class="mini-note">Exporta suas edições, catálogo pessoal, histórico e dados do médico num arquivo — útil pra trocar de computador ou compartilhar sua base.</div>
-    </details>
-  </div>
 
-  <div class="receita-wrap">
-    <div class="toolbar">
-      <span class="count-chip" id="countChip"></span>
-      <button id="btnLimpar" class="ghost">Nova receita</button>
-      <button id="btnCopiar">Copiar texto</button>
-      <button id="btnImprimir">Imprimir / PDF</button>
-      <button id="btnDocx" class="primary">Baixar .docx</button>
-      <button id="btnEncaminhamento">Encaminhamento</button>
+      <div class="search-wrap" id="searchWrap">
+        <svg class="ic search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" id="search" placeholder="Buscar condição ou medicamento" aria-label="Buscar condição ou medicamento" autocomplete="off">
+        <kbd class="search-kbd" aria-hidden="true">/</kbd>
+        <button class="search-clear" id="searchClear" type="button" title="Limpar busca" aria-label="Limpar busca">&times;</button>
+      </div>
+
+      <div class="list-scroll" id="listaContainer"></div>
+    </section>
+
+    <section class="panel panel-ferramentas" aria-labelledby="tituloFerramentas">
+      <h2 class="panel-title" id="tituloFerramentas">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+        Ferramentas
+      </h2>
+
+      <details class="add-custom">
+        <summary>Adicionar medicamento avulso ao catálogo</summary>
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="novoNome">Nome</label>
+            <input type="text" id="novoNome" placeholder="ex: Paracetamol 750mg">
+          </div>
+          <div class="field">
+            <label for="novoQtde">Quantidade</label>
+            <input type="text" id="novoQtde" placeholder="ex: 20 comprimidos">
+          </div>
+          <div class="field">
+            <label for="novoVia">Via</label>
+            <select id="novoVia"></select>
+          </div>
+          <div class="field span-2">
+            <label for="novoFator">Fator dose/kg <small>(opcional)</small></label>
+            <input type="text" id="novoFator" placeholder="ex: 0.6">
+          </div>
+          <div class="field span-2">
+            <label for="novoPosologia">Posologia</label>
+            <textarea id="novoPosologia" placeholder="Use a palavra DOSE onde o valor calculado pelo peso deve entrar (opcional)."></textarea>
+          </div>
+        </div>
+        <label class="save-check"><input type="checkbox" id="novoSalvar" checked> Salvar no meu catálogo permanentemente</label>
+        <button id="btnAddCustom" class="btn btn-primary" type="button">Adicionar à receita</button>
+      </details>
+
+      <details class="add-custom" id="editorCondicoesDetails">
+        <summary>Gerenciar condições clínicas</summary>
+        <div class="editor-wrap">
+          <div class="field">
+            <label for="editorSelectCond">Condição</label>
+            <select id="editorSelectCond"></select>
+          </div>
+          <div class="field" id="editorNomeCondField">
+            <label for="editorNomeCond">Nome da condição</label>
+            <input type="text" id="editorNomeCond" placeholder="ex: Hipertensão Arterial">
+          </div>
+
+          <div class="editor-section-label">Medicamentos</div>
+          <div id="editorMedsContainer" class="editor-list"></div>
+          <button id="editorBtnAddMed" class="btn btn-outline btn-sm" type="button">+ Adicionar medicamento</button>
+
+          <div class="editor-section-label">Orientações</div>
+          <div id="editorOrientsContainer" class="editor-list"></div>
+          <button id="editorBtnAddOrient" class="btn btn-outline btn-sm" type="button">+ Adicionar orientação</button>
+
+          <div class="editor-actions">
+            <button id="editorBtnSalvar" class="btn btn-primary" type="button">Salvar</button>
+            <button id="editorBtnExcluir" class="btn btn-danger-outline" type="button" style="display:none">Excluir</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="add-custom" id="histDetails">
+        <summary>Histórico de receitas geradas</summary>
+        <input type="text" id="histBuscaPaciente" class="input-full" placeholder="Buscar por nome do paciente..." aria-label="Buscar no histórico por nome do paciente">
+        <div id="histLista"></div>
+        <button id="btnLimparHist" class="btn btn-outline btn-sm" type="button">Limpar histórico</button>
+        <div class="mini-note">Fica guardado apenas neste navegador. "Reaplicar" restaura os itens e o peso — não o nome do paciente.</div>
+      </details>
+
+      <details class="add-custom">
+        <summary>Backup e ajustes</summary>
+        <div class="mini-note" id="storageNote"></div>
+        <div class="backup-btns">
+          <button id="btnExport" class="btn btn-primary" type="button">Exportar meus dados</button>
+          <button id="btnImport" class="btn btn-outline" type="button">Importar dados</button>
+          <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
+        <div class="mini-note">Exporta suas edições, catálogo pessoal, histórico e dados do médico num arquivo — útil pra trocar de computador ou compartilhar sua base.</div>
+      </details>
+    </section>
+  </aside>
+
+  <main class="receita-wrap" aria-label="Prévia da receita">
+    <div class="toolbar" role="toolbar" aria-label="Ações da receita">
+      <span class="count-chip" id="countChip" aria-live="polite"></span>
+      <div class="toolbar-actions">
+        <button id="btnLimpar" class="btn btn-ghost-danger" type="button" title="Limpa a receita para o próximo paciente (Ctrl+Enter)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg>
+          Nova receita
+        </button>
+        <button id="btnPediatrica" class="btn" type="button" title="Troca por apresentações pediátricas (gotas) pelo peso e remove o que não é adequado para crianças">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="2.5"/><path d="M7 10.5 12 9l5 1.5M12 9v6M9 21l3-6 3 6"/></svg>
+          Versão pediátrica
+        </button>
+        <span class="toolbar-sep" aria-hidden="true"></span>
+        <button id="btnCopiar" class="btn" type="button" title="Copia a receita como texto">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+          Copiar
+        </button>
+        <button id="btnEncaminhamento" class="btn" type="button" title="Monta um texto de encaminhamento à atenção básica">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+          Encaminhar
+        </button>
+        <span class="toolbar-sep" aria-hidden="true"></span>
+        <button id="btnImprimir" class="btn" type="button">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+          Imprimir / PDF
+        </button>
+        <button id="btnDocx" class="btn btn-primary" type="button">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Baixar .docx
+        </button>
+      </div>
     </div>
-    <div class="aviso-bar" id="avisoBar"></div>
-    <div class="receita-paper" id="receitaPaper"></div>
-  </div>
+    <div class="receita-scroll">
+      <div class="aviso-bar" id="avisoBar" aria-live="polite"></div>
+      <div class="receita-paper" id="receitaPaper"></div>
+    </div>
+  </main>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <datalist id="datalistMedicamentosEditor"></datalist>
 
-<!-- Modal de Edição de Itens da Prescrição -->
+<!-- Ajuda -->
+<div class="ajuda-overlay" id="ajudaOverlay">
+  <div class="ajuda-modal" role="dialog" aria-modal="true" aria-labelledby="ajudaTitulo">
+    <div class="ajuda-modal-head">
+      <h2 id="ajudaTitulo">Como usar o Gerador de Receitas</h2>
+      <button id="btnFecharAjuda" class="btn-fechar-ajuda" type="button" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="ajuda-modal-body">
+      <ol>
+        <li><b>Preencha o paciente.</b> Digite o nome completo no campo "Paciente". Se for criança, informe o peso em kg — isso calcula automaticamente a dose de medicamentos com posologia por peso.</li>
+        <li><b>Escolha o tipo de receita e o local.</b> "Comum (1 via)" para receitas normais, ou "Controle especial (2 vias)" para medicamentos controlados (sai em duas vias, para farmácia e paciente). O local (Carmo do Paranaíba, Patos de Minas ou Rio Paranaíba) define o cabeçalho da prefeitura e fica salvo para as próximas receitas.</li>
+        <li><b>Busque e adicione condições/medicamentos.</b> Use a busca em "Prescrever" para encontrar uma condição clínica (adiciona todos os medicamentos daquela condição de uma vez) ou um medicamento específico.</li>
+        <li><b>Ajuste se precisar.</b> Na prévia da receita, você pode editar um item só para este paciente (&#9998;) ou removê-lo (&times;).</li>
+        <li><b>Receita para criança.</b> Preencha o peso (e, se quiser, a idade: "4a", "8m", "1a6m"). Quando a receita tem remédio de adulto com versão pediátrica, aparece a sugestão "Converter agora": comprimidos viram gotas/suspensão com dose pelo peso (com teto por dose) e o que não serve para criança sai. Marque "Converter sozinho" para isso acontecer automaticamente quando a idade informada for menor que 12 anos. Leia os avisos (mostram a conta em mg/kg) e confira cada dose antes de imprimir; "Desfazer" volta como estava.</li>
+        <li><b>Preencha seus dados (nome e CRM).</b> Em "Dados do médico". Eles ficam salvos neste computador para as próximas receitas; cada profissional deve conferir os seus ao usar o app pela primeira vez neste dispositivo.</li>
+        <li><b>Gere a receita.</b> "Imprimir / PDF" imprime direto; "Baixar .docx" gera um arquivo Word editável; "Copiar" copia como texto; "Encaminhar" monta um encaminhamento à atenção básica.</li>
+        <li><b>Atalhos:</b> <kbd>/</kbd> foca a busca; <kbd>Enter</kbd> na busca adiciona o primeiro resultado; <kbd>1</kbd>–<kbd>9</kbd> aplicam as condições mais usadas; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> limpa a receita para o próximo paciente.</li>
+      </ol>
+      <p class="ajuda-nota">Todos os dados (histórico, medicamentos personalizados, nome/CRM) ficam salvos apenas neste computador/navegador — nada é enviado para a internet. Use "Exportar meus dados" (em Ferramentas › Backup e ajustes) periodicamente para não perder suas personalizações. O botão ao lado do "?" alterna o tema claro/escuro; a receita impressa é sempre clara.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Edição de itens da prescrição -->
 <div class="ajuda-overlay" id="editItemOverlay">
-  <div class="ajuda-modal" style="max-width: 500px;">
+  <div class="ajuda-modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="editItemTitle">
     <div class="ajuda-modal-head">
       <h2 id="editItemTitle">Editar Item</h2>
-      <button id="btnFecharEditItem" class="btn-fechar-ajuda" aria-label="Fechar">&times;</button>
+      <button id="btnFecharEditItem" class="btn-fechar-ajuda" type="button" aria-label="Fechar">&times;</button>
     </div>
-    <div class="ajuda-modal-body" style="padding: 18px;">
-      <div id="editItemFields" style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="field" id="editItemNomeField">
-          <label for="editItemNome" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Medicamento</label>
-          <input type="text" id="editItemNome" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
-        </div>
-        
-        <div id="editItemMedsGrid" style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px;">
-          <div class="field">
-            <label for="editItemQtde" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Qtde</label>
-            <input type="text" id="editItemQtde" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
-          </div>
-          <div class="field">
-            <label for="editItemVia" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Via</label>
-            <select id="editItemVia" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px; height: 34px;"></select>
-          </div>
-          <div class="field">
-            <label for="editItemFator" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Fator/kg</label>
-            <input type="text" id="editItemFator" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
-          </div>
-        </div>
-        
+    <div class="ajuda-modal-body form-stack" id="editItemFields">
+      <div class="field" id="editItemNomeField">
+        <label for="editItemNome">Medicamento</label>
+        <input type="text" id="editItemNome">
+      </div>
+      <div class="form-grid-3" id="editItemMedsGrid">
         <div class="field">
-          <label id="editItemPosologiaLabel" for="editItemPosologia" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Posologia / Modo de Uso</label>
-          <textarea id="editItemPosologia" style="width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; min-height: 80px; resize: vertical; font-size: 13px;"></textarea>
+          <label for="editItemQtde">Qtde</label>
+          <input type="text" id="editItemQtde">
         </div>
-        
-        <input type="hidden" id="editItemId">
-        
-        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px;">
-          <button id="btnCancelEditItem" style="background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Cancelar</button>
-          <button id="btnSaveEditItem" style="background: var(--teal); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Salvar</button>
+        <div class="field">
+          <label for="editItemVia">Via</label>
+          <select id="editItemVia"></select>
         </div>
+        <div class="field">
+          <label for="editItemFator">Fator/kg</label>
+          <input type="text" id="editItemFator">
+        </div>
+      </div>
+      <div class="field">
+        <label id="editItemPosologiaLabel" for="editItemPosologia">Posologia / Modo de Uso</label>
+        <textarea id="editItemPosologia" rows="4"></textarea>
+      </div>
+      <input type="hidden" id="editItemId">
+      <div class="modal-actions">
+        <button id="btnCancelEditItem" class="btn btn-outline" type="button">Cancelar</button>
+        <button id="btnSaveEditItem" class="btn btn-primary" type="button">Salvar</button>
       </div>
     </div>
   </div>
 </div>
 
-
-<!-- Modal de Encaminhamento -->
+<!-- Encaminhamento -->
 <div class="ajuda-overlay" id="encaminhamentoOverlay">
-  <div class="ajuda-modal" style="max-width: 560px;">
+  <div class="ajuda-modal" role="dialog" aria-modal="true" aria-labelledby="encTitulo">
     <div class="ajuda-modal-head">
-      <h2>Encaminhamento</h2>
-      <button id="btnFecharEncaminhamento" class="btn-fechar-ajuda" aria-label="Fechar">&times;</button>
+      <h2 id="encTitulo">Encaminhamento</h2>
+      <button id="btnFecharEncaminhamento" class="btn-fechar-ajuda" type="button" aria-label="Fechar">&times;</button>
     </div>
-    <div class="ajuda-modal-body" style="padding: 18px;">
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="field">
-          <label for="encNomePaciente" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Paciente</label>
-          <input type="text" id="encNomePaciente" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
-        </div>
-        <div class="field">
-          <label for="encCondicao" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Diagnóstico / condição</label>
-          <select id="encCondicao" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px; height: 34px;"></select>
-        </div>
-        <div class="field" id="encCondicaoOutraField" style="display: none;">
-          <label for="encCondicaoOutra" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Descreva o diagnóstico</label>
-          <input type="text" id="encCondicaoOutra" placeholder="Ex: Pneumonia" style="width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; font-size: 13px;">
-        </div>
-        <div class="field">
-          <label for="encTexto" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Texto do encaminhamento</label>
-          <textarea id="encTexto" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px; font-family: inherit; min-height: 220px; resize: vertical; font-size: 13px; line-height: 1.55;"></textarea>
-          <div class="mini-note" style="margin-top: 6px;">Você pode editar este texto livremente antes de copiar ou imprimir.</div>
-        </div>
-        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; border-top: 1px solid var(--line); padding-top: 12px;">
-          <button id="btnCopiarEncaminhamento" style="background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Copiar texto</button>
-          <button id="btnImprimirEncaminhamento" style="background: var(--teal); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Imprimir</button>
-        </div>
+    <div class="ajuda-modal-body form-stack">
+      <div class="field">
+        <label for="encNomePaciente">Paciente</label>
+        <input type="text" id="encNomePaciente">
+      </div>
+      <div class="field">
+        <label for="encCondicao">Diagnóstico / condição</label>
+        <select id="encCondicao"></select>
+      </div>
+      <div class="field" id="encCondicaoOutraField" style="display:none">
+        <label for="encCondicaoOutra">Descreva o diagnóstico</label>
+        <input type="text" id="encCondicaoOutra" placeholder="ex: Pneumonia">
+      </div>
+      <div class="field">
+        <label for="encTexto">Texto do encaminhamento</label>
+        <textarea id="encTexto" class="enc-texto"></textarea>
+        <div class="mini-note">Você pode editar este texto livremente antes de copiar ou imprimir.</div>
+      </div>
+      <div class="modal-actions">
+        <button id="btnCopiarEncaminhamento" class="btn btn-outline" type="button">Copiar texto</button>
+        <button id="btnImprimirEncaminhamento" class="btn btn-primary" type="button">Imprimir</button>
       </div>
     </div>
   </div>
@@ -243,6 +346,7 @@
 
 <script src="js/dados.js"></script>
 <script src="js/logos.js"></script>
+<script src="js/pediatria.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
