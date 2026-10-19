@@ -13,6 +13,7 @@
   const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
   // "500 mg/mL", "gotas", "suspensão" etc.: item que já é formulação pediátrica
   const jaPediatrico = nome => /\/\s*ml|gotas|xarope|suspens/.test(norm(nome));
+  const ehOral = it => !it.via || norm(it.via) === 'oral';
   const toKg = p => { const v = parseFloat(String(p === undefined || p === null ? '' : p).replace(',', '.')); return v > 0 ? v : null; };
   const numBR = n => String(n).replace('.', ',');
 
@@ -159,8 +160,11 @@
     const it = typeof item === 'string' ? { nome: item } : (item || {});
     if(it.convertidoPediatrico) return null;
     const n = norm(it.nome);
-    const liquido = jaPediatrico(it.nome);
-    const regra = REGRAS.find(r => r.match.test(n) && !(r.exceto && r.exceto.test(n)) && (!liquido || r.incluiLiquidos || r.acao !== 'substituir'));
+    // substituir só vale para forma oral de adulto: colírio, pomada e injetável do
+    // mesmo princípio ativo não viram gotas/xarope
+    const oral = ehOral(it);
+    const regra = REGRAS.find(r => r.match.test(n) && !(r.exceto && r.exceto.test(n))
+      && (r.acao !== 'substituir' || (oral && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
     if(!regra) return null;
     if(regra.idadeLimiteMeses && typeof idadeMeses === 'number' && idadeMeses >= regra.idadeLimiteMeses) return null;
     return regra;
@@ -266,7 +270,7 @@
     entradas.forEach(([id, it]) => {
       const regra = regraPara(it, idade);
       if(!regra){
-        if(!it.convertidoPediatrico && !jaPediatrico(it.nome) && !itemPorPeso(it)){
+        if(!it.convertidoPediatrico && ehOral(it) && !jaPediatrico(it.nome) && !itemPorPeso(it)){
           fixos.push(`${it.nome}: sem regra pediátrica cadastrada, mantido como está. Confira manualmente.`);
         }
         entries.push([id, it]);

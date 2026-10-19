@@ -104,6 +104,13 @@ assert.strictEqual(regraPara(item('Dipirona 500 mg/mL')), null);
 // dextrometorfano em xarope é removido mesmo sendo líquido (incluiLiquidos)
 assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 48).acao, 'remover');
 assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 96), null);
+// colírio, pomada e injetável não viram gotas/xarope (nem geram aviso de "sem regra")
+assert.strictEqual(regraPara(item('Prednisolona 1% - Colírio', 'x', { via: 'Oftálmico' })), null);
+assert.strictEqual(regraPara(item('Dipirona 1g/2mL', 'x', { via: 'Intramuscular' })), null);
+assert.strictEqual(regraPara(item('Prednisona 20mg')).acao, 'substituir');
+const col = converterParaPediatrico([['c', item('Prednisolona 1% - Colírio', 'x', { via: 'Oftálmico' })]], 20);
+assert.strictEqual(col.entries[0][1].nome, 'Prednisolona 1% - Colírio');
+assert.strictEqual(col.fixos.length, 0);
 // hidratação da dengue: aviso de volume pediátrico
 assert.strictEqual(regraPara(item('Manhã')).acao, 'avisar');
 
