@@ -825,6 +825,42 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Mesmo paciente: limpa so a receita e mantem nome, idade e peso; Nova receita limpa tudo ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const estado = () => page.evaluate(() => ({
+      nome: document.getElementById('nomePaciente').value, idade: document.getElementById('idade').value, peso: document.getElementById('peso').value,
+      itens: document.querySelectorAll('#receitaPaper .nome-med').length, orient: document.querySelectorAll('#receitaPaper .orientacoes-bloco li').length
+    }));
+    await page.fill('#nomePaciente', 'Maria Mesmo Paciente');
+    await page.fill('#idade', '40');
+    await page.fill('#peso', '62');
+    await selectCondicao(page, 'ITU');
+    await page.waitForTimeout(200);
+    const antes = await estado();
+    await page.click('#btnMesmoPaciente');
+    await page.waitForTimeout(200);
+    const mesmo = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.keyboard.press('Control+Shift+Enter');
+    await page.waitForTimeout(200);
+    const atalho = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+    const nova = await estado();
+    const ok = antes.itens > 0 && antes.orient > 0
+      && mesmo.nome === 'Maria Mesmo Paciente' && mesmo.idade === '40' && mesmo.peso === '62' && mesmo.itens === 0 && mesmo.orient === 0
+      && atalho.nome === 'Maria Mesmo Paciente' && atalho.itens === 0
+      && nova.nome === '' && nova.idade === '' && nova.peso === '' && nova.itens === 0
+      && consoleErrors.length === 0;
+    record('mesmo paciente mantem nome/idade/peso; nova receita limpa tudo', ok, JSON.stringify({ antes, mesmo, atalho, nova, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

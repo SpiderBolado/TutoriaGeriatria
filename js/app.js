@@ -2165,7 +2165,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
       e.preventDefault();
-      el('btnLimpar').click();
+      el(e.shiftKey ? 'btnMesmoPaciente' : 'btnLimpar').click();
     }
   });
 
@@ -2778,11 +2778,21 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     try{ localStorage.setItem(AUTO_PED_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
     if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
   });
+  // Nova receita: próximo paciente (limpa tudo)
   el('btnLimpar').addEventListener('click', () => {
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
+  });
+  // Mesmo paciente: outra receita para quem já está na tela (ex.: antibiótico
+  // nas 2 vias e sintomáticos na comum). Mantém nome, idade, peso e os rascunhos
+  // de encaminhamento/atestado; limpa remédios e orientações.
+  el('btnMesmoPaciente').addEventListener('click', () => {
+    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    renderTudo();
+    const nome = el('nomePaciente').value.trim();
+    showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos');
   });
 
   el('btnAddCustom').addEventListener('click', async () => {

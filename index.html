@@ -215,6 +215,10 @@
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg>
           Nova receita
         </button>
+        <button id="btnMesmoPaciente" class="btn" type="button" title="Limpa remédios e orientações e mantém nome, idade e peso — para outra receita do mesmo paciente (ex.: antibiótico em 2 vias e sintomáticos na comum). Ctrl+Shift+Enter">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 8h5M19.5 5.5v5"/></svg>
+          Mesmo paciente
+        </button>
         <button id="btnPediatrica" class="btn" type="button" title="Troca por apresentações pediátricas (gotas) pelo peso e remove o que não é adequado para crianças">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="2.5"/><path d="M7 10.5 12 9l5 1.5M12 9v6M9 21l3-6 3 6"/></svg>
           Versão pediátrica
@@ -268,8 +272,8 @@
         <li><b>Ajuste se precisar.</b> Na prévia da receita, você pode editar um item só para este paciente (&#9998;) ou removê-lo (&times;). Nas orientações, &para; dá um espaço (novo parágrafo) antes da orientação, para separar blocos; quebras de linha digitadas no texto também saem na receita.</li>
         <li><b>Receita para criança.</b> Preencha o peso (e, se quiser, a idade: "4a", "8m", "1a6m"). Quando a receita tem remédio de adulto com versão pediátrica, aparece a sugestão "Converter agora": comprimidos viram gotas/suspensão com dose pelo peso (com teto por dose) e o que não serve para criança sai. Marque "Converter sozinho" para isso acontecer automaticamente quando a idade informada for menor que 12 anos. Leia os avisos (mostram a conta em mg/kg) e confira cada dose antes de imprimir; "Desfazer" volta como estava.</li>
         <li><b>Preencha seus dados (nome e CRM).</b> Em "Dados do médico". Eles ficam salvos neste computador para as próximas receitas; cada profissional deve conferir os seus ao usar o app pela primeira vez neste dispositivo.</li>
-        <li><b>Gere a receita.</b> "Imprimir / PDF" imprime direto; "Baixar .docx" gera um arquivo Word editável; "Copiar" copia como texto; "Encaminhar" monta um encaminhamento à atenção básica; "Atestado" monta atestado de afastamento ou declaração de comparecimento/acompanhante.</li>
-        <li><b>Atalhos:</b> <kbd>/</kbd> foca a busca; <kbd>Enter</kbd> na busca adiciona o primeiro resultado; <kbd>1</kbd>–<kbd>9</kbd> aplicam as condições mais usadas; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> limpa a receita para o próximo paciente.</li>
+        <li><b>Gere a receita.</b> "Nova receita" limpa tudo para o próximo paciente; "Mesmo paciente" limpa só os remédios e orientações e mantém nome, idade e peso (por exemplo, antibiótico nas 2 vias e depois os sintomáticos na receita comum). "Imprimir / PDF" imprime direto; "Baixar .docx" gera um arquivo Word editável; "Copiar" copia como texto; "Encaminhar" monta um encaminhamento à atenção básica; "Atestado" monta atestado de afastamento ou declaração de comparecimento/acompanhante.</li>
+        <li><b>Atalhos:</b> <kbd>/</kbd> foca a busca; <kbd>Enter</kbd> na busca adiciona o primeiro resultado; <kbd>1</kbd>–<kbd>9</kbd> aplicam as condições mais usadas; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> limpa a receita para o próximo paciente; <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> faz outra receita para o mesmo paciente.</li>
       </ol>
       <p class="ajuda-nota">Todos os dados (histórico, medicamentos personalizados, nome/CRM) ficam salvos apenas neste computador/navegador — nada é enviado para a internet. Use "Exportar meus dados" (em Ferramentas › Backup e ajustes) periodicamente para não perder suas personalizações. O botão ao lado do "?" alterna o tema claro/escuro; a receita impressa é sempre clara.</p>
     </div>
