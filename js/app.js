@@ -82,11 +82,44 @@
     return obj;
   }
 
+  // Edições de condição são guardadas pelo índice do item (overrides[cond].meds[i]);
+  // quando um item sai do catálogo, os índices seguintes mudam. Cada versão lista,
+  // por condição, o novo índice de cada item antigo (null = item removido).
+  const CATALOGO_VERSAO = 2;
+  const REMAP_CATALOGO = {
+    2: { 'Vertigem': { meds: [null, 0, 1] } }   // saiu o Meclin 25mg
+  };
+  function migrarIndicesCatalogo(obj, versao){
+    for(let v = (versao || 1) + 1; v <= CATALOGO_VERSAO; v++){
+      Object.entries(REMAP_CATALOGO[v] || {}).forEach(([cond, mapa]) => {
+        const ov = obj && obj[cond];
+        if(!ov) return;
+        Object.keys(mapa).forEach(campo => {
+          if(!ov[campo]) return;
+          const novo = {};
+          Object.keys(ov[campo]).forEach(i => {
+            const j = mapa[campo][i];
+            if(j !== null && j !== undefined) novo[j] = ov[campo][i];
+          });
+          ov[campo] = novo;
+        });
+      });
+    }
+    return obj;
+  }
+
   async function loadOverrides(){
     try{
       const r = await storage.get('overrides-condicoes', false);
       overrides = r && r.value ? JSON.parse(r.value) : {};
       migrarChaveConstipacao(overrides);
+      const rv = await storage.get('overrides-catalogo', false);
+      const versao = rv && rv.value ? parseInt(rv.value, 10) : 1;
+      if(versao < CATALOGO_VERSAO){
+        migrarIndicesCatalogo(overrides, versao);
+        await saveOverrides();
+        await storage.set('overrides-catalogo', String(CATALOGO_VERSAO), false);
+      }
     }catch(e){ overrides = {}; }
   }
   async function saveOverrides(){
@@ -182,7 +215,9 @@
         fator: o.fator !== undefined ? o.fator : m.fator,
         // teto e idade mínima valem para o item original; editar nome ou fator os descarta
         max: (o.nome === undefined && o.fator === undefined) ? m.max : undefined,
+        faixas: (o.nome === undefined && o.fator === undefined) ? m.faixas : undefined,
         idadeMinMeses: o.nome === undefined ? m.idadeMinMeses : undefined,
+        pesoMinKg: o.nome === undefined ? m.pesoMinKg : undefined,
         editado: o.nome!==undefined || o.qtde!==undefined || o.posologia!==undefined || o.via!==undefined || o.fator!==undefined
       };
     }).filter(Boolean);
@@ -202,7 +237,7 @@
       if(selected[id]){
         selected[id] = Object.assign({}, selected[id], {
           nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia, via: m.via || 'Outro', fator: m.fator,
-          max: m.max, idadeMinMeses: m.idadeMinMeses, origemCondicao: nome
+          max: m.max, faixas: m.faixas, idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: nome
         });
       }
     });
@@ -212,22 +247,19 @@
     });
   }
 
-  // Dose por peso: round(peso x fator), limitada ao teto por dose do item (max), se houver.
-  function doseCalculada(fator, peso, max){
-    if(fator === null || fator === undefined || fator === '' || !peso) return null;
-    const valor = Math.round(parseFloat(String(peso).replace(',', '.')) * parseFloat(fator));
-    if(isNaN(valor)) return null;
-    return { valor: (max && valor > max) ? max : valor, semTeto: valor, limitada: !!(max && valor > max) };
-  }
-  function calcDose(posologia, fator, peso, max){
+  // Dose por peso do item (fator com teto, ou faixa de peso) — cálculo único em js/pediatria.js.
+  // Peso fora das faixas sai como "____" para preencher à mão (com aviso).
+  function calcDoseItem(it, peso){
+    const posologia = it.posologiaBase;
     if(!posologia) return posologia;
-    const d = doseCalculada(fator, peso, max);
+    const d = window.PEDIATRIA.doseDoItem(it, peso);
     if(!d) return posologia;
-    return posologia.replace(/DOSE/g, String(d.valor));
+    return posologia.replace(/DOSE/g, d.valor === null ? '____' : String(d.valor));
   }
+  const itemPorPeso = it => window.PEDIATRIA.itemPorPeso(it);
 
   function anySelectedNeedsPeso(){
-    return Object.values(selected).some(it => it.fator !== null && it.fator !== undefined && it.fator !== '');
+    return Object.values(selected).some(itemPorPeso);
   }
 
   // Converte o texto digitado em "Fator dose/kg" pra número, ou null se vazio
@@ -653,7 +685,7 @@
     if(ligar){
       selected[id] = {
         nome: m.nome, qtde: m.qtde, posologiaBase: m.posologia,
-        via: m.via || 'Outro', fator: m.fator, max: m.max, idadeMinMeses: m.idadeMinMeses, origemCondicao: nomeCondicao
+        via: m.via || 'Outro', fator: m.fator, max: m.max, faixas: m.faixas, idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: nomeCondicao
       };
     } else {
       delete selected[id];
@@ -679,7 +711,8 @@
       selected[id] = {
         nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
         via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null,
-        max: (efetivo.fator === m.fator) ? m.max : undefined, idadeMinMeses: m.idadeMinMeses, origemCondicao: null
+        max: (efetivo.fator === m.fator) ? m.max : undefined, faixas: (efetivo.fator === m.fator) ? m.faixas : undefined,
+        idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: null
       };
     } else {
       delete selected[id];
@@ -784,8 +817,8 @@
     viaOrder.forEach(via => {
       html += `<div class="via-titulo">Uso ${via}</div>`;
       grupos[via].forEach(([id, it], idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
-        const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
+        const posologia = calcDoseItem(it, peso);
+        const precisaPeso = itemPorPeso(it) && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
           <div class="item-linha">
@@ -1198,7 +1231,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
 
     // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
-    const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas) : 0;
+    const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas, idade) : 0;
     if(conversiveis && pacientePediatrico()){
       const quem = idade !== null ? window.PEDIATRIA.formatarIdade(idade) + (kg ? ', ' + numBR(kg) + ' kg' : '') : numBR(kg) + ' kg';
       bar.appendChild(avisoHtml('teal', '&#9432;',
@@ -1226,13 +1259,15 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const soltos = [];
     entradas.forEach(([, it]) => {
       if(it.convertidoPediatrico) return;
-      const d = doseCalculada(it.fator, kg, it.max);
+      const d = window.PEDIATRIA.doseDoItem(it, kg);
       if(d && d.limitada) soltos.push(`${it.nome}: dose calculada (${d.semTeto}) excede o máximo de ${it.max} por dose; a receita sai com ${it.max}.`);
+      if(d && d.valor === null) soltos.push(`ATENÇÃO — ${it.nome}: peso fora das faixas de dose (mínimo ${it.pesoMinKg || '?'} kg). Preencha à mão ou revise.`);
+      if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)) soltos.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){
         soltos.push(`ATENÇÃO — ${it.nome}: paciente com ${window.PEDIATRIA.formatarIdade(idade)}, abaixo da idade mínima de ${window.PEDIATRIA.formatarIdade(it.idadeMinMeses)}. Revise.`);
       }
     });
-    if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Doses por peso</b>' + listaHtml(soltos)));
+    if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Confira doses e idade mínima</b>' + listaHtml(soltos)));
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2){
         const div = document.createElement('div');
@@ -1339,6 +1374,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const payload = {
       app: 'gerador-receitas',
       versao: 1,
+      catalogo: CATALOGO_VERSAO,
       exportadoEm: new Date().toISOString(),
       customMeds, overrides, overridesMedicamentos, usoCondicoes, historico, customCondicoes,
       medico: { nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }
@@ -1395,6 +1431,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       customMeds = Array.isArray(payload.customMeds) ? payload.customMeds : [];
       customCondicoes = payload.customCondicoes && typeof payload.customCondicoes === 'object' ? payload.customCondicoes : {};
       overrides = payload.overrides && typeof payload.overrides === 'object' ? payload.overrides : {};
+      migrarChaveConstipacao(overrides);
+      migrarIndicesCatalogo(overrides, payload.catalogo);
       overridesMedicamentos = payload.overridesMedicamentos && typeof payload.overridesMedicamentos === 'object' ? payload.overridesMedicamentos : {};
       usoCondicoes = payload.usoCondicoes && typeof payload.usoCondicoes === 'object' ? payload.usoCondicoes : {};
       historico = Array.isArray(payload.historico) ? payload.historico : [];
@@ -1433,7 +1471,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido
     if(!convertendoAuto && autoPediatriaAtiva() && !autoPedSuspensa){
       const meses = idadeAtualMeses();
-      if(meses !== null && meses < 144 && pesoAtualKg() && window.PEDIATRIA.contarConversiveis(Object.entries(selected))){
+      if(meses !== null && meses < 144 && pesoAtualKg() && window.PEDIATRIA.contarConversiveis(Object.entries(selected), meses)){
         convertendoAuto = true;
         let converteu = false;
         try{ converteu = executarConversao(true); } finally { convertendoAuto = false; }
@@ -1467,7 +1505,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     viaOrder.forEach(via => {
       out += `USO ${via.toUpperCase()}\n`;
       grupos[via].forEach((it, idx) => {
-        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
+        const posologia = calcDoseItem(it, peso);
         out += `${String(idx+1).padStart(2,'0')}. ${it.nome} ......... ${it.qtde||''}\n${posologia||''}\n\n`;
       });
     });
@@ -1561,7 +1599,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       grupos[via].push({
         nome: it.nome,
         qtde: it.qtde || '',
-        posologia: calcDose(it.posologiaBase, it.fator, peso, it.max) || ''
+        posologia: calcDoseItem(it, peso) || ''
       });
     });
 
@@ -2049,8 +2087,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         showToast('O nome do medicamento não pode ficar vazio');
         return;
       }
-      if(selected[id].nome !== nome || selected[id].fator !== fator){ delete selected[id].max; }
-      if(selected[id].nome !== nome){ delete selected[id].idadeMinMeses; }
+      if(selected[id].nome !== nome || selected[id].fator !== fator){ delete selected[id].max; delete selected[id].faixas; }
+      if(selected[id].nome !== nome){ delete selected[id].idadeMinMeses; delete selected[id].pesoMinKg; }
       selected[id].nome = nome;
       selected[id].qtde = qtde || null;
       selected[id].via = via;
@@ -2300,8 +2338,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         html += `<div class="via-titulo">Uso ${e.via}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
-        const posologia = calcDose(it.posologiaBase, it.fator, peso, it.max);
-        const precisaPeso = (it.fator !== null && it.fator !== undefined && it.fator !== '') && !peso;
+        const posologia = calcDoseItem(it, peso);
+        const precisaPeso = itemPorPeso(it) && !peso;
         const posVazia = !posologia && !precisaPeso;
         html += `
           <div class="item-linha">

@@ -132,7 +132,7 @@ const DATA = {
         "Evite deitar-se ou realizar exercícios físicos até 2 horas após as refeições",
         "Evite roupas e cintos apertados",
         "Mantenha o peso adequado",
-        "Retorne imediatamente se:\n1. Tiver vômitos com sangue ou com aparência de borra de café\n2. Tiver fezes pretas e com mau cheiro\n3. Sentir dor intensa no peito ou na barriga, que não melhore com o remédio",
+        "Retorne imediatamente se:\n1. Tiver vômitos com sangue ou com aparência de borra de café\n2. Tiver fezes pretas e com mau cheiro\n3. Sentir dor intensa no peito ou na barriga, que não melhore com o remédio\n4. Tiver dificuldade ou dor para engolir, vômitos repetidos ou perda de peso sem explicação",
         "Fundamental que procure acompanhamento longitudinal em Unidade de Saúde, para dar continuação ao tratamento."
       ]
     },
@@ -175,16 +175,16 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "O soro caseiro pode ser preparado com:",
-        "1 copo de água filtrada e limpa",
-        "1 colher das de café de sal de cozinha",
-        "1 colher das de chá de açúcar.",
-        "Coloque algumas gotas de limão para melhorar o sabor da solução.",
+        "Prefira o Soro de Reidratação Oral entregue na Unidade. Se faltar, faça o soro caseiro com:",
+        "1 litro de água filtrada ou fervida (fria)",
+        "1 colher de chá rasa de sal",
+        "2 colheres de sopa rasas de açúcar (ou use a colher-medida da Unidade de Saúde).",
+        "Não acrescente mel, adoçante nem outros ingredientes. Use em até 24 horas.",
         "A alimentação não deve ser interrompida.",
         "Manter hidratação rigorosa, respeitando aproximadamente a proporção de 1/3 de soro para 2/3 de líquidos caseiros ao longo do dia.",
         "Evitar AAS/AINEs (Risco de sangramento).",
         "Os sinais de alarme costumam aparecer entre o 3º e o 7º dia, muitas vezes já com a queda da febre — não interpretar a queda da febre como sinal de melhora completa.",
-        "Monitorar sinais de alarme: dor abdominal intensa, vômitos persistentes, sangramentos, tontura ou desmaio, sonolência excessiva."
+        "Procure atendimento IMEDIATAMENTE se: dor forte e contínua na barriga; vômitos que não param; sangramento (gengiva, nariz, urina, fezes pretas ou vômito com sangue); tontura ou desmaio ao levantar; sonolência excessiva ou irritabilidade; diminuição da urina; falta de ar ou barriga inchada. Mesmo sem esses sinais, retorne para reavaliação no dia em que a febre baixar ou, se a febre continuar, no 5º dia de doença."
       ]
     },
     "Mastite": {
@@ -219,20 +219,20 @@ const DATA = {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
           "posologia": "Aplicar 01 gota, em cada olho, de 04/04 horas ou sempre que necessário",
-          "via": "Tópico",
+          "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Olopatadina 1 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, no olho acometido, de 08/08 horas, por 07 dias, apenas se houver coceira.",
-          "via": "Tópico",
+          "posologia": "Aplicar 01 gota, no olho acometido, de 12/12 horas, por até 07 dias, se coceira.",
+          "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Loratadina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido ao dia, por 05 dias, apenas se houver coceira.",
+          "posologia": "Tomar 01 comprimido ao dia, por 05 dias, se coceira nos olhos.",
           "via": "Oral",
           "fator": null
         }
@@ -317,8 +317,8 @@ const DATA = {
         },
         {
           "nome": "Pyridium 200mg",
-          "qtde": "09 Drágeas",
-          "posologia": "Tomar 01 drágea, de 08/08 horas, por 03 dias.",
+          "qtde": "06 Drágeas",
+          "posologia": "Tomar 01 drágea, de 08/08 horas, por 02 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -364,13 +364,6 @@ const DATA = {
     "Vertigem": {
       "meds": [
         {
-          "nome": "Meclin 25mg",
-          "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos.",
-          "via": "Oral",
-          "fator": null
-        },
-        {
           "nome": "Cinarizina 25 mg",
           "qtde": "09 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, por 03 dias.",
@@ -380,7 +373,7 @@ const DATA = {
         {
           "nome": "Domperidona 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias.",
+          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -431,24 +424,30 @@ const DATA = {
       "meds": [
         {
           "nome": "Amoxicilina 50mg/mL",
-          "qtde": "01 Frasco",
+          "qtde": "02 Frascos",
           "posologia": "Tomar DOSE mL, de 08/08 horas, por 10 dias.",
           "via": "Oral",
-          "fator": 0.33
+          "fator": 0.33,
+          "max": 10,
+          "idadeMinMeses": 3
         },
         {
           "nome": "Flogoral",
           "qtde": "01 Caixa",
-          "posologia": "Consumir 01 pastilha, de 06/06 horas, se dor na garganta.",
+          "posologia": "Dissolver 01 pastilha na boca, de 06/06 horas, se dor na garganta.",
           "via": "Oral",
-          "fator": null
+          "fator": null,
+          "idadeMinMeses": 72
         },
         {
           "nome": "Dipirona 500 mg/mL",
-          "qtde": "01 Caixa",
+          "qtde": "01 Frasco",
           "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
           "via": "Oral",
-          "fator": 0.6
+          "fator": 0.6,
+          "max": 40,
+          "idadeMinMeses": 3,
+          "pesoMinKg": 5
         }
       ],
       "orientacoes": [
@@ -466,19 +465,23 @@ const DATA = {
           "qtde": "01 Frasco",
           "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
           "via": "Oral",
-          "fator": 0.6
+          "fator": 0.6,
+          "max": 40,
+          "idadeMinMeses": 3,
+          "pesoMinKg": 5
         },
         {
           "nome": "Prednisolona 3mg/mL",
           "qtde": "01 Frasco",
           "posologia": "Tomar DOSE mL, pela manhã, por 05 dias",
           "via": "Oral",
-          "fator": 0.3
+          "fator": 0.3,
+          "max": 13
         },
         {
           "nome": "Salbutamol 100mcg Spray",
           "qtde": "01 Frasco",
-          "posologia": "Inalar 04 jatos, de 2/2 horas, se tosse, chieira ou falta de ar.",
+          "posologia": "Inalar 04 jatos, de 04/04 horas, se tosse, chieira ou falta de ar.",
           "via": "Inalatório",
           "fator": null
         }
@@ -486,7 +489,7 @@ const DATA = {
       "orientacoes": [
         "Use o Salbutamol com espaçador (bombinha), quando disponível, para melhorar a chegada do medicamento aos pulmões.",
         "Evite irritantes como fumaça de cigarro, poeira e produtos de limpeza com cheiro forte.",
-        "Se precisar usar o Salbutamol com frequência maior do que a orientada, procure a Unidade de Saúde.",
+        "Se precisar do Salbutamol antes de 4 horas, ou se o alívio durar menos de 4 horas, procure atendimento de urgência.",
         "Procure atendimento de urgência IMEDIATAMENTE se: lábios ou unhas arroxeados, dificuldade para falar frases inteiras ou mamar, respiração muito acelerada, sonolência ou agitação incomum."
       ]
     },
@@ -550,8 +553,9 @@ const DATA = {
         "Evite duchas vaginais e sabonetes íntimos perfumados.",
         "Não é necessário tratar o parceiro sexual, a menos que ele também tenha sintomas.",
         "Os sintomas costumam melhorar em poucos dias.",
-        "Retorne se não houver melhora em 7 dias, se as crises forem frequentes (mais de 4x/ano), ou se você tiver diabetes, estiver grávida ou imunossuprimida.",
-        "Procure atendimento se notar corrimento com odor forte, cor amarelo-esverdeada, ou dor pélvica — pode não ser candidíase."
+        "Retorne se não houver melhora em 7 dias, se as crises forem frequentes (mais de 4x/ano), ou se você tiver diabetes ou imunossupressão.",
+        "Procure atendimento se notar corrimento com odor forte, cor amarelo-esverdeada, ou dor pélvica — pode não ser candidíase.",
+        "Se estiver grávida ou houver chance de gravidez, NÃO tome o Fluconazol: use apenas o creme vaginal e avise o médico."
       ]
     },
     "Cerume": {
@@ -665,7 +669,8 @@ const DATA = {
         "Efeitos colaterais iniciais como náusea e insônia são comuns e geralmente melhoram com a continuidade do uso.",
         "Usar preservativo em todas as relações até a confirmação dos exames finais.",
         "Comparecer às consultas de acompanhamento e aos exames de 30 e 90 dias.",
-        "Retorne se surgir febre, ínguas ou manchas na pele durante o uso."
+        "Retorne se surgir febre, ínguas ou manchas na pele durante o uso.",
+        "Não tome o Dolutegravir junto com antiácidos (hidróxido de alumínio ou de magnésio) nem com vitaminas ou suplementos que contenham cálcio, ferro, zinco ou magnésio: tome o Dolutegravir 2 horas antes ou 6 horas depois deles."
       ]
     },
     "Constipação": {
@@ -735,7 +740,8 @@ const DATA = {
     "Corpo estranho": {
       "meds": [],
       "orientacoes": [
-        "Molhar gazes em soro fisiológico frio e aplicar suavemente sobre o olho acometido, para alívio da dor e do incômodo."
+        "Molhar gazes em soro fisiológico frio e aplicar suavemente sobre o olho acometido, para alívio da dor e do incômodo.",
+        "Não esfregue o olho e não use lentes de contato até melhorar. Procure atendimento no mesmo dia se a dor piorar, a visão ficar embaçada ou diminuir, surgir sensibilidade à luz, secreção ou piora da vermelhidão, ou se a sensação de cisco no olho continuar após 24 horas."
       ]
     },
     "Dermatite": {
@@ -826,7 +832,7 @@ const DATA = {
         {
           "nome": "Metoclopramida 10 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se náuseas ou vômitos, por no máximo 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -857,7 +863,7 @@ const DATA = {
         {
           "nome": "Flurbiprofeno 8,75mg",
           "qtde": "01 Caixa",
-          "posologia": "Consumir 01 pastilha de 08/08 horas, até melhora do desconforto por no máximo 05 dias.",
+          "posologia": "Dissolver lentamente na boca 01 pastilha, de 08/08 horas, se dor de garganta, por no máximo 03 dias. Não usar no mesmo dia que o Ibuprofeno.",
           "via": "Oral",
           "fator": null
         }
@@ -914,7 +920,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Ácido Mefenamico 500 mg",
+          "nome": "Ácido Mefenâmico 500 mg",
           "qtde": "15 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
@@ -928,16 +934,16 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Levonogestrel 150 mcg + Etinilestradiol 30 mcg",
+          "nome": "Levonorgestrel 150 mcg + Etinilestradiol 30 mcg",
           "qtde": "21 Comprimidos",
           "posologia": "Tomar 01 comprimido, de 08/08 horas, até cessamento do sangramento ou 07 dias (o que ocorrer primeiro). Não usar junto com o Ácido Tranexâmico.",
           "via": "Oral",
           "fator": null
         },
         {
-          "nome": "Levonogestrel 150 mcg + Etinilestradiol 30 mcg",
+          "nome": "Levonorgestrel 150 mcg + Etinilestradiol 30 mcg",
           "qtde": "Contínuo",
-          "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 03 meses Em mulheres mais velhas ou com fatores de risco cardiovascular/tabagismo, avaliar risco de trombose antes de manter o estrogênio combinado — Ácido Tranexâmico isolado pode ser opção mais segura conforme a idade.",
+          "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 03 meses. Não usar junto com o Ácido Tranexâmico.",
           "via": "Oral",
           "fator": null
         }
@@ -980,15 +986,15 @@ const DATA = {
         },
         {
           "nome": "Amitriptilina 25mg",
-          "qtde": "Contínuo",
-          "posologia": "Tomar 01 comprimido pela noite.",
+          "qtde": "30 Comprimidos",
+          "posologia": "Tomar 01 comprimido à noite, por 30 dias, e reavaliar na Unidade Básica de Saúde. Pode causar sonolência, boca seca e tontura ao se levantar.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Tramadol 50mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima.",
+          "posologia": "Tomar 01 comprimido de 06/06 horas, se dor forte que não melhore com as terapias acima. Pode causar sonolência, tontura e enjoo.",
           "via": "Oral",
           "fator": null
         },
@@ -1038,14 +1044,14 @@ const DATA = {
           "nome": "Carmelose Sódica",
           "qtde": "01 Frasco",
           "posologia": "Aplicar 01 gota, no olho acometido, sempre que ardência ou irritação local.",
-          "via": "Tópico",
+          "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Tobramicina 0,3% Pomada",
           "qtde": "01 Tubo",
-          "posologia": "Aplicar, aproximadamente, 01 cm da pomada, de 06/06 horas, por 07 dias.",
-          "via": "Tópico",
+          "posologia": "Aplicar, aproximadamente, 01 cm da pomada na borda da pálpebra acometida, de 06/06 horas, por 07 dias.",
+          "via": "Oftálmico",
           "fator": null
         },
         {
@@ -1100,7 +1106,9 @@ const DATA = {
         "Procurar o pronto atendimento imediatamente, se:",
         "Inchaço de face, lábios ou garganta",
         "Dificuldade para respirar",
-        "Surgimento de pus na lesão ou febre ou dor progressiva"
+        "Surgimento de pus na lesão ou febre ou dor progressiva",
+        "Tontura, desmaio ou vômitos",
+        "Suor excessivo, agitação, tremores, salivação ou sonolência, principalmente em crianças, ou se perceber que a picada foi de escorpião, aranha, cobra ou taturana (lagarta)"
       ]
     },
     "Insuficiência venosa": {
@@ -1108,7 +1116,7 @@ const DATA = {
         {
           "nome": "Diosmina + Hesperidina 900/100mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 14 dias.",
+          "posologia": "Tomar 01 comprimido ao dia, pela manhã, por 14 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -1289,8 +1297,8 @@ const DATA = {
         {
           "nome": "Trometamol Cetorolaco 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor importante, por no máximo 05 dias. Evitar ou reduzir a dose se houver função renal reduzida, desidratação ou suspeita de obstrução — Cetorolaco reduz o fluxo sanguíneo renal e é um dos AINEs mais nefrotóxicos, especialmente relevante numa condição que já é renal.",
-          "via": "Oral",
+          "posologia": "Colocar 01 comprimido sob a língua e deixar dissolver, até de 06/06 horas, se dor importante, por no máximo 05 dias. Não partir nem mastigar.",
+          "via": "Sublingual",
           "fator": null
         },
         {
@@ -1318,7 +1326,7 @@ const DATA = {
     "Alergia": {
       "meds": [
         {
-          "nome": "Dipirona 500mg",
+          "nome": "Paracetamol 500mg",
           "qtde": "01 Caixa",
           "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor.",
           "via": "Oral",
@@ -1383,7 +1391,7 @@ const DATA = {
         {
           "nome": "Budesonida 50mcg",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 02 jatos em cada narina, de 08/08 horas, por 05 a 07 dias, para descongestão.",
+          "posologia": "Aplicar 02 jatos em cada narina, de 12/12 horas, por 05 a 07 dias.",
           "via": "Tópico",
           "fator": null
         },
@@ -1398,7 +1406,7 @@ const DATA = {
       "orientacoes": [
         "Mantenha hidratação abundante e repouso.",
         "Evite exposição ao frio e mudanças bruscas de temperatura.",
-        "Procure atendimento IMEDIATAMENTE se:\n1. Febre alta que não passa depois de 3 dias\n2. Dificuldade para respirar\n3. Catarro do nariz ficando amarelo/esverdeado e grosso\n4. Confusão mental repentina, quedas, urinar bem menos que o normal, ou piora de um problema de saúde que você já tem (do coração ou do pulmão, por exemplo) — mesmo sem sentir falta de ar",
+        "Procure atendimento IMEDIATAMENTE se:\n1. Falta de ar, respiração rápida ou cansaço para respirar\n2. Lábios ou rosto arroxeados, ou dor ou pressão no peito que não passa\n3. Febre alta que não passa depois de 3 dias, ou febre/tosse que volta a piorar depois de ter começado a melhorar\n4. Confusão mental repentina, quedas, urinar bem menos que o normal, ou piora de um problema de saúde que você já tem (do coração ou do pulmão, por exemplo) — mesmo sem sentir falta de ar",
         "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
       ]
     },
@@ -1420,11 +1428,12 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Lavar área afetada apenas com água corrente e sabão neutro",
-        "Evitar romper bolhas, aplicar pomadas caseiras ou expor região ao sol",
-        "Manter local limpo, coberto com gaze estéril.",
-        "Trocar curativo diariamente",
-        "Procurar atendimento médico se formação de bolhas, secreção, febre ou aumento da dor."
+        "Lavar a área afetada com água corrente (ou soro fisiológico) e sabão neutro, antes de cada aplicação do creme.",
+        "Não romper bolhas, não aplicar pomadas ou receitas caseiras e não expor a região ao sol.",
+        "Manter o local limpo, coberto com gaze estéril.",
+        "Trocar o curativo a cada 12 horas, junto com a aplicação do creme.",
+        "Procurar atendimento médico se houver vermelhidão que se espalha, pus ou mau cheiro, febre, aumento da dor, ou se a ferida não estiver cicatrizando em até 2 semanas.",
+        "Confira sua vacina antitetânica; se não estiver em dia, procure a sala de vacinação da Unidade de Saúde."
       ]
     },
     "TCE": {
@@ -1448,7 +1457,7 @@ const DATA = {
         "Manter repouso relativo nas primeiras 24 horas",
         "Evitar atividades físicas intensas, uso de bebidas alcoólicas e medicações aqui não prescritas",
         "Se em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), procurar avaliação de EMERGÊNCIA imediatamente, mesmo sem sintomas — risco de hemorragia intracraniana tardia mesmo em trauma leve.",
-        "Retornar para reavaliação imediata se: sonolência excessiva, confusão, vômitos persistentes, fraqueza em membros, convulsões, ou saída de líquido pelo ouvido ou nariz."
+        "Retornar para reavaliação imediata se: dor de cabeça forte ou que piora progressivamente, sonolência excessiva ou dificuldade para acordar, confusão ou agitação, vômitos persistentes, fraqueza em braços ou pernas, alteração da fala ou da visão, convulsões, ou saída de líquido pelo ouvido ou nariz. Manter um adulto responsável acompanhando o paciente nas primeiras 24 horas."
       ]
     },
     "Ferimento": {
@@ -1480,7 +1489,7 @@ const DATA = {
         "Trocar de curativo diariamente",
         "Evitar exposição solar direta e traumas locais",
         "Retornar para avaliação médica se houver dor intensa, secreção amarelada ou febre.",
-        "Realizar reforço de vacinação antitetânica (dT) em unidade de saúde."
+        "Levar o cartão de vacina à unidade de saúde o quanto antes para conferir a vacina antitetânica (dT): se o esquema estiver incompleto ou for desconhecido, ou se a última dose foi há 10 anos ou mais (ou há 5 anos ou mais, em ferimento profundo, sujo, perfurante ou por mordedura), tomar a dT e completar o esquema, se necessário."
       ]
     },
     "Micose": {
@@ -1544,7 +1553,7 @@ const DATA = {
         {
           "nome": "Permetrina 5% - Creme",
           "qtde": "01 Bisnaga",
-          "posologia": "Utilizar em toda extensão das regiões acometidas, aplicando antes de dormir, realizar por 2 noites. Após 01 semana, utilizar novamente por uma noite.",
+          "posologia": "Aplicar em todo o corpo, do pescoço para baixo (inclusive entre os dedos, sob as unhas, axilas, umbigo, nádegas, região genital e plantas dos pés), à noite, antes de dormir, e retirar com banho na manhã seguinte (após 8 a 14 horas). Em crianças pequenas e idosos, aplicar também no couro cabeludo, rosto e atrás das orelhas, evitando olhos e boca. Realizar por 02 noites seguidas. Após 01 semana, repetir por mais 01 noite.",
           "via": "Tópico",
           "fator": null
         },
@@ -1564,7 +1573,7 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Tratar todos do mesmo domicílio",
+        "Tratar ao mesmo tempo todos os moradores do domicílio e contatos íntimos, mesmo que não tenham coceira.",
         "Lavar todas as roupas de cama em água quente para evitar reinfecção",
         "Evitar contato próximo com pessoas não tratadas, até o fim da terapia.",
         "coceira pode persistir por 02 a 03 semanas após o tratamento.\nNão significando falha do remédio"
@@ -1621,7 +1630,7 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter grande ingesta hídrica, de ao menos 02 litros",
-        "Não se exponha a fumaça de cigarro e à ambientes poluídos.",
+        "Não se exponha à fumaça de cigarro nem a ambientes poluídos.",
         "A maioria das tosses associadas a resfriado é autolimitada e melhora em 1 a 3 semanas — corticoide oral não é indicado rotineiramente para tosse comum, salvo se houver chiado/falta de ar (nesse caso, ver as condições \"Broncoespasmo\" ou \"Asma\").",
         "Procurar atendimento médico se febre, expectoração purulenta, dificuldade de respirar ou tosse intensa que interfira nas atividades diárias.",
         "Se a tosse persistir por mais de 3 semanas, é importante investigar a causa (não deve ser tratada indefinidamente apenas com sintomáticos)."
@@ -1639,17 +1648,17 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimido, de 06/06 horas, se dor.",
+          "posologia": "Tomar 02 comprimidos, de 06/06 horas, se dor.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
         "Manter-se em repouso",
-        "Aplicar compressas de gases, banhadas em soro fisiológico frio, de 06/06 horas, por 15 minutos.",
+        "Aplicar compressas de gazes, banhadas em soro fisiológico frio, de 06/06 horas, por 15 minutos.",
         "Manter o membro elevado acima do nível do coração",
         "Evitar esforços físicos e esportes por 48 a 72 horas",
-        "Procurar avaliação médica se aumento da dor, inchaço significativo e dificuldade para caminhar."
+        "Procurar avaliação médica se aumento da dor, inchaço significativo ou dificuldade para caminhar."
       ]
     },
     "Xeroftalmia": {
@@ -1682,7 +1691,7 @@ const DATA = {
       "orientacoes": [
         "Manter controle glicêmico rigoroso",
         "Evitar aplicar pressão sobre o pé afetado",
-        "Higienizar o pé diariamente com água morna e sabão neutro",
+        "Examinar os pés todos os dias (inclusive a sola e entre os dedos, com ajuda de espelho ou de outra pessoa). Lavar os pés diariamente com água morna e sabão neutro, testando antes a temperatura da água com a mão ou o cotovelo (nunca com o pé), e secar bem entre os dedos. Não andar descalço, nem só de meias ou de chinelo de sola fina, dentro ou fora de casa; não cortar calos nem usar calicidas.",
         "Manter pele seca e protegida",
         "Buscar imediatamente acompanhamento longitudinal em Unidade Básica de Saúde",
         "Sinais de infecção grave (emergência, risco de amputação): febre, secreção purulenta, odor fétido, exposição de osso ou tendão, vermelhidão que se espalha rapidamente — nesses casos, não é só \"acompanhamento\", é emergência."
@@ -1700,7 +1709,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, se coceira intensa que interfere no sono.",
+          "posologia": "Tomar 01 comprimido, à noite, antes de dormir, apenas se coceira intensa que atrapalhe o sono.",
           "via": "Oral",
           "fator": null
         },
@@ -1723,14 +1732,14 @@ const DATA = {
         {
           "nome": "Fluconazol 150 mg",
           "qtde": "22 Comprimidos",
-          "posologia": "Tomar 02 comprimidos (300mg) no primeiro dia e, a partir do segundo dia, 01 comprimido (150mg) por dia, por 14 a 21 dias — manter por pelo menos 14 dias após o desaparecimento dos sintomas. Esofagite por cândida costuma sinalizar alguma imunossupressão de base (HIV, diabetes descompensado, uso de corticoide/imunossupressor) — vale investigar a causa.",
+          "posologia": "Tomar 02 comprimidos (300mg) no primeiro dia e, a partir do segundo dia, 01 comprimido (150mg) ao dia, completando 21 dias de tratamento.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Omeprazol 20mg",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, pela manhã em jejum, por 30 dias. Incluir apenas se houver sintomas concomitantes de DRGE/pirose — supressão ácida crônica pode favorecer o próprio crescimento fúngico e não é indicação padrão isolada para esofagite por Candida.",
+          "posologia": "Tomar 01 comprimido, pela manhã, em jejum, por 30 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -1810,7 +1819,7 @@ const DATA = {
         {
           "nome": "Vitamina D 10.000 UI",
           "qtde": "20 Cápsulas",
-          "posologia": "Tomar 05 cápsulas (50.000 UI), 01 vez por semana, por 04 semanas — dose de reposição para corrigir deficiência importante (a dose anterior era de manutenção, insuficiente para repor deficiência sintomática). Reavaliar dose de manutenção contínua após controle laboratorial.",
+          "posologia": "Tomar 05 cápsulas (50.000 UI), 01 vez por semana, por 04 semanas. Após esse período, retornar com exames para definir a dose de manutenção.",
           "via": "Oral",
           "fator": null
         }
@@ -1901,7 +1910,7 @@ const DATA = {
         {
           "nome": "Prednisolona 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota no olho acometido, de 06/06 horas, por 07 dias.",
+          "posologia": "Aplicar 01 gota no olho acometido, de 06/06 horas, até a avaliação oftalmológica. Não suspender por conta própria — o oftalmologista orientará a redução gradual.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -2004,7 +2013,8 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Encaminhamento urgente para avaliação odontológica (tratamento da causa)."
+        "Encaminhamento urgente para avaliação odontológica (tratamento da causa).",
+        "Retorne imediatamente se:\n1. Inchaço ou vermelhidão na pálpebra ou ao redor dos olhos\n2. Visão dupla ou dificuldade para mover os olhos\n3. Dor de cabeça súbita e forte, confusão ou vômitos persistentes\n4. Febre alta que não passa"
       ]
     },
     "Mononucleose Infecciosa": {
@@ -2027,7 +2037,8 @@ const DATA = {
       "orientacoes": [
         "Evitar exercícios físicos por 03 a 04 semanas (risco de ruptura esplênica).",
         "Manter repouso relativo e hidratação adequada.",
-        "Retornar imediatamente se dor abdominal intensa no quadrante superior esquerdo."
+        "Procure atendimento de urgência IMEDIATAMENTE se dificuldade para respirar ou para engolir a saliva, dor forte no lado esquerdo da barriga (abaixo das costelas) ou no ombro esquerdo, tontura ou desmaio, ou pele/olhos amarelados.",
+        "Evitar amoxicilina ou ampicilina durante a doença (podem causar manchas na pele e não tratam a mononucleose, que é causada por vírus)."
       ]
     },
     "Tromboflebite Superficial": {
@@ -2056,7 +2067,9 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter a perna elevada ao máximo.",
-        "Encaminhamento para Angiologia/Cirurgia Vascular."
+        "Encaminhamento para Angiologia/Cirurgia Vascular.",
+        "Solicitado USG Doppler venoso do membro acometido, para avaliar a extensão do trombo e descartar trombose venosa profunda. Trombo com 5 cm ou mais e a mais de 3 cm da junção safeno-femoral/safeno-poplítea: considerar fondaparinux 2,5mg SC 1x/dia (ou heparina de baixo peso molecular em dose profilática) por 45 dias. Trombo a 3 cm ou menos da junção, ou TVP associada: anticoagulação em dose plena (tratar como TVP).",
+        "Procure atendimento de urgência IMEDIATAMENTE se surgir inchaço de toda a perna, dor forte na panturrilha, vermelhidão subindo em direção à virilha, falta de ar súbita, dor no peito ou tosse com sangue — podem ser sinais de trombose venosa profunda ou embolia pulmonar."
       ]
     },
     "Varicorragia": {
@@ -2064,7 +2077,7 @@ const DATA = {
         {
           "nome": "Diosmina + Hesperidina 900/100mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 14 dias.",
+          "posologia": "Tomar 01 comprimido ao dia, pela manhã, por 14 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2084,8 +2097,9 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Repouso com as pernas elevadas",
-        "Encaminhamento urgente para Cirurgia Vascular."
+        "Repouso com as pernas elevadas.",
+        "Encaminhamento urgente para Cirurgia Vascular.",
+        "Se voltar a sangrar: deitar, elevar a perna acima do nível do coração e comprimir firmemente o local com pano limpo por pelo menos 10 minutos, sem soltar para olhar. Se não parar, procurar urgência imediatamente (SAMU 192)."
       ]
     },
     "Herpes Simples Labial": {
@@ -2093,14 +2107,14 @@ const DATA = {
         {
           "nome": "Aciclovir 400mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias — esquema padrão para herpes labial em imunocompetente (dose menor que a usada em zóster).",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias. Iniciar aos primeiros sintomas (formigamento/ardor no lábio).",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Aciclovir 5% - Pomada",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar fina camada, de 04/04 horas, sobre as lesões. Uso opcional/alternativo ao comprimido oral — associar os dois não tem benefício adicional bem estabelecido.",
+          "posologia": "Aplicar fina camada sobre as lesões, de 04/04 horas, por 05 dias.",
           "via": "Tópico",
           "fator": null
         },
@@ -2127,8 +2141,8 @@ const DATA = {
         },
         {
           "nome": "Aciclovir 400mg",
-          "qtde": "15 Comprimidos",
-          "posologia": "Reservar para suspeita de Síndrome de Ramsay Hunt (vesículas/otalgia associadas) — uso rotineiro em Paralisia de Bell idiopática típica tem benefício incerto pela evidência atual. Se indicado: 01 comprimido, 03 vezes ao dia, por 07 dias.",
+          "qtde": "70 Comprimidos",
+          "posologia": "Reservar para suspeita de Síndrome de Ramsay Hunt (vesículas/otalgia associadas) — uso rotineiro em Paralisia de Bell idiopática típica tem benefício incerto pela evidência atual. Se indicado: Tomar 02 comprimidos (800mg), de 4/4 horas (5 vezes ao dia, respeitando o intervalo noturno), por 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2166,22 +2180,24 @@ const DATA = {
         {
           "nome": "Fluoxetina 20mg",
           "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, pela manhã, por 30 dias.",
+          "posologia": "Tomar 01 comprimido, pela manhã, uso contínuo. Não suspender sem orientação médica — o efeito começa após 2 a 4 semanas e a melhora completa pode levar alguns meses.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
         "Evitar cafeína e outras substâncias estimulantes.",
-        "Agendar consulta com Psiquiatra/Psicólogo para manejo longitudinal e terapia."
+        "Agendar consulta com Psiquiatra/Psicólogo para manejo longitudinal e terapia.",
+        "Nas primeiras semanas a ansiedade pode piorar um pouco; se isso acontecer, ou se surgirem pensamentos de se machucar ou de suicídio, procure atendimento imediatamente (CVV 188).",
+        "Após tomar o clonazepam, não dirigir e não ingerir bebida alcoólica; uso apenas ocasional (risco de dependência)."
       ]
     },
     "Candidíase Oral": {
       "meds": [
         {
           "nome": "Nistatina Suspensão Oral 100.000 UI/mL",
-          "qtde": "01 Frasco",
-          "posologia": "Aplicar 1mL na boca, 04 vezes ao dia, mantendo o máximo de tempo possível na lesão, por 07 dias.",
+          "qtde": "03 Frascos",
+          "posologia": "Bochechar 05 mL, 04 vezes ao dia, mantendo na boca o máximo de tempo possível antes de engolir, por 07 a 14 dias (manter até 48 horas após o desaparecimento das lesões).",
           "via": "Oral",
           "fator": null
         }
@@ -2213,7 +2229,7 @@ const DATA = {
         "Encaminhar para avaliação de imagem (RX/TC de face) e cirurgia buco-maxilo-facial se suspeita de fratura, deformidade, má oclusão dentária ou os sinais de alarme abaixo.",
         "Se paciente em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), encaminhar para avaliação de imagem (TC de crânio) mesmo em trauma leve, pelo risco de hematoma intracraniano.",
         "Se houver ferimento associado, avaliar/atualizar profilaxia antitetânica.",
-        "Retornar se: visão dupla, dor intensa, sangramento nasal/oral persistente, ou dormência de face."
+        "Retornar imediatamente se: visão dupla, perda ou piora da visão, olho \"saltado\" ou dor forte no olho, dor intensa, sangramento nasal/oral persistente, saída de líquido claro pelo nariz, dormência de face, sonolência, vômitos ou confusão."
       ]
     },
     "Amigdalite Crônica Agudizada": {
@@ -2235,13 +2251,15 @@ const DATA = {
         {
           "nome": "Flogoral",
           "qtde": "01 Caixa",
-          "posologia": "Consumir 01 pastilha, de 06/06 horas, se dor na garganta.",
+          "posologia": "Dissolver 01 pastilha na boca, de 06/06 horas, se dor na garganta.",
           "via": "Oral",
-          "fator": null
+          "fator": null,
+          "idadeMinMeses": 72
         }
       ],
       "orientacoes": [
-        "Agendar consulta com Otorrinolaringologista para avaliação cirúrgica."
+        "Agendar consulta com Otorrinolaringologista para avaliação cirúrgica.",
+        "Procurar atendimento imediatamente se: dificuldade para abrir a boca, voz abafada, não conseguir engolir a própria saliva ou líquidos, dor forte de um lado só da garganta, inchaço de um lado do pescoço, falta de ar, ou febre que continua após 48-72 horas de antibiótico."
       ]
     },
     "Ferimento com Risco de Raiva": {
@@ -2372,7 +2390,7 @@ const DATA = {
         {
           "nome": "Prednisona 20mg",
           "qtde": "35 Comprimidos",
-          "posologia": "Tomar 02 comprimidos (40mg), pela manhã, por 07 dias. Depois 01 comprimido e meio (30mg) por 07 dias. Depois 01 comprimido (20mg) por 07 dias. Depois meio comprimido (10mg) por 07 dias — desmame total de 4 a 6 semanas (mais lento que em outras indicações, para evitar rebote da dor). Considerar AINE isolado como primeira linha em dor leve a moderada, reservando o corticoide para dor moderada-severa refratária.",
+          "posologia": "Tomar 02 comprimidos (40mg), pela manhã, por 07 dias. Depois 01 comprimido e meio (30mg), pela manhã, por 07 dias. Depois 01 comprimido (20mg), pela manhã, por 07 dias. Depois meio comprimido (10mg), pela manhã, por 07 dias, e suspender.",
           "via": "Oral",
           "fator": null
         },
@@ -2446,8 +2464,8 @@ const DATA = {
       "meds": [
         {
           "nome": "Soro Fisiológico 0,9%",
-          "qtde": "Contínuo",
-          "posologia": "Lavar a área atingida por 15-20 minutos em água corrente e Soro Fisiológico.",
+          "qtde": null,
+          "posologia": "Lavar abundantemente a área atingida com água corrente ou Soro Fisiológico 0,9%: pele por pelo menos 15-20 minutos; olho por pelo menos 30 minutos, com as pálpebras abertas.",
           "via": "Tópico",
           "fator": null
         },
@@ -2462,7 +2480,7 @@ const DATA = {
       "orientacoes": [
         "Remover roupas contaminadas.",
         "Não neutralizar com outros agentes químicos.",
-        "Encaminhamento para Oftalmologia ou Dermatologia, dependendo da lesão."
+        "Se atingiu o olho: retirar lentes de contato, não esfregar e procurar avaliação oftalmológica no mesmo dia (urgência), principalmente se o produto for alcalino (cal, cimento, soda cáustica, água sanitária). Se o produto for pó seco (cal, cimento) na pele, retirar o excesso a seco (pano ou escova) antes de lavar. Lesões de pele: encaminhar à Dermatologia conforme a extensão."
       ]
     },
     "Hiperêmese gravídica": {
@@ -2509,8 +2527,8 @@ const DATA = {
         },
         {
           "nome": "Azitromicina 500mg",
-          "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 05 dias. Pode ser usada sozinha (se suspeita de germe atípico — início mais arrastado, tosse seca, sem toxemia importante) ou junto com um dos esquemas de Amoxicilina acima, conforme avaliação clínica.",
+          "qtde": "03 Comprimidos",
+          "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 03 dias. Pode ser usada sozinha (se suspeita de germe atípico — início mais arrastado, tosse seca, sem toxemia importante) ou junto com um dos esquemas de Amoxicilina acima, conforme avaliação clínica.",
           "via": "Oral",
           "fator": null
         },
@@ -2562,56 +2580,90 @@ const DATA = {
           "qtde": "01 Frasco",
           "posologia": "Tomar DOSE mL, de 08/08 horas, por 07 a 10 dias.",
           "via": "Oral",
-          "fator": 0.33
+          "fator": 0.33,
+          "max": 20,
+          "idadeMinMeses": 3
         },
         {
           "nome": "Azitromicina 40mg/mL - 1º dia",
           "qtde": "01 Frasco",
           "posologia": "Alternativa se suspeita de germe atípico (criança escolar, início insidioso, tosse seca arrastada, sem toxemia) — não usar junto com a Amoxicilina. Tomar DOSE mL, 01 vez, no 1º dia.",
           "via": "Oral",
-          "fator": 0.25
+          "fator": 0.25,
+          "max": 12,
+          "idadeMinMeses": 6
         },
         {
           "nome": "Azitromicina 40mg/mL - 2º ao 5º dia",
           "qtde": "01 Frasco",
           "posologia": "Continuação do esquema acima. Tomar DOSE mL, 01 vez ao dia, do 2º ao 5º dia.",
           "via": "Oral",
-          "fator": 0.125
+          "fator": 0.125,
+          "max": 6,
+          "idadeMinMeses": 6
         },
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
           "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
           "via": "Oral",
-          "fator": 0.6
+          "fator": 0.6,
+          "max": 40,
+          "idadeMinMeses": 3,
+          "pesoMinKg": 5
         },
         {
           "nome": "Paracetamol 200mg/mL",
           "qtde": "01 Frasco",
           "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
-          "fator": 1
+          "fator": 1,
+          "max": 35
         },
         {
           "nome": "Ibuprofeno 200mg/mL",
           "qtde": "01 Frasco",
           "posologia": "Dar DOSE gotas, de 08/08 horas, se dor ou febre, por no máximo 05 dias.",
           "via": "Oral",
-          "fator": 0.5
+          "fator": 0.5,
+          "max": 20,
+          "idadeMinMeses": 6
         },
         {
           "nome": "Metoclopramida Gotas 4mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos importantes.",
+          "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos importantes, por no máximo 05 dias.",
           "via": "Oral",
-          "fator": 0.5
+          "fator": 0.5,
+          "max": 50,
+          "idadeMinMeses": 12
         },
         {
           "nome": "Ondansetrona 4mg (Comprimido)",
           "qtde": "06 Comprimidos",
-          "posologia": "Dose por peso: 8 a 15kg — 1/2 comprimido (2mg); 15 a 30kg — 01 comprimido (4mg); acima de 30kg — 02 comprimidos (8mg). Tomar a dose correspondente, se náuseas ou vômitos importantes, até de 08/08 horas.",
+          "posologia": "Tomar DOSE, se náuseas ou vômitos importantes, até de 08/08 horas.",
           "via": "Oral",
-          "fator": null
+          "fator": null,
+          "faixas": [
+            {
+              "ateKg": 7.99,
+              "valor": null
+            },
+            {
+              "ateKg": 15,
+              "valor": "1/2 comprimido (2 mg)"
+            },
+            {
+              "ateKg": 30,
+              "valor": "01 comprimido (4 mg)"
+            },
+            {
+              "ateKg": 999,
+              "valor": "02 comprimidos (8 mg)"
+            }
+          ],
+          "idadeMinMeses": 6,
+          "pesoMinKg": 8
         }
       ],
       "orientacoes": [
@@ -2784,7 +2836,7 @@ const DATA = {
       "concentracao": "500+125mg/5mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar mL, de 12/12 horas, por 07 dias.",
+      "posologia": "Tomar ____ mL, de 12/12 horas, por 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3099,18 +3151,26 @@ const DATA = {
       "concentracao": "500mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Dar 0,8 gts/kg de 6/6 horas se dor ou febre",
+      "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.6,
+      "max": 40,
+      "idadeMinMeses": 3,
+      "pesoMinKg": 5
     },
     {
       "nome": "Dipirona xarope",
       "concentracao": "50mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Dar 0,4 mL/kg de 6/6 horas se dor ou febre",
+      "posologia": "Dar DOSE mL, de 06/06 horas, se dor ou febre.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.3,
+      "max": 20,
+      "idadeMinMeses": 3,
+      "pesoMinKg": 5
     },
     {
       "nome": "Dolutegravir",
@@ -3234,9 +3294,12 @@ const DATA = {
       "concentracao": "200mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Dar 0,5 gts/kg de 8/8 horas por 05 dias.",
+      "posologia": "Dar DOSE gotas, de 08/08 horas, por 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.5,
+      "max": 20,
+      "idadeMinMeses": 6
     },
     {
       "nome": "Ivermectina",
@@ -3284,7 +3347,7 @@ const DATA = {
       "via": "Nasal"
     },
     {
-      "nome": "Levonogestrel / Etinilestradiol",
+      "nome": "Levonorgestrel / Etinilestradiol",
       "concentracao": "150 / 30mcg",
       "forma": "",
       "qtde": "",
@@ -3350,10 +3413,13 @@ const DATA = {
       "nome": "Metoclopramida gotas",
       "concentracao": "",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.5,
+      "max": 50,
+      "idadeMinMeses": 12
     },
     {
       "nome": "Metronidazol",
@@ -3485,10 +3551,12 @@ const DATA = {
       "nome": "Prednisolona xarope",
       "concentracao": "3mg/mL",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Tomar DOSE mL, pela manhã, por 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.3,
+      "max": 13
     },
     {
       "nome": "Prednisona",
@@ -3731,7 +3799,8 @@ const DATA = {
       "qtde": "01 Frasco",
       "posologia": "Tomar 10 mL (400 mg) por via oral, em dose única.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "idadeMinMeses": 24
     },
     {
       "nome": "Albendazol",
@@ -3740,7 +3809,8 @@ const DATA = {
       "qtde": "01 Comprimido",
       "posologia": "Tomar 01 comprimido mastigável por via oral, em dose única.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "idadeMinMeses": 24
     },
     {
       "nome": "Alendronato De Sódio",
@@ -3800,10 +3870,13 @@ const DATA = {
       "nome": "Amoxicilina",
       "concentracao": "50mg/mL",
       "forma": "",
-      "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "02 Frascos",
+      "posologia": "Tomar DOSE mL, de 08/08 horas, por 10 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.33,
+      "max": 10,
+      "idadeMinMeses": 3
     },
     {
       "nome": "Anlodipino Besilato",
@@ -3837,9 +3910,12 @@ const DATA = {
       "concentracao": "40mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar DOSE mL, 01 vez ao dia, por 03 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.25,
+      "max": 12,
+      "idadeMinMeses": 6
     },
     {
       "nome": "Azitromicina",
@@ -3944,10 +4020,13 @@ const DATA = {
       "nome": "Cefalexina",
       "concentracao": "50mg/mL",
       "forma": "",
-      "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "02 Frascos",
+      "posologia": "Tomar DOSE mL, de 06/06 horas, por 07 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.25,
+      "max": 10,
+      "idadeMinMeses": 3
     },
     {
       "nome": "Cetoconazol",
@@ -4080,9 +4159,13 @@ const DATA = {
       "concentracao": "500mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.6,
+      "max": 40,
+      "idadeMinMeses": 3,
+      "pesoMinKg": 5
     },
     {
       "nome": "Enalapril Maleato",
@@ -4242,9 +4325,12 @@ const DATA = {
       "concentracao": "50mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Dar DOSE gotas, de 08/08 horas, se dor ou febre, por no máximo 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 1,
+      "max": 40,
+      "idadeMinMeses": 6
     },
     {
       "nome": "Imipramina Cloridrato",
@@ -4395,9 +4481,20 @@ const DATA = {
       "concentracao": "1mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar DOSE mL, 01 vez ao dia, por 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "faixas": [
+        {
+          "ateKg": 30,
+          "valor": 5
+        },
+        {
+          "ateKg": 999,
+          "valor": 10
+        }
+      ],
+      "idadeMinMeses": 24
     },
     {
       "nome": "Medroxiprogesterona Acetato",
@@ -4440,9 +4537,12 @@ const DATA = {
       "concentracao": "4mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.5,
+      "max": 50,
+      "idadeMinMeses": 12
     },
     {
       "nome": "Metronidazol",
@@ -4575,18 +4675,22 @@ const DATA = {
       "concentracao": "200mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Dar DOSE gotas, de 06/06 horas, se dor ou febre.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 1,
+      "max": 35
     },
     {
       "nome": "Prednisolona Fosfato Sodico",
       "concentracao": "3mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar DOSE mL, pela manhã, por 05 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.3,
+      "max": 13
     },
     {
       "nome": "Prednisona",
@@ -4665,9 +4769,12 @@ const DATA = {
       "concentracao": "40+8mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar DOSE mL, de 12/12 horas, por 07 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.375,
+      "max": 20,
+      "idadeMinMeses": 2
     },
     {
       "nome": "Sulfametoxazol + Trimetroprima",
