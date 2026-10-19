@@ -127,12 +127,12 @@ const DATA = {
       ],
       "orientacoes": [
         "Eleve a cabeceira da cama aproximadamente 15cm. Pode-se colocar tijolos abaixo dos pés da cama (da cabeceira). Outra opção é usar almofadas e travesseiros para a cabeça ficar em um nível mais elevado ao deitar.",
-        "Evite gorduras, bebidas cítricas, alcoólicas e gaseificado, café, menta, hortelã, molho de tomate, chocolates, balas e doces, condimentos em excesso e outros alimentos que pioram os sintomas.",
+        "Evite gorduras, bebidas cítricas, alcoólicas e gaseificadas, café, menta, hortelã, molho de tomate, chocolates, balas e doces, condimentos em excesso e outros alimentos que pioram os sintomas.",
         "Faça refeições pequenas e mastigue devagar. Evite encher demais o estômago",
         "Evite deitar-se ou realizar exercícios físicos até 2 horas após as refeições",
         "Evite roupas e cintos apertados",
         "Mantenha o peso adequado",
-        "Retorne imediatamente se:\n1. Tiver vômitos com sangue ou com aparência de borra de café\n2. Tiver fezes pretas e com mau cheiro\n3. Sentir dor intensa no peito ou na barriga, que não melhorem com o remédio",
+        "Retorne imediatamente se:\n1. Tiver vômitos com sangue ou com aparência de borra de café\n2. Tiver fezes pretas e com mau cheiro\n3. Sentir dor intensa no peito ou na barriga, que não melhore com o remédio",
         "Fundamental que procure acompanhamento longitudinal em Unidade de Saúde, para dar continuação ao tratamento."
       ]
     },
@@ -225,14 +225,14 @@ const DATA = {
         {
           "nome": "Olopatadina 1 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, no olho acometido, de 08/08 horas, por 07 dias. Usar apenas se houver componente alérgico/prurido associado — conjuntivite viral isolada é autolimitada e não tem indicação primária de antialérgico.",
+          "posologia": "Aplicar 01 gota, no olho acometido, de 08/08 horas, por 07 dias, apenas se houver coceira.",
           "via": "Tópico",
           "fator": null
         },
         {
           "nome": "Loratadina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido ao dia, por 05 dias. Usar apenas se houver componente alérgico/prurido associado.",
+          "posologia": "Tomar 01 comprimido ao dia, por 05 dias, apenas se houver coceira.",
           "via": "Oral",
           "fator": null
         }
@@ -419,11 +419,11 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Evitar consumo de mais de 2g de sal no dia, cafeína, álcool e cigarro.",
+        "Evite sal em excesso: no máximo 2 g de sódio por dia (cerca de 5 g de sal, ou 1 colher de chá rasa, somando todo o sal do dia). Evite também cafeína, álcool e cigarro.",
         "Hidratação adequada",
         "Controle de estresse e sono regular",
         "O tratamento visa reduzir frequência e intensidade das crises, mas não cura",
-        "Retorno IMEDIATO se houver: diplopia, disartria, déficit neurológico, perda auditiva súbita, vertigem prolongada >24 h",
+        "Retorne IMEDIATAMENTE se houver: visão dupla, dificuldade para falar, fraqueza ou dormência em um lado do corpo, perda súbita da audição, ou tontura que dure mais de 24 horas.",
         "Buscar avaliação em Unidade de Saúde para acompanhamento longitudinal"
       ]
     },
@@ -524,17 +524,17 @@ const DATA = {
       "orientacoes": [
         "O Clenil é de uso CONTÍNUO diário, mesmo sem sintomas — ele controla a doença e previne crises.",
         "O Salbutamol é só para alívio imediato dos sintomas — se precisar usá-lo mais de 2 a 3 vezes por semana, procure a Unidade de Saúde para reavaliar o tratamento.",
-        "Use espaçador (bombinha) sempre que possível, para melhorar a chegada do medicamento aos pulmões.",
+        "Use o espaçador acoplado à bombinha sempre que possível, para melhorar a chegada do medicamento aos pulmões. Após usar o Clenil, enxágue a boca com água e cuspa, para evitar sapinho.",
         "Procure atendimento de urgência IMEDIATAMENTE se: dificuldade para falar frases inteiras, lábios ou unhas arroxeados, respiração muito acelerada, ou falta de ar que não melhora com o Salbutamol."
       ]
     },
     "Candidíase": {
       "meds": [
         {
-          "nome": "Nistatina Pomada 25.000u/g",
+          "nome": "Nistatina Creme Vaginal 25.000 UI/g",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar na vagina ao deitar, por 14 dias.",
-          "via": "Tópico",
+          "posologia": "Aplicar 01 aplicador cheio (4 g) na vagina, ao deitar, por 14 dias.",
+          "via": "Vaginal",
           "fator": null
         },
         {
@@ -565,6 +565,7 @@ const DATA = {
         }
       ],
       "orientacoes": [
+        "Após pingar as gotas, permaneça deitado com o ouvido tratado para cima por 05 minutos, para o medicamento penetrar.",
         "Agendar lavagem do conduto auditivo em UBS.",
         "Não usar cotonetes — eles tendem a empurrar o cerume para dentro do ouvido, piorando o quadro.",
         "Procure atendimento antes da data agendada se houver dor forte, secreção ou sangramento, ou piora importante da audição."
@@ -734,7 +735,7 @@ const DATA = {
     "Corpo estranho": {
       "meds": [],
       "orientacoes": [
-        "Molhar gases em soro fisiológico frio, e aplicar suavemente sobre o olho acometido, para alívio da dor e do incômodo."
+        "Molhar gazes em soro fisiológico frio e aplicar suavemente sobre o olho acometido, para alívio da dor e do incômodo."
       ]
     },
     "Dermatite": {
@@ -755,13 +756,13 @@ const DATA = {
         },
         {
           "nome": "Prednisona 20mg",
-          "qtde": "05 Comprimidos",
+          "qtde": "10 Comprimidos",
           "posologia": "Tomar 02 comprimidos, pela manhã, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
-          "nome": "Acetato de Hidrocortisona (Creme 10mg)",
+          "nome": "Acetato de Hidrocortisona Creme 10 mg/g (1%)",
           "qtde": "01 Tubo",
           "posologia": "Aplicar fina camada, de 06/06 horas, massageando sobre a lesão. \nApós melhora dos sintomas, aplicar 01 vez ao dia.",
           "via": "Tópico",
@@ -899,7 +900,6 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Após aplicar medicação no ouvido, permanecer deitado por lado acometido para cima, por 05 minutos, para absorção da medicação",
         "Não mergulhar ou praticar atividades aquáticas pelos próximos 30 dias.",
         "Procure atendimento se houver dor, inchaço ou vermelhidão atrás da orelha, ou febre persistente — sinais de possível mastoidite."
       ]
