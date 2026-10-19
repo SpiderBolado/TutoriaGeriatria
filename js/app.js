@@ -1452,6 +1452,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         bar.appendChild(div);
       }
     });
+    renderSugestoesPadroes(bar);
   }
 
   // ---------- Contador de itens ----------
@@ -1463,6 +1464,223 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     let txt = n + ' medicamento' + (n !== 1 ? 's' : '');
     if(o) txt += ' · ' + o + ' orientaç' + (o !== 1 ? 'ões' : 'ão');
     chip.textContent = txt;
+  }
+
+  // ---------- Padrões de uso: sugerir tornar padrão o que o médico repete ----------
+  // Cada atendimento (de uma "Nova receita" à próxima, ou até mudar o paciente —
+  // as duas receitas de um mesmo paciente contam como um atendimento) é comparado
+  // com o padrão de cada condição usada: item com posologia/quantidade trocada,
+  // item ou orientação que ficou de fora, orientação reescrita, remédio
+  // acrescentado. Quando a mesma mudança se repete, a receita sugere torná-la o
+  // padrão. Fica tudo neste navegador e sem dado de paciente (só condição,
+  // remédio e texto).
+  const PADROES_MIN = 3;          // repetições para sugerir
+  const PADROES_FRACAO = 0.6;     // retirar/acrescentar: fração dos atendimentos com a condição
+  const PADROES_MAX_CHAVES = 400;
+  let padroes = { uso: {}, n: {}, info: {}, dispensadas: {}, adiadas: {} };
+  let atendimentoAtual = null;    // { paciente, inicio, ignorar, conds: {X: {meds: {i: {posologia, qtde}}, orient: {i: texto}}}, extras: {nome: item} }
+
+  async function loadPadroes(){
+    try{
+      const r = await storage.get('padroes-uso', false);
+      if(r && r.value) padroes = Object.assign(padroes, JSON.parse(r.value));
+      const a = await storage.get('padroes-atendimento', false);
+      atendimentoAtual = a && a.value ? JSON.parse(a.value) : null;
+    }catch(e){ atendimentoAtual = null; }
+    // atendimento esquecido aberto (app fechado sem "Nova receita"): fecha agora
+    if(atendimentoAtual && Date.now() - (atendimentoAtual.inicio || 0) > 12 * 3600e3) finalizarAtendimento();
+  }
+  async function savePadroes(){
+    try{
+      const chaves = Object.keys(padroes.n);
+      if(chaves.length > PADROES_MAX_CHAVES){
+        chaves.sort((a, b) => padroes.n[a] - padroes.n[b]).slice(0, chaves.length - PADROES_MAX_CHAVES)
+          .forEach(k => { delete padroes.n[k]; delete padroes.info[k]; });
+      }
+      await storage.set('padroes-uso', JSON.stringify(padroes), false);
+      await storage.set('padroes-atendimento', JSON.stringify(atendimentoAtual), false);
+    }catch(e){ /* sem armazenamento: só não aprende */ }
+  }
+
+  // Chamado a cada receita emitida (imprimir, .docx, copiar)
+  function registrarAtendimento(){
+    const paciente = el('nomePaciente').value.trim();
+    if(atendimentoAtual && atendimentoAtual.paciente !== paciente) finalizarAtendimento();
+    if(!atendimentoAtual) atendimentoAtual = { paciente, inicio: Date.now(), ignorar: false, conds: {}, extras: {} };
+    const at = atendimentoAtual;
+    const cond = nome => (at.conds[nome] = at.conds[nome] || { meds: {}, orient: {} });
+    Object.entries(selected).forEach(([id, it]) => {
+      // receita convertida para pediatria difere do padrão de propósito: não ensina nada
+      if(it.convertidoPediatrico) { at.ignorar = true; return; }
+      const m = /^cond:(.+):med:(\d+)$/.exec(id);
+      if(m) cond(m[1]).meds[m[2]] = { posologia: it.posologiaBase || '', qtde: it.qtde || '' };
+      else if(!it.origemCondicao) at.extras[it.nome] = { nome: it.nome, qtde: it.qtde || null, posologia: it.posologiaBase || null, via: it.via || 'Oral', fator: it.fator ?? null };
+    });
+    Object.entries(selectedOrient).forEach(([id, o]) => {
+      const m = /^cond:(.+):or:(\d+)$/.exec(id);
+      if(m) cond(m[1]).orient[m[2]] = o.texto;
+    });
+    savePadroes();
+  }
+
+  function chavePadrao(i){
+    if(i.tipo === 'E') return `E|${i.cond}|${i.idx}|${i.campo}|${i.valor}`;
+    if(i.tipo === 'EO') return `EO|${i.cond}|${i.idx}|${i.valor}`;
+    if(i.tipo === 'A') return `A|${i.cond}|${norm(i.item)}`;
+    return `${i.tipo}|${i.cond}|${i.idx}`;
+  }
+  function contar(info){
+    const chave = chavePadrao(info);
+    padroes.n[chave] = (padroes.n[chave] || 0) + 1;
+    padroes.info[chave] = info;
+  }
+
+  function finalizarAtendimento(){
+    const at = atendimentoAtual;
+    atendimentoAtual = null;
+    if(!at || at.ignorar){ savePadroes(); return; }
+    const conds = Object.keys(at.conds).filter(nome => DATA.condicoes[nome] || customCondicoes[nome]);
+    conds.forEach(nome => {
+      const eff = getCondEffective(nome);
+      const usado = at.conds[nome];
+      const emitidos = eff.meds.filter(m => usado.meds[m.idx]).length;
+      // só conta "ficou de fora"/"acrescentou" quando a condição foi usada como conjunto
+      // (metade ou mais dos itens), não quando se pegou um item avulso dela
+      const comoConjunto = eff.meds.length ? emitidos / eff.meds.length >= 0.5 : Object.keys(usado.orient).length > 0;
+      if(comoConjunto) padroes.uso[nome] = (padroes.uso[nome] || 0) + 1;
+      eff.meds.forEach(m => {
+        const e = usado.meds[m.idx];
+        if(!e){
+          if(comoConjunto) contar({ tipo: 'R', cond: nome, idx: m.idx, item: m.nome });
+          return;
+        }
+        if(e.posologia && e.posologia !== (m.posologia || '')) contar({ tipo: 'E', cond: nome, idx: m.idx, item: m.nome, campo: 'posologia', valor: e.posologia });
+        if(e.qtde && e.qtde !== (m.qtde || '')) contar({ tipo: 'E', cond: nome, idx: m.idx, item: m.nome, campo: 'qtde', valor: e.qtde });
+      });
+      if(!comoConjunto) return;
+      eff.orientacoes.forEach(o => {
+        const t = usado.orient[o.idx];
+        if(t === undefined) contar({ tipo: 'RO', cond: nome, idx: o.idx, item: o.texto });
+        else if(t !== o.texto) contar({ tipo: 'EO', cond: nome, idx: o.idx, item: o.texto, valor: t });
+      });
+      Object.values(at.extras).forEach(x => {
+        if(!eff.meds.some(m => norm(m.nome) === norm(x.nome))) contar({ tipo: 'A', cond: nome, item: x.nome, med: x });
+      });
+    });
+    savePadroes();
+  }
+
+  // A sugestão ainda vale? (o padrão pode ter mudado depois, à mão ou por outra sugestão)
+  function sugestaoAtual(chave){
+    const info = padroes.info[chave];
+    const n = padroes.n[chave] || 0;
+    if(!info || padroes.dispensadas[chave] || n < PADROES_MIN || n < (padroes.adiadas[chave] || 0)) return null;
+    const eff = getCondEffective(info.cond);
+    const uso = padroes.uso[info.cond] || 0;
+    const m = eff.meds.find(x => x.idx === info.idx);
+    const o = eff.orientacoes.find(x => x.idx === info.idx);
+    if(info.tipo === 'E') return m && m.nome === info.item && (m[info.campo] || '') !== info.valor ? info : null;
+    if(info.tipo === 'R') return m && m.nome === info.item && n / Math.max(uso, 1) >= PADROES_FRACAO ? info : null;
+    if(info.tipo === 'EO') return o && o.texto === info.item ? info : null;
+    if(info.tipo === 'RO') return o && o.texto === info.item && n / Math.max(uso, 1) >= PADROES_FRACAO ? info : null;
+    if(info.tipo === 'A') return !eff.meds.some(x => norm(x.nome) === norm(info.item)) && n / Math.max(uso, 1) >= PADROES_FRACAO ? info : null;
+    return null;
+  }
+
+  function textoSugestao(info, n){
+    const c = `<b>${escapeHtml(info.cond)}</b>`, it = `<b>${escapeHtml(info.item)}</b>`;
+    const vezes = `${n} ${n === 1 ? 'vez' : 'vezes'}`;
+    const curto = t => escapeHtml(t.length > 140 ? t.slice(0, 139) + '…' : t);
+    if(info.tipo === 'E') return `Em ${c}, você mudou ${info.campo === 'qtde' ? 'a quantidade' : 'o modo de uso'} de ${it} para “${curto(info.valor)}” ${vezes}.`;
+    if(info.tipo === 'R') return `Em ${c}, você tirou ${it} da receita ${vezes}.`;
+    if(info.tipo === 'EO') return `Em ${c}, você reescreveu a orientação “${curto(info.item)}” como “${curto(info.valor)}” ${vezes}.`;
+    if(info.tipo === 'RO') return `Em ${c}, você tirou a orientação “${curto(info.item)}” ${vezes}.`;
+    return `Em ${c}, você acrescentou ${it} ${vezes}.`;
+  }
+  const ACAO_SUGESTAO = { E: 'Tornar padrão', R: 'Tirar do padrão', EO: 'Tornar padrão', RO: 'Tirar do padrão', A: 'Incluir no padrão' };
+
+  // Até 2 sugestões, só das condições que estão na receita agora
+  function renderSugestoesPadroes(bar){
+    const condsNaReceita = new Set([
+      ...Object.values(selected).map(it => it.origemCondicao).filter(Boolean),
+      ...Object.values(selectedOrient).map(o => o.origemCondicao).filter(Boolean)
+    ]);
+    if(!condsNaReceita.size) return;
+    const chaves = Object.keys(padroes.n)
+      .filter(k => condsNaReceita.has((padroes.info[k] || {}).cond) && sugestaoAtual(k))
+      .sort((a, b) => padroes.n[b] - padroes.n[a]).slice(0, 2);
+    chaves.forEach(k => {
+      const info = padroes.info[k];
+      bar.appendChild(avisoHtml('teal', '&#10022;',
+        `<b>Sugestão do seu uso:</b> ${textoSugestao(info, padroes.n[k])}`,
+        `<span class="aviso-acoes"><button type="button" data-acao="padrao-aplicar" data-chave="${escapeHtml(k)}">${ACAO_SUGESTAO[info.tipo]}</button>` +
+        `<button type="button" class="sec" data-acao="padrao-adiar" data-chave="${escapeHtml(k)}">Agora não</button>` +
+        `<button type="button" class="sec" data-acao="padrao-dispensar" data-chave="${escapeHtml(k)}">Não sugerir</button></span>`));
+    });
+  }
+
+  function itemDeCondicao(m){
+    const x = { nome: m.nome, qtde: m.qtde ?? null, posologia: m.posologia ?? null, via: m.via || 'Oral', fator: m.fator ?? null };
+    ['max', 'faixas', 'idadeMinMeses', 'pesoMinKg'].forEach(k => { if(m[k] !== undefined) x[k] = m[k]; });
+    return x;
+  }
+
+  async function aplicarSugestao(chave){
+    const info = sugestaoAtual(chave);
+    if(!info) return;
+    const nome = info.cond;
+    if(info.tipo === 'E') setOverrideMed(nome, info.idx, { [info.campo]: info.valor });
+    else if(info.tipo === 'R') setOverrideMed(nome, info.idx, { removido: true });
+    else if(info.tipo === 'EO') setOverrideOrientacao(nome, info.idx, { texto: info.valor });
+    else if(info.tipo === 'RO') setOverrideOrientacao(nome, info.idx, { removido: true });
+    else if(info.tipo === 'A'){
+      // acrescentar item: a condição passa a ter uma versão sua (como no editor de
+      // condições; "Restaurar padrão" no editor volta à original). As edições por
+      // índice viram parte dessa versão, e os itens já na receita são renumerados.
+      const eff = getCondEffective(nome);
+      const novoIdxMed = {}, novoIdxOr = {};
+      eff.meds.forEach((m, k) => { novoIdxMed[m.idx] = k; });
+      eff.orientacoes.forEach((o, k) => { novoIdxOr[o.idx] = k; });
+      customCondicoes[nome] = {
+        meds: [...eff.meds.map(itemDeCondicao), itemDeCondicao(info.med)],
+        orientacoes: eff.orientacoes.map(o => o.texto)
+      };
+      delete overrides[nome];
+      const renumera = (obj, tipo, mapa) => Object.keys(obj).forEach(id => {
+        const m = new RegExp('^cond:' + nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':' + tipo + ':(\\d+)$').exec(id);
+        if(!m) return;
+        const v = obj[id]; delete obj[id];
+        if(mapa[m[1]] !== undefined) obj[`cond:${nome}:${tipo}:${mapa[m[1]]}`] = v;
+      });
+      renumera(selected, 'med', novoIdxMed);
+      renumera(selectedOrient, 'or', novoIdxOr);
+      if(atendimentoAtual && atendimentoAtual.conds[nome]){
+        const c = atendimentoAtual.conds[nome], meds = {}, orient = {};
+        Object.entries(c.meds).forEach(([i, v]) => { if(novoIdxMed[i] !== undefined) meds[novoIdxMed[i]] = v; });
+        Object.entries(c.orient).forEach(([i, v]) => { if(novoIdxOr[i] !== undefined) orient[novoIdxOr[i]] = v; });
+        atendimentoAtual.conds[nome] = { meds, orient };
+      }
+      // as outras sugestões desta condição seguem valendo, com a numeração nova
+      Object.keys(padroes.n).forEach(k => {
+        const i = padroes.info[k];
+        if(!i || i.cond !== nome || i.tipo === 'A') return;
+        const novo = (i.tipo === 'E' || i.tipo === 'R' ? novoIdxMed : novoIdxOr)[i.idx];
+        const n = padroes.n[k], disp = padroes.dispensadas[k], adia = padroes.adiadas[k];
+        delete padroes.n[k]; delete padroes.info[k]; delete padroes.dispensadas[k]; delete padroes.adiadas[k];
+        if(novo === undefined) return;
+        const info2 = Object.assign({}, i, { idx: novo }), k2 = chavePadrao(info2);
+        padroes.n[k2] = n; padroes.info[k2] = info2;
+        if(disp) padroes.dispensadas[k2] = disp;
+        if(adia) padroes.adiadas[k2] = adia;
+      });
+      await saveCustomCondicoes();
+      await saveOverrides();
+      populateEditorMedsDatalist();
+    }
+    padroes.dispensadas[chave] = true;
+    await savePadroes();
+    renderTudo();
+    showToast(`Padrão de ${nome} atualizado (dá para desfazer em "Restaurar original" na lista ou no editor de condições)`);
   }
 
   // ---------- Histórico de receitas ----------
@@ -1494,6 +1712,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     saveHistorico();
     renderHistorico();
+    registrarAtendimento();
   }
 
   function renderHistorico(filtroPaciente){
@@ -1551,7 +1770,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       versao: 1,
       catalogo: CATALOGO_VERSAO,
       exportadoEm: new Date().toISOString(),
-      customMeds, overrides, overridesMedicamentos, usoCondicoes, historico, customCondicoes,
+      customMeds, overrides, overridesMedicamentos, usoCondicoes, historico, customCondicoes, padroes,
       medico: { nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1611,6 +1830,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       overridesMedicamentos = payload.overridesMedicamentos && typeof payload.overridesMedicamentos === 'object' ? payload.overridesMedicamentos : {};
       usoCondicoes = payload.usoCondicoes && typeof payload.usoCondicoes === 'object' ? payload.usoCondicoes : {};
       historico = Array.isArray(payload.historico) ? payload.historico : [];
+      if(payload.padroes && typeof payload.padroes === 'object') padroes = Object.assign({ uso: {}, n: {}, info: {}, dispensadas: {}, adiadas: {} }, payload.padroes);
       if(payload.medico){
         el('medicoNome').value = payload.medico.nome || '';
         el('medicoCrm').value = payload.medico.crm || '';
@@ -1621,6 +1841,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       await saveOverridesMedicamentos();
       await saveUso();
       await saveHistorico();
+      await savePadroes();
       await saveMedico();
       populateEditorMedsDatalist();
       renderTudo();
@@ -2772,6 +2993,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!b) return;
     if(b.dataset.acao === 'converter-ped') executarConversao(false);
     if(b.dataset.acao === 'desfazer-ped') desfazerConversao();
+    if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
+    if(b.dataset.acao === 'padrao-adiar'){ padroes.adiadas[b.dataset.chave] = (padroes.n[b.dataset.chave] || 0) + PADROES_MIN; savePadroes(); renderTudo(); }
+    if(b.dataset.acao === 'padrao-dispensar'){ padroes.dispensadas[b.dataset.chave] = true; savePadroes(); renderTudo(); }
   });
   el('avisoBar').addEventListener('change', (e) => {
     if(!e.target.matches('input[data-acao="auto-ped"]')) return;
@@ -2780,6 +3004,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   });
   // Nova receita: próximo paciente (limpa tudo)
   el('btnLimpar').addEventListener('click', () => {
+    finalizarAtendimento();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
@@ -3126,6 +3351,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     await loadUnidade();
     await loadUso();
     await loadHistorico();
+    await loadPadroes();
     atualizarAvisoBackup();
     renderHistorico();
     renderTudo();

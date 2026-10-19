@@ -861,6 +861,83 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Padroes de uso: mudanca repetida em 3 atendimentos vira sugestao; aplicar muda o padrao ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.open = () => ({ document: { write(){}, close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const NOVA = 'Tomar 01 comprimido, de 08/08 horas, se dor.';
+    // atendimento = Dor Muscular sem a Ciclobenzaprina, com Dipirona editada e Omeprazol acrescentado;
+    // o 2o atendimento e feito em duas receitas do mesmo paciente (nao pode contar a "remocao" da 1a parte)
+    // remove da receita, um por vez (cada clique redesenha a receita), os itens cujo nome casa com re
+    const removerItens = async (re) => {
+      for (;;) {
+        const tirou = await page.evaluate((src) => {
+          const b = [...document.querySelectorAll('#receitaPaper .rm-item[data-sel]')].find((x) => new RegExp(src).test(x.closest('.item-linha').textContent));
+          if (b) b.click();
+          return !!b;
+        }, re);
+        if (!tirou) return;
+        await page.waitForTimeout(60);
+      }
+    };
+    const atendimento = async (i, dividido) => {
+      await page.fill('#nomePaciente', 'Paciente ' + i);
+      await selectCondicao(page, 'Dor Muscular');
+      await removerItens('Ciclobenzaprina');
+      await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .edit-item-btn[data-sel]')].find((x) => /Dipirona/.test(x.closest('.item-linha').textContent)).click());
+      await page.fill('#editItemPosologia', NOVA);
+      await page.click('#btnSaveEditItem');
+      await page.fill('#search', 'Omeprazol'); await page.waitForTimeout(250);
+      await page.evaluate(() => { const c = [...document.querySelectorAll('#listaContainer .card.med-avulso')].find((x) => /^Omeprazol/.test(x.querySelector('.nome')?.textContent.trim() || '')); c.querySelector('input[type=checkbox]').click(); });
+      await page.waitForTimeout(150);
+      if(dividido){
+        // 1a receita so com a Dipirona; 2a (Mesmo paciente) com o resto
+        await removerItens('^(?:(?!Dipirona).)*$');
+        await page.click('#btnImprimir'); await page.waitForTimeout(150);
+        await page.click('#btnMesmoPaciente');
+        await selectCondicao(page, 'Dor Muscular');
+        await removerItens('Ciclobenzaprina|Dipirona');
+        await page.fill('#search', 'Omeprazol'); await page.waitForTimeout(250);
+        await page.evaluate(() => { const c = [...document.querySelectorAll('#listaContainer .card.med-avulso')].find((x) => /^Omeprazol/.test(x.querySelector('.nome')?.textContent.trim() || '')); c.querySelector('input[type=checkbox]').click(); });
+        await page.waitForTimeout(150);
+      }
+      await page.click('#btnImprimir'); await page.waitForTimeout(150);
+      await page.click('#btnLimpar'); await page.waitForTimeout(150);
+    };
+    await atendimento(1, false);
+    await atendimento(2, true);
+    await selectCondicao(page, 'Dor Muscular');
+    const depoisDe2 = await barra();
+    await page.click('#btnLimpar');
+    await atendimento(3, false);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(200);
+    const depoisDe3 = await barra();
+    // aplica as tres sugestoes
+    for (let k = 0; k < 3; k++) {
+      const b = await page.$('#avisoBar button[data-acao="padrao-aplicar"]');
+      if (!b) break;
+      await b.click(); await page.waitForTimeout(250);
+    }
+    await page.click('#btnLimpar');
+    await page.reload(); await page.waitForTimeout(400);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(200);
+    const receita = await page.evaluate(() => document.querySelector('#receitaPaper').innerText.replace(/\s+/g, ' '));
+    const semSugestao = !/Sugestão do seu uso/.test(await barra());
+    const ok = !/Sugestão do seu uso/.test(depoisDe2)
+      && /Sugestão do seu uso/.test(depoisDe3) && /Dipirona/.test(depoisDe3) && /tirou .*Ciclobenzaprina|acrescentou .*Omeprazol/.test(depoisDe3)
+      && receita.includes(NOVA) && !/Ciclobenzaprina/.test(receita) && /Omeprazol/.test(receita)
+      && semSugestao && consoleErrors.length === 0;
+    record('padroes de uso: sugere apos 3 atendimentos (receita dividida conta como 1) e aplicar muda o padrao', ok,
+      JSON.stringify({ depoisDe2: depoisDe2.slice(0, 200), depoisDe3: depoisDe3.slice(0, 500), receita: receita.slice(0, 400), semSugestao, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

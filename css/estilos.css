@@ -669,6 +669,12 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   font-weight:600;cursor:pointer;
 }
 .aviso button:hover{background:var(--amber);color:#fff;}
+/* Sugestões do uso: uma ação principal e duas discretas */
+.aviso-acoes{margin-left:auto;flex:none;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;max-width:46%;}
+.aviso-acoes button{margin-left:0;}
+.aviso.teal .aviso-acoes button.sec{border-color:transparent;font-weight:500;text-decoration:underline;text-underline-offset:3px;padding:4px 6px;}
+.aviso.teal .aviso-acoes button.sec:hover{background:transparent;color:var(--teal-dark);text-decoration-thickness:2px;}
+@media (max-width:520px){ .aviso{flex-wrap:wrap;} .aviso-acoes{max-width:none;width:100%;justify-content:flex-start;} }
 
 /* ---------- Papel da receita (sempre claro, igual à impressão) ---------- */
 .receita-paper{
