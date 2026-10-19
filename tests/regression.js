@@ -721,6 +721,9 @@ async function run(url) {
     await page.click('#btnImprimir');
     await page.waitForTimeout(400);
     const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    const pImp = await browser.newPage(); await pImp.setContent(impresso);
+    const botoesNaImpressao = await pImp.evaluate(() => [...document.querySelectorAll('.par-item, .edit-item-btn, .rm-item')].filter((b) => getComputedStyle(b).display !== 'none').length);
+    await pImp.close();
     await page.click('#btnCopiar');
     await page.waitForTimeout(200);
     const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
@@ -733,12 +736,12 @@ async function run(url) {
     await page.waitForTimeout(150);
     const desfeito = await lis();
     const ok = antes.every((l) => !l.esp && l.ws === 'pre-line') && depois[2].esp && depois[2].mt === '14px' && !depois[1].esp
-      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso)
+      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso) && botoesNaImpressao === 0
       && /\n\n- /.test(copiado.split('ORIENTAÇÕES')[1] || '')
       && /<w:spacing w:before="200"\/>/.test(xml) && (xml.match(/<w:br\/>/g) || []).length >= 3
       && !desfeito[2].esp && consoleErrors.length === 0;
     record('orientacoes: quebra de linha e espaco de paragrafo (previa, impressao, copia, docx)', ok,
-      JSON.stringify({ antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+      JSON.stringify({ botoesNaImpressao, antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
     await browser.close();
   }
 

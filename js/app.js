@@ -2382,7 +2382,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;}
       .via-box-patos-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;font-size:11px;}
       .receita-vazia-mini{padding:20px 6px;color:#4B5A55;font-size:12.5px;text-align:center;}
-      .rm-item, .edit-item-btn, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .pos-vazia{ display:none !important; }
     `;
   }
 
@@ -2622,7 +2622,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-footer > div{flex:1;padding:9px 12px;font-size:10.5px;color:#4B5A55;line-height:1.7;}
       .via-box-footer > div:first-child{border-right:1.5px solid #16241F;}
       .via-box-footer b{color:#16241F;}
-      .rm-item, .edit-item-btn, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .pos-vazia{ display:none !important; }
       .assinatura-bloco{margin-top:50px;padding-top:16px;border-top:1px dashed #D7DEDA;display:flex;align-items:flex-end;justify-content:center;gap:28px;}
       .carimbo-box{width:190px;height:88px;flex:none;border:1.5px dashed #D7DEDA;border-radius:6px;display:flex;align-items:center;justify-content:center;}
       .carimbo-box span{font-size:10.5px;color:#D7DEDA;text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
