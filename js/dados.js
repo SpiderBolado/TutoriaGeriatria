@@ -19,7 +19,7 @@ const DATA = {
         {
           "nome": "Sumatriptano 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Se dor, apesar das medicações acima, utilizar 01 comprimido; pode repetir após 2 horas se necessário, no máximo 04 comprimidos (100mg) em 24 horas.",
+          "posologia": "Se dor, apesar das medicações acima, tomar 01 comprimido. Se a dor melhorar e depois voltar, pode tomar mais 01 comprimido após pelo menos 2 horas; se o primeiro comprimido não aliviar nada, não repita nesta crise. No máximo 04 comprimidos (100mg) em 24 horas.",
           "via": "Oral",
           "fator": null
         },
@@ -32,11 +32,11 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Em caso de sintomas compatíveis como: \nPior dor de cabeça da vida; Uma dor completamente diferente; Mudança na Consciência; Fraqueza Repentina; Problemas da Fala; Visão Dupla ou Perda súbita da visão; Convulsões; Febre alta inexplicável (acima de 39°); Dor que piora ao tossir, fazer esforço ou deitar. \nProcurar atendimento imediatamente!",
+        "Procure atendimento imediatamente se tiver:\nA pior dor de cabeça da vida, ou dor muito forte que começa de repente; dor completamente diferente das habituais; confusão ou sonolência; fraqueza repentina; dificuldade para falar; visão dupla ou perda súbita da visão; convulsão; febre alta sem explicação (acima de 39 °C) ou rigidez na nuca; dor que piora ao tossir, fazer esforço ou deitar.",
         "Tente identificar e evitar fatores que causam a dor: estresse, jejum prolongado, privação de sono, consumo excessivo de álcool ou cafeína.",
         "Fique em um quarto escuro e silencioso, e tente repousar. Isso pode ajudar a dor a passar mais rápido.",
         "Evite usar analgésicos ou o Sumatriptano por mais de 10 dias no mês — o uso excessivo pode, paradoxalmente, causar mais dor de cabeça (cefaleia por abuso de medicação).",
-        "Busque avaliação longitudinal em Unidade de Saúde para, se necessário, profilaxia de novas crises."
+        "Procure acompanhamento na Unidade Básica de Saúde para avaliar, se necessário, um tratamento para prevenir novas crises."
       ]
     },
     "Dor Muscular": {
@@ -58,15 +58,15 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 a 07 dias. (Se sonolência, partir o comprimido).",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 a 07 dias. Se sonolência no dia seguinte, tomar meio comprimido. Pode causar sonolência, tontura e boca seca: não dirigir e não ingerir bebida alcoólica durante o uso.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Repouso relativo: Evite exercícios pesados ou movimentos que causem dor. Faça alongamentos leves para não enrijecer o músculo",
-        "Use compressas de gazes, banhadas em soro fisiológico frio, para auxílio à melhora da dor e redução do inchaço",
-        "Retorne imediatamente se surgimento de inchaço repentino com dor intensa; Ou apresentar febre alta ou mal-estar muito forte; Ou surgir formigamento ou dormência que não existiam antes"
+        "Repouso relativo: evite exercícios pesados ou movimentos que causem dor. Faça alongamentos leves para não enrijecer o músculo.",
+        "Use compressas de gazes banhadas em soro fisiológico frio, por 15 minutos, algumas vezes ao dia, para aliviar a dor e reduzir o inchaço.",
+        "Retorne imediatamente se surgir inchaço repentino com dor intensa, febre alta ou mal-estar muito forte, urina escura (cor de chá ou de refrigerante de cola), fraqueza, ou formigamento ou dormência que não existiam antes."
       ]
     },
     "GECA": {
@@ -88,14 +88,14 @@ const DATA = {
         {
           "nome": "Ondansetrona 8mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Soro de Reidratação Oral",
           "qtde": "08 Sachês",
-          "posologia": "Diluir cada sachê em 01 Litro de água, tomar várias vezes ao dia.",
+          "posologia": "Diluir cada sachê em 01 litro de água filtrada ou fervida (fria) e tomar várias vezes ao dia, em pequenos goles. Usar em até 24 horas.",
           "via": "Oral",
           "fator": null
         }
@@ -103,9 +103,9 @@ const DATA = {
       "orientacoes": [
         "Beba o Soro de Reidratação Oral e outros líquidos (água, água de coco, sucos naturais), em pequenas quantidades, mas com muita frequência. Beba após cada episódio de vômito ou diarreia.",
         "Mantenha alimentação habitual, mas evite alimentos gordurosos, condimentados ou com muito açúcar.",
-        "Procure atendimento IMEDIATAMENTE se:\n1. Vômitos frequentes que impeçam de beber líquidos\n2. Muita sede, boca seca ou pouca urina\n3. Fezes com sangue ou muco\n4. Dor forte na barriga, que não passe com as medicações",
+        "Procure atendimento IMEDIATAMENTE se:\n1. Vômitos frequentes que impeçam de beber líquidos\n2. Muita sede, boca seca ou pouca urina\n3. Fezes com sangue ou muco\n4. Dor forte na barriga, que não passe com as medicações\n5. Sonolência excessiva, confusão, tontura ou desmaio ao levantar (principalmente em crianças e idosos)",
         "A diarreia costuma durar até 07 dias. Se durar mais de 14 dias, retorne para ser reavaliado.",
-        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
+        "Volte à Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
       ]
     },
     "DRGE": {
@@ -126,14 +126,14 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Eleve a cabeceira da cama aproximadamente 15cm. Pode-se colocar tijolos abaixo dos pés da cama (da cabeceira). Outra opção é usar almofadas e travesseiros para a cabeça ficar em um nível mais elevado ao deitar.",
+        "Eleve a cabeceira da cama em aproximadamente 15 cm, colocando tijolos ou calços sob os pés da cama do lado da cabeceira. Outra opção é usar uma cunha (rampa de espuma) sob o tronco. Apenas empilhar travesseiros sob a cabeça não ajuda: dobra o corpo na altura da barriga e pode piorar o refluxo.",
         "Evite gorduras, bebidas cítricas, alcoólicas e gaseificadas, café, menta, hortelã, molho de tomate, chocolates, balas e doces, condimentos em excesso e outros alimentos que pioram os sintomas.",
-        "Faça refeições pequenas e mastigue devagar. Evite encher demais o estômago",
-        "Evite deitar-se ou realizar exercícios físicos até 2 horas após as refeições",
-        "Evite roupas e cintos apertados",
-        "Mantenha o peso adequado",
+        "Faça refeições pequenas e mastigue devagar. Evite encher demais o estômago.",
+        "Evite deitar-se ou fazer exercícios físicos nas 2 horas seguintes às refeições.",
+        "Evite roupas e cintos apertados.",
+        "Mantenha o peso adequado.",
         "Retorne imediatamente se:\n1. Tiver vômitos com sangue ou com aparência de borra de café\n2. Tiver fezes pretas e com mau cheiro\n3. Sentir dor intensa no peito ou na barriga, que não melhore com o remédio\n4. Tiver dificuldade ou dor para engolir, vômitos repetidos ou perda de peso sem explicação",
-        "Fundamental que procure acompanhamento longitudinal em Unidade de Saúde, para dar continuação ao tratamento."
+        "É fundamental que você procure acompanhamento na Unidade Básica de Saúde para dar continuidade ao tratamento."
       ]
     },
     "Dengue": {
@@ -147,8 +147,8 @@ const DATA = {
         },
         {
           "nome": "Soro de Reidratação Oral",
-          "qtde": "04 Sachês",
-          "posologia": "Diluir e consumir livremente.",
+          "qtde": "10 Sachês",
+          "posologia": "Diluir cada sachê em 01 litro de água filtrada ou fervida (fria) e tomar nos volumes indicados abaixo (manhã, tarde e noite). Usar em até 24 horas.",
           "via": "Oral",
           "fator": null
         },
@@ -182,7 +182,7 @@ const DATA = {
         "Não acrescente mel, adoçante nem outros ingredientes. Use em até 24 horas.",
         "A alimentação não deve ser interrompida.",
         "Manter hidratação rigorosa, respeitando aproximadamente a proporção de 1/3 de soro para 2/3 de líquidos caseiros ao longo do dia.",
-        "Evitar AAS/AINEs (Risco de sangramento).",
+        "Não tome AAS (aspirina) nem anti-inflamatórios (ibuprofeno, diclofenaco, nimesulida, cetoprofeno, naproxeno e outros): aumentam o risco de sangramento na dengue.",
         "Os sinais de alarme costumam aparecer entre o 3º e o 7º dia, muitas vezes já com a queda da febre — não interpretar a queda da febre como sinal de melhora completa.",
         "Procure atendimento IMEDIATAMENTE se: dor forte e contínua na barriga; vômitos que não param; sangramento (gengiva, nariz, urina, fezes pretas ou vômito com sangue); tontura ou desmaio ao levantar; sonolência excessiva ou irritabilidade; diminuição da urina; falta de ar ou barriga inchada. Mesmo sem esses sinais, retorne para reavaliação no dia em que a febre baixar ou, se a febre continuar, no 5º dia de doença."
       ]
@@ -218,7 +218,7 @@ const DATA = {
         {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, em cada olho, de 04/04 horas ou sempre que necessário",
+          "posologia": "Aplicar 01 gota, em cada olho, de 04/04 horas ou sempre que necessário, sem encostar a ponta do frasco no olho.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -238,13 +238,13 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Fazer compressa fria, sobre os olhos com Soro Fisiológico, para melhorar os sintomas",
+        "Faça compressas frias com soro fisiológico sobre os olhos, para aliviar os sintomas.",
         "Lave as mãos frequentemente, com água e sabão, especialmente após tocar os olhos.",
         "Use toalhas de papel para secar o rosto ou troque a toalha de banho e a fronha do travesseiro todos os dias.",
-        "Evite apertos de mão, contato próximo e não compartilhe itens pessoais. Se possível evite locais com aglomerações, nos próximos 5 a 7 dias.",
-        "Retorne imediatamente se:\n1. Sentir dor intensa no olho\n2. A visão ficar embaçada, turva ou diminuir de forma repentina\n3. O olho inchar muito ou ficar sensível a luz",
-        "Evite usar maquiagens nos olhos ou lentes de contato, durante este período da infecção.",
-        "O quadro costuma melhorar sozinho e em 05 a 10 dias. Se secreção amarelada, retorne para reavaliação."
+        "Evite apertos de mão e contato próximo, e não compartilhe itens pessoais. Se possível, evite locais com aglomeração enquanto o olho estiver vermelho e lacrimejando (em geral, de 07 a 14 dias).",
+        "Retorne imediatamente se:\n1. Sentir dor intensa no olho\n2. A visão ficar embaçada, turva ou diminuir de forma repentina\n3. O olho inchar muito ou ficar sensível à luz",
+        "Evite usar maquiagem nos olhos e lentes de contato durante a infecção.",
+        "O quadro costuma melhorar sozinho em 05 a 10 dias. Se surgir secreção amarelada ou esverdeada, retorne para reavaliação."
       ]
     },
     "Sinusite bomba": {
@@ -273,7 +273,7 @@ const DATA = {
         {
           "nome": "Loratadina 10mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 01 comprimido, uma vez ao dia, se necessário",
+          "posologia": "Tomar 01 comprimido, 01 vez ao dia, se coriza ou espirros.",
           "via": "Oral",
           "fator": null
         },
@@ -281,22 +281,22 @@ const DATA = {
           "nome": "Budesonida 50mcg",
           "qtde": "01 Frasco",
           "posologia": "Aplicar 02 jatos, em cada narina, de 12/12 horas, por 4 semanas ou até reavaliação.",
-          "via": "Tópico",
+          "via": "Nasal",
           "fator": null
         },
         {
           "nome": "Lavagem Nasal",
           "qtde": null,
           "posologia": "Realizar lavagem nasal, com Soro Fisiológico, várias vezes ao dia.",
-          "via": "Tópico",
+          "via": "Nasal",
           "fator": null
         }
       ],
       "orientacoes": [
         "Este quadro leva tempo para melhorar. É esperado que ocorra redução da dor e da congestão após 03 a 05 dias de tratamento.",
         "Retorne imediatamente se:\n1. Inchaço ou vermelhidão na pálpebra ou ao redor dos olhos\n2. Visão dupla ou dificuldade para mover os olhos\n3. Dor de cabeça súbita e forte, confusão ou vômitos persistentes\n4. Febre alta que não passa",
-        "Mantenha ingestão de ao menos 3 litros de água, diariamente. Não fume.",
-        "Se não houver melhora dos sintomas após 07 dias, retorne à Unidade de Saúde para reavaliação."
+        "Beba bastante água ao longo do dia (cerca de 2 litros), salvo se o médico tiver orientado restrição de líquidos (por exemplo, por doença do coração ou dos rins). Não fume.",
+        "Se não houver melhora após 03 a 05 dias de antibiótico, ou se piorar a qualquer momento, retorne à Unidade de Saúde para reavaliação."
       ]
     },
     "ITU": {
@@ -304,14 +304,14 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor ou febre",
+          "posologia": "Tomar 01 comprimido, até de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Fosfomicina Trometamol 3g",
           "qtde": "01 Sachê",
-          "posologia": "Antes de dormir, urinar, depois em um copo de água filtrada, tomar conteúdo diluído do sachê. Não urinar até a próxima manhã.",
+          "posologia": "Dissolver o conteúdo do sachê em meio copo de água e tomar em DOSE ÚNICA, à noite, antes de deitar e logo após esvaziar a bexiga. Tomar com o estômago vazio (2 a 3 horas após a última refeição).",
           "via": "Oral",
           "fator": null
         },
@@ -324,9 +324,9 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Beba, no mínimo, 2 a 3 litros de água por dia. Isso ajuda a \"lavar\" as bactérias da bexiga",
-        "A urina ficará com coloração laranja/avermelhada por causa de um dos medicamentos, isso é esperado",
-        "Retorne imediatamente se:\n1. Febre (>37,8°)\n2. Sentir dor forte nas costas\n3. Vômitos ou mal estar muito intenso",
+        "Beba bastante água (cerca de 2 litros por dia), salvo se o médico tiver orientado restrição de líquidos (por exemplo, por doença do coração ou dos rins). Isso ajuda a \"lavar\" as bactérias da bexiga.",
+        "A urina ficará com cor laranja/avermelhada por causa do Pyridium. Isso é esperado e não é sangramento; pode manchar roupas e lentes de contato.",
+        "Retorne imediatamente se:\n1. Febre (temperatura acima de 37,8 °C)\n2. Sentir dor forte nas costas ou no lado da barriga\n3. Vômitos ou mal-estar muito intenso\n4. Confusão ou sonolência fora do normal (principalmente em idosos)",
         "Se os sintomas de dor ao urinar ou urgência não melhorarem após 48 horas do início do tratamento, retorne para reavaliação."
       ]
     },
@@ -336,14 +336,14 @@ const DATA = {
           "nome": "Olopatadina 1 mg/mL",
           "qtde": "01 Frasco",
           "posologia": "Aplicar 01 gota, no olho acometido, de 12/12 horas, por 05 dias.",
-          "via": "Tópico",
+          "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, em cada olho, de 04/04 horas ou sempre que necessário",
-          "via": "Tópico",
+          "posologia": "Aplicar 01 gota, em cada olho, de 04/04 horas ou sempre que necessário.",
+          "via": "Oftálmico",
           "fator": null
         },
         {
@@ -380,11 +380,11 @@ const DATA = {
       ],
       "orientacoes": [
         "Espera-se que seu quadro de tontura se resolva nos próximos dias.",
-        "Evitar condução de veículos até melhora completa",
-        "Buscar avaliação em Unidade de Saúde para estudo da causa",
+        "Não dirija até a melhora completa da tontura.",
+        "Procure a Unidade Básica de Saúde para investigar a causa da tontura.",
         "Quando a tontura começar, sente-se ou deite-se imediatamente, olhando para um ponto fixo.",
         "Evite movimentos bruscos da cabeça.",
-        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou fraqueza em um lado do corpo.\n2. Perda da consciência ou desmaios\n3. Tontura muito forte, que não melhore após 48 horas da medicação."
+        "Retorne imediatamente se:\n1. Tontura acompanhada de visão dupla, dificuldade para falar ou para engolir, fraqueza ou dormência em um lado do corpo ou no rosto.\n2. Não conseguir ficar em pé ou andar sem apoio, ou tontura com dor de cabeça forte e repentina ou dor na nuca.\n3. Perda súbita da audição.\n4. Perda da consciência ou desmaios.\n5. Tontura muito forte, que não melhore após 48 horas da medicação."
       ]
     },
     "Meniere": {
@@ -392,14 +392,14 @@ const DATA = {
         {
           "nome": "Meclin 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, apenas durante as crises de tontura, náuseas ou vômitos. Pode causar sonolência: não dirigir e não ingerir bebida alcoólica após tomar.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Domperidona 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Se náuseas persistentes, tomar 01 comprimido, de 08/08 horas, intercalado com Meclin, por no máximo 07 dias.",
+          "posologia": "Se as náuseas persistirem mesmo com o Meclin, tomar 01 comprimido, de 08/08 horas, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -413,11 +413,11 @@ const DATA = {
       ],
       "orientacoes": [
         "Evite sal em excesso: no máximo 2 g de sódio por dia (cerca de 5 g de sal, ou 1 colher de chá rasa, somando todo o sal do dia). Evite também cafeína, álcool e cigarro.",
-        "Hidratação adequada",
-        "Controle de estresse e sono regular",
-        "O tratamento visa reduzir frequência e intensidade das crises, mas não cura",
+        "Mantenha boa hidratação.",
+        "Procure controlar o estresse e manter o sono regular.",
+        "O tratamento visa reduzir a frequência e a intensidade das crises, mas não cura a doença.",
         "Retorne IMEDIATAMENTE se houver: visão dupla, dificuldade para falar, fraqueza ou dormência em um lado do corpo, perda súbita da audição, ou tontura que dure mais de 24 horas.",
-        "Buscar avaliação em Unidade de Saúde para acompanhamento longitudinal"
+        "Mantenha acompanhamento regular na Unidade Básica de Saúde."
       ]
     },
     "Faringoamigdalite": {
@@ -473,7 +473,7 @@ const DATA = {
         {
           "nome": "Prednisolona 3mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE mL, pela manhã, por 05 dias",
+          "posologia": "Tomar DOSE mL, pela manhã, por 05 dias.",
           "via": "Oral",
           "fator": 0.3,
           "max": 13
@@ -487,7 +487,7 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Use o Salbutamol com espaçador (bombinha), quando disponível, para melhorar a chegada do medicamento aos pulmões.",
+        "Use o Salbutamol com o espaçador acoplado à bombinha sempre que possível (em crianças pequenas, espaçador com máscara bem ajustada ao rosto), para melhorar a chegada do medicamento aos pulmões.",
         "Evite irritantes como fumaça de cigarro, poeira e produtos de limpeza com cheiro forte.",
         "Se precisar do Salbutamol antes de 4 horas, ou se o alívio durar menos de 4 horas, procure atendimento de urgência.",
         "Procure atendimento de urgência IMEDIATAMENTE se: lábios ou unhas arroxeados, dificuldade para falar frases inteiras ou mamar, respiração muito acelerada, sonolência ou agitação incomum."
@@ -498,14 +498,14 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar até 02 comprimidos, de 06/06 horas, se dor ou febre",
+          "posologia": "Tomar até 02 comprimidos, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Prednisona 20mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos, em dose única pela manhã, durante 05 dias",
+          "posologia": "Tomar 02 comprimidos, em dose única, pela manhã, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -543,7 +543,7 @@ const DATA = {
         {
           "nome": "Fluconazol 150 mg",
           "qtde": "01 Comprimido",
-          "posologia": "Tomar 01 comprimido, dose única (não é necessário usar junto com a pomada — escolha uma das duas opções, salvo em casos recorrentes/graves).",
+          "posologia": "Tomar 01 comprimido, em dose única.",
           "via": "Oral",
           "fator": null
         }
@@ -563,7 +563,7 @@ const DATA = {
         {
           "nome": "Cerumin",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 03 gotas no ouvido acometido, de 08/08 horas, por 5 a 7 dias.",
+          "posologia": "Aplicar 05 gotas no ouvido acometido, de 08/08 horas, por 05 a 07 dias.",
           "via": "Tópico",
           "fator": null
         }
@@ -572,7 +572,8 @@ const DATA = {
         "Após pingar as gotas, permaneça deitado com o ouvido tratado para cima por 05 minutos, para o medicamento penetrar.",
         "Agendar lavagem do conduto auditivo em UBS.",
         "Não usar cotonetes — eles tendem a empurrar o cerume para dentro do ouvido, piorando o quadro.",
-        "Procure atendimento antes da data agendada se houver dor forte, secreção ou sangramento, ou piora importante da audição."
+        "Procure atendimento antes da data agendada se houver dor forte, secreção ou sangramento, ou piora importante da audição.",
+        "Não use as gotas e não faça lavagem do ouvido se já teve perfuração no tímpano ou cirurgia no ouvido, ou se houver dor ou secreção saindo do ouvido — avise o médico."
       ]
     },
     "Cervicalgia": {
@@ -580,7 +581,7 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos, de 06/06 horas, se dor",
+          "posologia": "Tomar 02 comprimidos, de 06/06 horas, se dor.",
           "via": "Oral",
           "fator": null
         },
@@ -594,7 +595,7 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Pode causar sonolência, tontura e boca seca: não dirigir e não ingerir bebida alcoólica durante o uso.",
           "via": "Oral",
           "fator": null
         }
@@ -613,21 +614,21 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos, de 06/06 horas, se dor ou febre",
+          "posologia": "Tomar 02 comprimidos, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Loratadina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido ao dia, durante 05 dias, se coriza ou espirros",
+          "posologia": "Tomar 01 comprimido ao dia, por 05 dias, se coriza ou espirros.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, se mialgia importante, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, se dor muscular importante, por 05 dias. Pode causar sonolência, tontura e boca seca: não dirigir e não ingerir bebida alcoólica durante o uso.",
           "via": "Oral",
           "fator": null
         },
@@ -640,10 +641,11 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Manter hidratação e alimentação balanceadas",
-        "Manter repouso relativo",
+        "Mantenha boa hidratação e alimentação balanceada.",
+        "Mantenha repouso relativo.",
         "Se possível, meça a saturação de oxigênio com oxímetro — níveis abaixo de 95%, mesmo sem sensação de falta de ar, são sinal de alerta, principalmente em idosos.",
-        "Em caso de falta de ar intensa, prostração ou febre persistente, retornar à UPA para nova avaliação"
+        "Procure atendimento IMEDIATAMENTE (UPA) se:\n1. Falta de ar, respiração rápida ou cansaço para respirar\n2. Saturação abaixo de 95% no oxímetro\n3. Lábios ou rosto arroxeados, ou dor ou pressão no peito que não passa\n4. Febre alta que não passa depois de 3 dias, ou piora depois de ter começado a melhorar\n5. Confusão, sonolência excessiva, quedas ou urinar bem menos que o normal",
+        "Enquanto tiver sintomas, use máscara e evite contato próximo com outras pessoas, principalmente idosos, gestantes e pessoas com doenças crônicas."
       ]
     },
     "PEP": {
@@ -702,8 +704,8 @@ const DATA = {
         "Aumentar a ingestão de água (1,5 a 2 litros por dia).",
         "Praticar atividade física regular, conforme tolerado.",
         "Não segurar a vontade de evacuar.",
-        "Retorne se: sangue nas fezes, perda de peso sem explicação, dor abdominal forte, incapacidade de eliminar gases, vômitos, ou se a constipação persistir por mais de 2 semanas.",
-        "Em pacientes com várias medicações, vale revisar se algum remédio de uso contínuo (opioide, anticolinérgico, ferro, bloqueador de canal de cálcio, anti-histamínico) está contribuindo para a constipação."
+        "Procure atendimento IMEDIATAMENTE se: dor forte na barriga, barriga muito inchada, vômitos ou não conseguir eliminar gases. Procure a Unidade Básica de Saúde se: sangue nas fezes, perda de peso sem explicação, ou se a prisão de ventre durar mais de 2 semanas.",
+        "Se você usa remédios todos os dias, leve a lista (ou as caixas) à Unidade Básica de Saúde: alguns, como remédios fortes para dor, ferro e alguns remédios de pressão ou de alergia, podem prender o intestino. Não suspenda nenhum por conta própria."
       ]
     },
     "Costocondrite": {
@@ -725,7 +727,7 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. (Se sonolência excessiva no próximo dia, favor tomar meio comprimido).",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Se sonolência excessiva no dia seguinte, tomar meio comprimido. Pode causar tontura e boca seca: não dirigir e não ingerir bebida alcoólica durante o uso.",
           "via": "Oral",
           "fator": null
         }
@@ -749,7 +751,7 @@ const DATA = {
         {
           "nome": "Prometazina 25mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Causa sonolência: não dirigir e não ingerir bebida alcoólica durante o uso.",
           "via": "Oral",
           "fator": null
         },
@@ -787,7 +789,7 @@ const DATA = {
         {
           "nome": "Ciprofloxacino 500mg",
           "qtde": "14 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias. Não tomar junto com leite, iogurte, antiácidos ou suplementos de cálcio, ferro ou zinco (tomar 2 horas antes ou 6 horas depois deles). Se surgir dor ou inchaço em tendão (principalmente no calcanhar), pare o remédio e procure atendimento.",
           "via": "Oral",
           "fator": null
         },
@@ -817,7 +819,8 @@ const DATA = {
         "Nos primeiros dias, dar preferência a dieta líquida ou pastosa, evoluindo gradualmente para alimentos sólidos conforme a melhora.",
         "Evitar esforço físico durante o tratamento.",
         "Retorne em 48 a 72 horas para reavaliação, mesmo sem sinais de piora.",
-        "Procure atendimento de urgência IMEDIATAMENTE se: dor abdominal piorando, febre alta, distensão abdominal importante, incapacidade de eliminar gases ou fezes, sangramento retal, ou vômitos persistentes."
+        "Procure atendimento de urgência IMEDIATAMENTE se: dor abdominal piorando, febre alta, distensão abdominal importante, incapacidade de eliminar gases ou fezes, sangramento retal, ou vômitos persistentes.",
+        "Não consuma bebida alcoólica durante o tratamento e até 48 horas após o término — junto com o Metronidazol, o álcool pode causar reação intensa (náusea, vômitos, vermelhidão no rosto, palpitações)."
       ]
     },
     "Dor Abdominal": {
@@ -825,7 +828,7 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, até de 08/08 horas, se dor abdominal, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, até de 08/08 horas, se dor abdominal, por no máximo 05 dias. Não usar se estiver grávida, amamentando ou se tiver glaucoma.",
           "via": "Oral",
           "fator": null
         },
@@ -856,7 +859,7 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor forte. Por no máximo 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor forte, por no máximo 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -870,8 +873,8 @@ const DATA = {
       ],
       "orientacoes": [
         "Permanecer em repouso pelos próximos 03 dias.",
-        "Preferir alimentos não ácidos e frios, para melhora da dor. Evitando assim café, refrigerante e frituras",
-        "Procure atendimento de urgência se: dificuldade para engolir ou respirar, salivação excessiva, dor unilateral muito intensa, ou febre alta persistente por mais de 3 dias — sinais de possível abscesso periamigdaliano."
+        "Prefira alimentos frios e pouco ácidos, para aliviar a dor. Evite café, refrigerante e frituras.",
+        "Procure atendimento de urgência se: dificuldade para engolir ou respirar, dificuldade para abrir a boca, voz abafada, não conseguir engolir a própria saliva, dor muito forte de um lado só da garganta ou inchaço de um lado do pescoço, ou febre alta que continua por mais de 3 dias — podem ser sinais de abscesso (acúmulo de pus) perto da amígdala."
       ]
     },
     "Otite média": {
@@ -907,7 +910,7 @@ const DATA = {
       ],
       "orientacoes": [
         "Não mergulhar ou praticar atividades aquáticas pelos próximos 30 dias.",
-        "Procure atendimento se houver dor, inchaço ou vermelhidão atrás da orelha, ou febre persistente — sinais de possível mastoidite."
+        "Procure atendimento IMEDIATAMENTE se houver: dor, inchaço ou vermelhidão atrás da orelha (orelha empurrada para a frente); dor de cabeça forte, rigidez na nuca, sonolência ou confusão; tontura forte; ou se um lado do rosto ficar paralisado (boca torta, olho que não fecha). Se a dor e a febre não melhorarem após 48 a 72 horas de antibiótico, retorne para reavaliação."
       ]
     },
     "SUA": {
@@ -929,7 +932,7 @@ const DATA = {
         {
           "nome": "Ácido Tranexâmico 250mg",
           "qtde": "60 Comprimidos",
-          "posologia": "Tomar 04 comprimidos (1.000mg), de 08/08 horas, durante os dias de sangramento intenso, por no máximo 05 dias. Não usar junto com o anticoncepcional combinado abaixo — escolha um dos dois esquemas (o uso simultâneo de estrogênio e ácido tranexâmico aumenta o risco de trombose).",
+          "posologia": "Tomar 04 comprimidos (1.000mg), de 08/08 horas, durante os dias de sangramento intenso, por no máximo 05 dias. Não usar junto com anticoncepcional combinado (aumenta o risco de trombose).",
           "via": "Oral",
           "fator": null
         },
@@ -950,8 +953,8 @@ const DATA = {
       ],
       "orientacoes": [
         "Realizar acompanhamento longitudinal em unidade de saúde para estudo da causa do sangramento.",
-        "Se piora do sangramento, sonolência ou tontura, procurar o pronto socorro imediatamente.",
-        "Sangramento em mulher na pós-menopausa é sinal de alarme e exige avaliação ginecológica prioritária (investigação de neoplasia endometrial), mesmo que o sangramento melhore com o tratamento."
+        "Procure o pronto-socorro imediatamente se o sangramento piorar (por exemplo, se encharcar 01 absorvente por hora durante 2 horas seguidas ou se saírem coágulos grandes), ou se tiver tontura, desmaio, falta de ar, coração acelerado ou sonolência.",
+        "Se você já está na menopausa (há 1 ano ou mais sem menstruar), qualquer sangramento precisa de avaliação com ginecologista com prioridade, mesmo que melhore com o tratamento."
       ]
     },
     "Herpes Zoster": {
@@ -959,14 +962,14 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Paracetamol 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Se não melhora da dor com Dipirona, intercalar com tomada 01 comprimido, de 06/06 horas.",
+          "posologia": "Se a dor não melhorar com a Dipirona, tomar 01 comprimido, de 06/06 horas, intercalando com a Dipirona.",
           "via": "Oral",
           "fator": null
         },
@@ -1007,11 +1010,13 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Evitar estímulos mecânicos ou térmicos na área afetada",
-        "Manter hidratação cutânea e higiene local",
+        "Evitar atrito, coçar e calor ou frio intensos sobre a área afetada.",
+        "Manter hidratação cutânea e higiene local.",
         "Evite contato próximo com gestantes não imunizadas, imunossuprimidos e crianças não vacinadas contra varicela, até que todas as lesões formem crostas (risco de transmissão do vírus).",
         "Procure atendimento com urgência se as lesões envolverem a ponta do nariz, pálpebra ou proximidade do olho — pode indicar zóster oftálmico, que exige avaliação urgente pelo risco de complicação visual.",
-        "Realizar acompanhamento em Unidade Básica de Saúde, para manejo longitudinal"
+        "Realizar acompanhamento na Unidade Básica de Saúde, para controle da dor e da cicatrização.",
+        "Durante o uso do Aciclovir, beba bastante água. Se você tem doença nos rins, avise o médico antes de começar: a dose precisa ser ajustada.",
+        "Procure atendimento se as bolhas se espalharem por várias partes do corpo, ou se surgir febre alta, dor de cabeça forte, confusão, fraqueza em um lado do rosto, ou bolhas e dor no ouvido."
       ]
     },
     "Vaginose Bacteriana": {
@@ -1019,7 +1024,7 @@ const DATA = {
         {
           "nome": "Metronidazol 250 mg",
           "qtde": "28 Comprimidos",
-          "posologia": "Tomar 02 comprimido, de 12/12 horas, por 07 dias.",
+          "posologia": "Tomar 02 comprimidos, de 12/12 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -1043,7 +1048,7 @@ const DATA = {
         {
           "nome": "Carmelose Sódica",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, no olho acometido, sempre que ardência ou irritação local.",
+          "posologia": "Aplicar 01 gota no olho acometido sempre que houver ardência ou irritação.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -1057,7 +1062,7 @@ const DATA = {
         {
           "nome": "Compressas Mornas",
           "qtde": null,
-          "posologia": "Aplicar compressas, de gazes, em soro fisiológico morno, sobre a região acometida, até 04 vezes ao dia.",
+          "posologia": "Aplicar compressas de gazes molhadas em soro fisiológico morno sobre a pálpebra acometida, por 10 a 15 minutos, até 04 vezes ao dia.",
           "via": "Tópico",
           "fator": null
         }
@@ -1074,7 +1079,7 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor.",
           "via": "Oral",
           "fator": null
         },
@@ -1095,14 +1100,14 @@ const DATA = {
         {
           "nome": "Compressas Frias",
           "qtde": null,
-          "posologia": "Aplicar compressas de gazes, em soro fisiológico frio, sobre a região acometida, até 04 vezes ao dia, por 10 minutos cada, para redução do inchaço e da coceira",
+          "posologia": "Aplicar compressas de gazes, em soro fisiológico frio, sobre a região acometida, até 04 vezes ao dia, por 10 minutos cada, para redução do inchaço e da coceira.",
           "via": "Tópico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Evitar coçar ou manipular a lesão",
-        "Manter o local limpo e seco",
+        "Evitar coçar ou manipular a lesão.",
+        "Manter o local limpo e seco.",
         "Procurar o pronto atendimento imediatamente, se:",
         "Inchaço de face, lábios ou garganta",
         "Dificuldade para respirar",
@@ -1123,7 +1128,7 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor para a movimentação das pernas.",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor nas pernas ao se movimentar.",
           "via": "Oral",
           "fator": null
         },
@@ -1145,10 +1150,11 @@ const DATA = {
       "orientacoes": [
         "Elevar os pés acima do nível do coração por 30 minutos, 03 vezes ao dia, especialmente após caminhadas.",
         "Caminhadas leves e curtas, várias vezes ao dia, para estimular o retorno do sangue.",
-        "Exercícios ativos de flexão/extensão do tornozelo em pé ou sentado",
-        "Evitar ficar longos períodos em pé ou sentado sem movimentação (+ 30 minutos).",
+        "Fazer exercícios de movimentar os tornozelos (pontas dos pés para cima e para baixo), em pé ou sentado, várias vezes ao dia.",
+        "Evitar ficar longos períodos em pé ou sentado sem se movimentar (mais de 30 minutos).",
         "Agendar avaliação em Unidade de Saúde para acompanhamento longitudinal.",
-        "Procure atendimento de urgência IMEDIATAMENTE se surgir dor súbita e intensa em uma perna, com inchaço e calor localizado, ou falta de ar súbita — podem ser sinais de trombose venosa profunda ou embolia pulmonar."
+        "Procure atendimento de urgência IMEDIATAMENTE se surgir dor súbita e intensa em uma perna, com inchaço e calor localizado, ou falta de ar súbita — podem ser sinais de trombose venosa profunda ou embolia pulmonar.",
+        "Retire as meias e procure atendimento se os pés ou os dedos ficarem frios, pálidos, arroxeados, dormentes ou muito doloridos. Se você sente dor na panturrilha ao caminhar que melhora ao parar (sinal de má circulação nas artérias), avise o médico antes de usar as meias."
       ]
     },
     "Herpes genital": {
@@ -1177,17 +1183,18 @@ const DATA = {
         {
           "nome": "Banho de assento em água morna",
           "qtde": null,
-          "posologia": "Em água morna, realizar banho de assento, ao menos 02 vezes ao dia, para melhora do incômodo",
+          "posologia": "Em água morna, realizar banho de assento, ao menos 02 vezes ao dia, para melhora do incômodo.",
           "via": "Externo",
           "fator": null
         }
       ],
       "orientacoes": [
         "O tratamento deve ser iniciado o mais precocemente possível.",
-        "Utilizar preservativo em caso de atividade sexual, mesmo sem lesões visíveis.",
+        "Evite relações sexuais enquanto houver feridas ou sintomas (formigamento, ardor ou dor no local). Fora desses períodos, use preservativo em todas as relações, mesmo sem lesões visíveis.",
         "O herpes genital tende a ser recorrente — novos episódios costumam ser mais leves; comunique seu parceiro sexual sobre o diagnóstico.",
-        "Considere rastreio de outras infecções sexualmente transmissíveis.",
-        "Realizar acompanhamento longitudinal em unidade de saúde para avaliação do quadro e orientação quanto a prevenção e fatores desencadeantes."
+        "Faça na Unidade de Saúde os testes rápidos de HIV, sífilis e hepatites B e C.",
+        "Realizar acompanhamento na unidade de saúde para avaliação do quadro e orientação quanto à prevenção e aos fatores desencadeantes.",
+        "Procure atendimento se não conseguir urinar, se tiver febre alta ou dor de cabeça forte com rigidez na nuca, ou se as feridas se espalharem. Se estiver grávida, avise o médico do pré-natal sobre o herpes."
       ]
     },
     "Hemorroidas": {
@@ -1202,21 +1209,21 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas se, apesar do uso de dipirona, permanecer com dor.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se a dor continuar apesar do uso da Dipirona.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Proctfis H ou Similar",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar 02 cm de pomada na região acometida, seguido de massagem local, de 08/08 horas por 05 dias, se dor ou coceira local",
+          "posologia": "Aplicar 02 cm de pomada na região acometida, com leve massagem local, de 08/08 horas, por 05 dias, se dor ou coceira local. Aplicar de preferência após evacuar e após a higiene local.",
           "via": "Tópico",
           "fator": null
         },
         {
           "nome": "Diosmina + Hesperidina 450/50 mg",
-          "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
+          "qtde": "36 Comprimidos",
+          "posologia": "Tomar 03 comprimidos, de 12/12 horas, por 04 dias; depois, 02 comprimidos, de 12/12 horas, por 03 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -1230,11 +1237,12 @@ const DATA = {
       ],
       "orientacoes": [
         "Evitar realizar esforço evacuatório prolongado.",
-        "Se em momentos de constipação intestinal, procurar atendimento médico para manejo.",
-        "Aumentar consumo de fibras (Frutas e verduras)",
-        "Incrementar a ingesta hídrica, no mínimo de 2 L diariamente.",
+        "Se tiver intestino preso (constipação) com frequência, procure a Unidade de Saúde para tratamento.",
+        "Aumentar o consumo de fibras (frutas, verduras, legumes e cereais integrais).",
+        "Beber bastante água, no mínimo 2 litros por dia (exceto se o médico tiver restringido líquidos por doença do coração ou dos rins).",
         "Procurar acompanhamento longitudinal em Unidade de Saúde.",
-        "Em pacientes acima de 45-50 anos sem colonoscopia prévia, sangramento retal sempre merece investigação para descartar causas mais graves, mesmo com hemorroidas confirmadas."
+        "Se você tem mais de 45 anos e nunca fez colonoscopia, o sangramento pelo ânus precisa ser investigado na Unidade de Saúde, mesmo que seja das hemorroidas.",
+        "Procure atendimento imediatamente se tiver sangramento em grande quantidade ou com coágulos, tontura ou desmaio, febre, ou dor muito forte no ânus que não melhora com os remédios."
       ]
     },
     "Gota": {
@@ -1249,21 +1257,21 @@ const DATA = {
         {
           "nome": "Naproxeno 500 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 05 a 07 dias.",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, após as refeições, por 05 a 07 dias. Se você tem doença nos rins, úlcera no estômago ou insuficiência cardíaca, ou usa anticoagulante, avise o médico antes de tomar.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Omeprazol 20mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido ao dia, em jejum, enquanto durar o uso do Naproxeno (proteção gástrica — importante principalmente se usado junto com a Prednisolona).",
+          "posologia": "Tomar 01 comprimido ao dia, em jejum, enquanto durar o uso do Naproxeno, para proteger o estômago.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Colchicina 0,5mg",
           "qtde": "10 Comprimidos",
-          "posologia": "Tomar 02 comprimidos (1mg) agora, e mais 01 comprimido (0,5mg) após 1 hora. Se necessário, continuar com 01 comprimido de 12/12 horas por mais 2 a 3 dias, no máximo. Reduzir a dose ou evitar se houver doença renal.",
+          "posologia": "Tomar 02 comprimidos (1mg) agora e mais 01 comprimido (0,5mg) após 1 hora. Se necessário, continuar com 01 comprimido de 12/12 horas por mais 2 a 3 dias, no máximo. Suspender se tiver diarreia, vômitos ou dor de barriga forte. Se tiver doença nos rins ou no fígado, avise o médico antes de tomar.",
           "via": "Oral",
           "fator": null
         },
@@ -1276,13 +1284,13 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Elevar a articulação afetada",
+        "Elevar a articulação afetada.",
         "Aplicar compressas frias no local, de 10 a 15 minutos, de 02 a 03 vezes ao dia.",
         "Não ingerir álcool, reduzir ingesta de carne vermelha, frutos do mar e bebidas açucaradas.",
-        "Use apenas um dos anti-inflamatórios (Naproxeno, Colchicina ou Prednisolona) na maioria dos casos — associar mais de um aumenta o risco de efeitos colaterais sem necessariamente melhorar mais rápido; combinações ficam reservadas para casos mais intensos, a critério médico.",
+        "Use somente os anti-inflamatórios desta receita, como orientado; não acrescente outros por conta própria (como diclofenaco, nimesulida ou ibuprofeno).",
         "Não inicie nem suspenda o alopurinol (se já em uso) durante a crise — mantenha a dose habitual.",
-        "Torne a buscar atendimento médico de dor intensa, febre ou mudança no padrão da inflamação.",
-        "A Colchicina tem interações relevantes que aumentam o risco de toxicidade/rabdomiólise — cautela se em uso de estatina, macrolídeo (ex.: Azitromicina, Claritromicina), Diltiazem ou Verapamil."
+        "Procure atendimento médico se tiver dor muito intensa que não melhora com os remédios, febre ou calafrios, ou se a vermelhidão e o inchaço se espalharem ou atingirem outras articulações.",
+        "Avise o médico se você usa remédio para colesterol (como sinvastatina ou atorvastatina), antibiótico (claritromicina, eritromicina ou azitromicina), remédio para fungo (cetoconazol ou itraconazol), diltiazem, verapamil ou ciclosporina: junto com a Colchicina, eles aumentam o risco de efeitos graves. Se surgir dor ou fraqueza nos músculos, pare a Colchicina e procure atendimento."
       ]
     },
     "Nefrolitíase": {
@@ -1309,18 +1317,18 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Tansulozina 0.4mg",
+          "nome": "Tansulosina 0,4mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, após o café da manhã, por 04 semanas. Risco de hipotensão postural/síncope, principalmente na primeira dose — orientar a levantar-se devagar, sobretudo à noite.",
+          "posologia": "Tomar 01 comprimido, após o café da manhã, por 04 semanas. Pode causar tontura ou queda da pressão ao se levantar, principalmente nos primeiros dias: levante-se devagar, sobretudo à noite.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
-        "É imprescindível a realização do estudo de imagem para confirmação e posterior localização do cálculo",
-        "Proceder investigação em Unidade de Saúde, para profilaxia de cálculos",
-        "Muito importante manter hidratação abundante de, no mínimo, 03 litros de água, diariamente.",
-        "Procure atendimento de urgência IMEDIATAMENTE se houver febre, calafrios, ou piora importante do mal-estar junto com a dor — pode indicar obstrução urinária infectada, uma emergência que exige desobstrução imediata."
+        "É importante fazer o exame de imagem (ultrassom ou tomografia) para confirmar e localizar o cálculo.",
+        "Fazer acompanhamento na Unidade de Saúde para investigar a causa dos cálculos e prevenir novas crises.",
+        "Muito importante beber bastante água: no mínimo 03 litros por dia (exceto se o médico tiver restringido líquidos por doença do coração ou dos rins).",
+        "Procure atendimento de urgência IMEDIATAMENTE se houver febre, calafrios, ou piora importante do mal-estar junto com a dor — pode indicar obstrução urinária infectada, uma emergência que exige desobstrução imediata. Procure também se a dor não melhorar com os remédios, se tiver vômitos que impeçam de tomá-los, ou se urinar muito pouco ou nada."
       ]
     },
     "Alergia": {
@@ -1364,12 +1372,12 @@ const DATA = {
     "Ansiedade": {
       "meds": [],
       "orientacoes": [
-        "As diretrizes atuais recomendam abordagem não medicamentosa como primeira linha para ansiedade — técnicas de respiração, relaxamento muscular progressivo e regularização do sono ajudam a reduzir os sintomas.",
+        "Técnicas de respiração, relaxamento muscular e uma rotina regular de sono ajudam a reduzir os sintomas de ansiedade e são o primeiro passo do tratamento.",
         "Evite cafeína, álcool e outros estimulantes.",
         "Pratique atividade física regular.",
-        "Se os sintomas forem persistentes ou importantes, solicite encaminhamento para acompanhamento psicológico/psiquiátrico na sua unidade de saúde — medicação, quando necessária, deve ser iniciada e ajustada nesse acompanhamento, não como conduta isolada de pronto atendimento.",
-        "Procure atendimento COM URGÊNCIA se tiver pensamentos de fazer mal a si mesmo, desesperança intensa, ou se a ansiedade estiver impedindo totalmente suas atividades diárias.",
-        "Se os sintomas vierem com dor no peito, falta de ar ou palpitações, é importante descartar causas cardíacas antes de assumir que é só ansiedade, especialmente na primeira vez."
+        "Se os sintomas forem persistentes ou fortes, peça na sua Unidade de Saúde encaminhamento para acompanhamento psicológico/psiquiátrico; se for necessário remédio, ele deve ser iniciado e ajustado nesse acompanhamento.",
+        "Procure atendimento COM URGÊNCIA se tiver pensamentos de fazer mal a si mesmo, desesperança intensa, ou se a ansiedade estiver impedindo totalmente suas atividades diárias. Em caso de pensamentos de suicídio, você também pode ligar para o CVV (188, ligação gratuita, 24 horas) ou para o SAMU (192).",
+        "Se a ansiedade vier com dor no peito, falta de ar, palpitações ou desmaio, procure atendimento para descartar problema no coração, principalmente se for a primeira vez."
       ]
     },
     "Gripe": {
@@ -1384,7 +1392,7 @@ const DATA = {
         {
           "nome": "Loratadina 10mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, ao dia, preferencialmente à noite, enquanto persistirem os sintomas, ao máximo de 07 dias.",
+          "posologia": "Tomar 01 comprimido ao dia, preferencialmente à noite, enquanto persistirem os sintomas, por no máximo 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -1392,14 +1400,14 @@ const DATA = {
           "nome": "Budesonida 50mcg",
           "qtde": "01 Frasco",
           "posologia": "Aplicar 02 jatos em cada narina, de 12/12 horas, por 05 a 07 dias.",
-          "via": "Tópico",
+          "via": "Nasal",
           "fator": null
         },
         {
           "nome": "Soro Fisiológico 0,9%",
           "qtde": "01 Frasco",
           "posologia": "Realizar lavagem nasal, com seringa, conforme explicado em consultório, várias vezes ao dia, para higiene.",
-          "via": "Tópico",
+          "via": "Nasal",
           "fator": null
         }
       ],
@@ -1407,7 +1415,7 @@ const DATA = {
         "Mantenha hidratação abundante e repouso.",
         "Evite exposição ao frio e mudanças bruscas de temperatura.",
         "Procure atendimento IMEDIATAMENTE se:\n1. Falta de ar, respiração rápida ou cansaço para respirar\n2. Lábios ou rosto arroxeados, ou dor ou pressão no peito que não passa\n3. Febre alta que não passa depois de 3 dias, ou febre/tosse que volta a piorar depois de ter começado a melhorar\n4. Confusão mental repentina, quedas, urinar bem menos que o normal, ou piora de um problema de saúde que você já tem (do coração ou do pulmão, por exemplo) — mesmo sem sentir falta de ar",
-        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
+        "Volte à Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando."
       ]
     },
     "Queimadura": {
@@ -1422,7 +1430,7 @@ const DATA = {
         {
           "nome": "Sulfadiazina de prata 1% - Creme",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar fina camada, sobre áreas afetadas, de 12/12 horas, após limpeza local com soro fisiológico",
+          "posologia": "Aplicar fina camada sobre as áreas afetadas, de 12/12 horas, após limpeza local com soro fisiológico.",
           "via": "Tópico",
           "fator": null
         }
@@ -1441,22 +1449,15 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor",
-          "via": "Oral",
-          "fator": null
-        },
-        {
-          "nome": "Meclin 25mg",
-          "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, apenas se náusea leve isolada, sem vômitos — vômitos recorrentes/persistentes não devem ser \"tratados\" com este medicamento; procurar reavaliação se isso ocorrer.",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Manter repouso relativo nas primeiras 24 horas",
-        "Evitar atividades físicas intensas, uso de bebidas alcoólicas e medicações aqui não prescritas",
-        "Se em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), procurar avaliação de EMERGÊNCIA imediatamente, mesmo sem sintomas — risco de hemorragia intracraniana tardia mesmo em trauma leve.",
+        "Manter repouso relativo nas primeiras 24 horas.",
+        "Evitar atividades físicas intensas, bebidas alcoólicas e remédios que não foram prescritos nesta receita (principalmente calmantes e remédios para dormir).",
+        "Se você usa remédio que afina o sangue (como varfarina, rivaroxabana, apixabana, dabigatrana, AAS ou clopidogrel) e não informou ao médico, volte para avaliação IMEDIATAMENTE, mesmo sem sintomas: o risco de sangramento dentro da cabeça é maior, mesmo em batida leve.",
         "Retornar para reavaliação imediata se: dor de cabeça forte ou que piora progressivamente, sonolência excessiva ou dificuldade para acordar, confusão ou agitação, vômitos persistentes, fraqueza em braços ou pernas, alteração da fala ou da visão, convulsões, ou saída de líquido pelo ouvido ou nariz. Manter um adulto responsável acompanhando o paciente nas primeiras 24 horas."
       ]
     },
@@ -1470,7 +1471,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Neomicina 5mg + Bacitracina 250UI/g Pomada",
+          "nome": "Neomicina 5 mg/g + Bacitracina 250 UI/g Pomada",
           "qtde": "01 Bisnaga",
           "posologia": "Aplicar fina camada sobre ferida, após limpeza local, de 12/12 horas, por 10 dias.",
           "via": "Tópico",
@@ -1479,15 +1480,15 @@ const DATA = {
         {
           "nome": "Clorexidina aquosa 0,5% - Solução",
           "qtde": "01 Frasco",
-          "posologia": "Lavar a ferida com soro fisiológico e, em seguida, aplicar a solução de clorexidina de 12/12 horas, até cicatrização",
+          "posologia": "Lavar a ferida com soro fisiológico e, em seguida, aplicar a solução de clorexidina, de 12/12 horas, até a cicatrização.",
           "via": "Tópico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Manter local da ferida sempre limpo e seco",
-        "Trocar de curativo diariamente",
-        "Evitar exposição solar direta e traumas locais",
+        "Manter o local da ferida sempre limpo e seco.",
+        "Trocar o curativo a cada 12 horas, junto com a limpeza e a aplicação dos medicamentos.",
+        "Evitar exposição solar direta e traumas locais.",
         "Retornar para avaliação médica se houver dor intensa, secreção amarelada ou febre.",
         "Levar o cartão de vacina à unidade de saúde o quanto antes para conferir a vacina antitetânica (dT): se o esquema estiver incompleto ou for desconhecido, ou se a última dose foi há 10 anos ou mais (ou há 5 anos ou mais, em ferimento profundo, sujo, perfurante ou por mordedura), tomar a dT e completar o esquema, se necessário."
       ]
@@ -1502,7 +1503,7 @@ const DATA = {
           "fator": null
         },
         {
-          "nome": "Terbinafina 250mg (Se resistente)",
+          "nome": "Terbinafina 250mg",
           "qtde": "30 Comprimidos",
           "posologia": "Tomar 01 comprimido ao dia, por 30 dias.",
           "via": "Oral",
@@ -1511,9 +1512,10 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter pele limpa e seca, especialmente entre os dedos.",
-        "Evitar o uso de calçados fechados por longos períodos",
-        "Trocar de meias diariamente",
-        "Lavar roupas e toalhas em água quente para evitar reinfecção"
+        "Evitar o uso de calçados fechados por longos períodos.",
+        "Trocar as meias diariamente.",
+        "Lavar roupas e toalhas em água quente para evitar reinfecção.",
+        "Se usar a Terbinafina: suspenda e procure atendimento se surgirem pele ou olhos amarelados, urina escura, enjoo persistente, cansaço intenso, ou manchas ou bolhas na pele."
       ]
     },
     "Abcesso": {
@@ -1521,21 +1523,21 @@ const DATA = {
         {
           "nome": "Dipirona 500mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Cefalexina 500mg",
           "qtde": "28 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         }
@@ -1543,16 +1545,16 @@ const DATA = {
       "orientacoes": [
         "Aplicar compressas de gazes, banhadas em soro fisiológico morno, na região, de 06/06 horas por 15 minutos.",
         "Manter local limpo e seco.",
-        "NÃO MANIPULAR O LOCAL",
+        "Não espremer, furar ou manipular o local.",
         "Procurar atendimento médico se aumento rápido do volume, febre ou dor intensa.",
-        "Se houver flutuação (coleção de pus palpável), a drenagem é o tratamento principal — antibiótico isolado pode não ser suficiente; encaminhar para drenagem."
+        "Se o local ficar amolecido, com pus acumulado, volte para avaliação: pode ser preciso drenar (abrir e esvaziar) o abscesso, porque só o antibiótico pode não resolver."
       ]
     },
     "Escabiose": {
       "meds": [
         {
           "nome": "Permetrina 5% - Creme",
-          "qtde": "01 Bisnaga",
+          "qtde": "02 Bisnagas",
           "posologia": "Aplicar em todo o corpo, do pescoço para baixo (inclusive entre os dedos, sob as unhas, axilas, umbigo, nádegas, região genital e plantas dos pés), à noite, antes de dormir, e retirar com banho na manhã seguinte (após 8 a 14 horas). Em crianças pequenas e idosos, aplicar também no couro cabeludo, rosto e atrás das orelhas, evitando olhos e boca. Realizar por 02 noites seguidas. Após 01 semana, repetir por mais 01 noite.",
           "via": "Tópico",
           "fator": null
@@ -1574,9 +1576,10 @@ const DATA = {
       ],
       "orientacoes": [
         "Tratar ao mesmo tempo todos os moradores do domicílio e contatos íntimos, mesmo que não tenham coceira.",
-        "Lavar todas as roupas de cama em água quente para evitar reinfecção",
+        "Lavar as roupas de cama, toalhas e roupas usadas nos últimos 3 dias em água quente e secar ao sol ou passar a ferro; o que não puder ser lavado deve ficar fechado em saco plástico por pelo menos 3 dias.",
         "Evitar contato próximo com pessoas não tratadas, até o fim da terapia.",
-        "coceira pode persistir por 02 a 03 semanas após o tratamento.\nNão significando falha do remédio"
+        "A coceira pode continuar por 02 a 03 semanas após o tratamento, e isso não significa falha do remédio. Retorne se surgirem lesões novas depois desse período.",
+        "Se estiver grávida ou amamentando, avise o médico antes de tomar a Ivermectina: nessas situações o tratamento indicado é a Permetrina."
       ]
     },
     "Impetigo": {
@@ -1591,7 +1594,7 @@ const DATA = {
         {
           "nome": "Cefalexina 500mg",
           "qtde": "28 Comprimidos",
-          "posologia": "Se múltiplos locais acometidos: tomar 01 comprimido, de 06/06 horas, por 07 dias.",
+          "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -1604,11 +1607,12 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Manter a pele limpa",
-        "Lavar as lesões com água e sabão neutro antes da aplicação tópica",
-        "Evitar manipulação das crostas e contato direto com outras pessoas, até a melhora",
-        "Lavar roupas, toalhas e lençóis frequentemente",
-        "Procurar atendimento médico se aumento rápido do número de lesões, febre ou muita dor."
+        "Manter a pele limpa.",
+        "Lavar as lesões com água e sabão neutro antes de aplicar a pomada.",
+        "Evitar manipulação das crostas e contato direto com outras pessoas, até a melhora.",
+        "Lavar roupas, toalhas e lençóis frequentemente.",
+        "Procurar atendimento médico se aumento rápido do número de lesões, febre ou muita dor.",
+        "Procure atendimento se, nas próximas semanas, a urina ficar escura (cor de chá ou de refrigerante de cola) ou diminuir, ou se surgir inchaço no rosto ou nas pernas."
       ]
     },
     "Tosse": {
@@ -1629,18 +1633,18 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Manter grande ingesta hídrica, de ao menos 02 litros",
+        "Beber bastante líquido, ao menos 02 litros por dia (exceto se o médico tiver restringido líquidos por doença do coração ou dos rins).",
         "Não se exponha à fumaça de cigarro nem a ambientes poluídos.",
-        "A maioria das tosses associadas a resfriado é autolimitada e melhora em 1 a 3 semanas — corticoide oral não é indicado rotineiramente para tosse comum, salvo se houver chiado/falta de ar (nesse caso, ver as condições \"Broncoespasmo\" ou \"Asma\").",
-        "Procurar atendimento médico se febre, expectoração purulenta, dificuldade de respirar ou tosse intensa que interfira nas atividades diárias.",
-        "Se a tosse persistir por mais de 3 semanas, é importante investigar a causa (não deve ser tratada indefinidamente apenas com sintomáticos)."
+        "A maioria das tosses de resfriado melhora sozinha em 1 a 3 semanas.",
+        "Procure atendimento se tiver falta de ar, chiado no peito, dor no peito, catarro com sangue, febre por mais de 3 dias, ou tosse intensa que atrapalhe as atividades diárias.",
+        "Se a tosse durar 3 semanas ou mais, volte à Unidade de Saúde para investigar a causa, inclusive tuberculose."
       ]
     },
     "Entorse": {
       "meds": [
         {
           "nome": "Diclofenaco dietilamônio 11,6 mg/g - Gel",
-          "qtde": "01 Frasco",
+          "qtde": "01 Bisnaga",
           "posologia": "Aplicar fina camada sobre área afetada, de 08/08 horas, por 05 dias.",
           "via": "Tópico",
           "fator": null
@@ -1654,10 +1658,10 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Manter-se em repouso",
+        "Manter o membro em repouso nas primeiras 48 a 72 horas, voltando a movimentá-lo aos poucos, conforme a dor permitir.",
         "Aplicar compressas de gazes, banhadas em soro fisiológico frio, de 06/06 horas, por 15 minutos.",
-        "Manter o membro elevado acima do nível do coração",
-        "Evitar esforços físicos e esportes por 48 a 72 horas",
+        "Manter o membro elevado acima do nível do coração.",
+        "Evitar esforços físicos e esportes por 48 a 72 horas.",
         "Procurar avaliação médica se aumento da dor, inchaço significativo ou dificuldade para caminhar."
       ]
     },
@@ -1666,35 +1670,35 @@ const DATA = {
         {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota sobre ambos olhos, de 04/04 horas, até melhora do desconforto",
+          "posologia": "Aplicar 01 gota em ambos os olhos, de 04/04 horas, até melhora do desconforto.",
           "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Hialuronato de sódio 0,15% - Gel",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 vez ao dia, preferencialmente à noite, para lubrificação prolongada",
+          "posologia": "Aplicar 01 gota em cada olho, 01 vez ao dia, de preferência à noite, antes de dormir.",
           "via": "Oftálmico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Manter colírios refrigerados",
-        "Evitar exposição prolongada a ambientes secos, vento ou ar-condicionado",
-        "Piscar regularmente durante o uso de telas",
-        "Retornar a esta unidade se dor ocular intensa, vermelhidão significativa, secreção ou alterações visuais",
-        "Buscar acompanhamento longitudinal em Unidade de Saúde para controle da causa"
+        "Guardar os colírios bem fechados, em temperatura ambiente (15 a 30 °C), e não encostar a ponta do frasco no olho.",
+        "Evitar exposição prolongada a ambientes secos, vento ou ar-condicionado.",
+        "Piscar regularmente durante o uso de telas.",
+        "Retornar a esta unidade se houver dor ocular intensa, vermelhidão importante, secreção ou alteração da visão.",
+        "Buscar acompanhamento longitudinal em Unidade de Saúde para controle da causa."
       ]
     },
     "Pé diabético": {
       "meds": [],
       "orientacoes": [
-        "Manter controle glicêmico rigoroso",
-        "Evitar aplicar pressão sobre o pé afetado",
+        "Manter controle glicêmico rigoroso.",
+        "Evitar aplicar pressão sobre o pé afetado.",
         "Examinar os pés todos os dias (inclusive a sola e entre os dedos, com ajuda de espelho ou de outra pessoa). Lavar os pés diariamente com água morna e sabão neutro, testando antes a temperatura da água com a mão ou o cotovelo (nunca com o pé), e secar bem entre os dedos. Não andar descalço, nem só de meias ou de chinelo de sola fina, dentro ou fora de casa; não cortar calos nem usar calicidas.",
-        "Manter pele seca e protegida",
-        "Buscar imediatamente acompanhamento longitudinal em Unidade Básica de Saúde",
-        "Sinais de infecção grave (emergência, risco de amputação): febre, secreção purulenta, odor fétido, exposição de osso ou tendão, vermelhidão que se espalha rapidamente — nesses casos, não é só \"acompanhamento\", é emergência."
+        "Manter pele seca e protegida.",
+        "Agendar o quanto antes acompanhamento na Unidade Básica de Saúde.",
+        "Procure atendimento de EMERGÊNCIA se tiver febre, pus ou mau cheiro na ferida, osso ou tendão aparecendo, vermelhidão ou inchaço que se espalham rapidamente, ou se o pé ficar frio, pálido, arroxeado ou escuro — há risco de amputação."
       ]
     },
     "Prurido Inespecífico": {
@@ -1709,7 +1713,7 @@ const DATA = {
         {
           "nome": "Hidroxizina 25 mg",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, à noite, antes de dormir, apenas se coceira intensa que atrapalhe o sono.",
+          "posologia": "Tomar 01 comprimido, à noite, antes de dormir, apenas se coceira intensa que atrapalhe o sono. Pode causar sonolência, boca seca, tontura e confusão, principalmente em idosos: cuidado para não cair.",
           "via": "Oral",
           "fator": null
         },
@@ -1722,9 +1726,9 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Evitar banhos quentes e uso de sabonetes agressivos",
+        "Evitar banhos quentes e uso de sabonetes agressivos.",
         "Manter a pele hidratada com cremes neutros.",
-        "Buscar avaliação em Unidade de Saúde para estudo da causa de base"
+        "Buscar avaliação em Unidade de Saúde para estudo da causa de base."
       ]
     },
     "Esofagite por Cândida": {
@@ -1746,8 +1750,9 @@ const DATA = {
       ],
       "orientacoes": [
         "Evitar alimentos ácidos e muito condimentados.",
-        "Manter higiene oral rigorosa",
-        "Retornar ao serviço médico se disfagia intensa ou febre."
+        "Manter higiene oral rigorosa.",
+        "Retornar ao serviço médico se tiver dor forte ou muita dificuldade para engolir, se não conseguir se alimentar ou beber líquidos, ou se tiver febre.",
+        "Faça o teste rápido de HIV na Unidade de Saúde: a candidíase no esôfago costuma estar ligada à queda da imunidade."
       ]
     },
     "Cefaleia Tensional": {
@@ -1776,7 +1781,7 @@ const DATA = {
       ],
       "orientacoes": [
         "Evitar estresse, manter boa higiene do sono e postura.",
-        "Utilizar compressas mornas na região cervical/têmporas",
+        "Utilizar compressas mornas na nuca e nas têmporas.",
         "Evite usar analgésicos por mais de 10 dias no mês — uso excessivo pode causar cefaleia por abuso de medicação.",
         "Retornar imediatamente se: pior dor de cabeça da vida; mudança de consciência; fraqueza súbita; alteração de fala; perda de visão; convulsão; febre alta inexplicável; dor que piora ao tossir, fazer esforço ou deitar."
       ]
@@ -1799,10 +1804,10 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "ATENÇÃO: se no momento desta prescrição houver falta de ar, dor no peito, alteração visual súbita, fraqueza ou formigamento em um lado do corpo, dificuldade para falar, confusão mental ou dor de cabeça muito forte e súbita, NÃO usar esta prescrição em casa — procurar atendimento de EMERGÊNCIA imediatamente (SAMU 192 ou a emergência mais próxima).",
+        "Se você estiver com falta de ar, dor no peito, alteração súbita da visão, fraqueza ou formigamento em um lado do corpo, dificuldade para falar, confusão mental ou dor de cabeça muito forte e súbita, NÃO trate a pressão em casa: procure atendimento de EMERGÊNCIA imediatamente (SAMU 192 ou a emergência mais próxima).",
         "Tomar o Captopril conforme prescrito e medir a pressão novamente após 30 minutos. Se a pressão continuar acima de 160x100 mmHg mesmo após a segunda dose, procurar atendimento de emergência — não repetir uma terceira dose por conta própria.",
         "Evitar esforços físicos intensos e situações de estresse até a reavaliação.",
-        "Agendar consulta em até poucos dias em Unidade de Saúde para ajuste da medicação anti-hipertensiva de uso contínuo.",
+        "Agendar consulta na Unidade de Saúde nos próximos dias para ajuste da medicação anti-hipertensiva de uso contínuo.",
         "Procurar atendimento de EMERGÊNCIA a qualquer momento se surgir: falta de ar, dor no peito, alteração da visão, fraqueza ou formigamento em um lado do corpo, dificuldade para falar, ou dor de cabeça muito intensa e súbita.",
         "Os comprimidos fornecidos são só para este episódio — não devem ser guardados como \"estoque\" para crises futuras; crises repetidas indicam necessidade de ajustar a medicação anti-hipertensiva de uso contínuo, não de repetir Captopril por conta própria."
       ]

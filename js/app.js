@@ -85,9 +85,10 @@
   // Edições de condição são guardadas pelo índice do item (overrides[cond].meds[i]);
   // quando um item sai do catálogo, os índices seguintes mudam. Cada versão lista,
   // por condição, o novo índice de cada item antigo (null = item removido).
-  const CATALOGO_VERSAO = 2;
+  const CATALOGO_VERSAO = 3;
   const REMAP_CATALOGO = {
-    2: { 'Vertigem': { meds: [null, 0, 1] } }   // saiu o Meclin 25mg
+    2: { 'Vertigem': { meds: [null, 0, 1] } },  // saiu o Meclin 25mg
+    3: { 'TCE': { meds: [0, null] } }           // saiu o Meclin 25mg
   };
   function migrarIndicesCatalogo(obj, versao){
     for(let v = (versao || 1) + 1; v <= CATALOGO_VERSAO; v++){
