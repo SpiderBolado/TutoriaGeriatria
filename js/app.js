@@ -860,6 +860,7 @@
           <div class="item-linha">
             <span class="num mono">${String(idx+1).padStart(2,'0')}.</span>
             <span class="nome-med">${escapeHtml(it.nome)}</span>
+            ${tipoReceitaAtual() === 'auto' ? (() => { const d = precisaDuasVias(it); return `<button class="vias-item${d ? ' em-duas' : ''}" data-sel="${escapeHtml(id)}" title="${d ? 'Vai no receituário de 2 vias — clique para passar para a receita comum' : 'Vai na receita comum — clique para passar para as 2 vias'}">${d ? '2 vias' : 'comum'}</button>`; })() : ''}
             <span class="dots"></span>
             <span class="qtde">${escapeHtml(it.qtde||'')}</span>
             <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item" aria-label="Editar ${escapeHtml(it.nome)}">&#x270E;</button>
@@ -1251,13 +1252,44 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     `;
   }
 
-  function renderReceita(){
-    const paper = el('receitaPaper');
+  // ---------- Separar sozinho: o que exige 2 vias × receita comum ----------
+  // Com "Separar sozinho", antimicrobiano e controlado vão para o receituário de
+  // controle especial (2 vias) e o resto, com as orientações, para a receita
+  // comum; impressão e .docx saem juntos. it.vias2 (true/false) guarda a troca
+  // de lado feita à mão na prévia.
+  const precisaDuasVias = it => it.vias2 !== undefined ? !!it.vias2 : !!window.VIAS.classificar(it);
+  function partesReceita(){
+    const duas = {}, comum = {};
+    Object.entries(selected).forEach(([id, it]) => { (precisaDuasVias(it) ? duas : comum)[id] = it; });
+    // orientações acompanham os sintomáticos; sem eles, vão com as 2 vias
+    const comComum = Object.keys(comum).length > 0;
+    return { duas, comum, orientComum: comComum ? selectedOrient : {}, orientDuas: comComum ? {} : selectedOrient };
+  }
+  // Separação em duas receitas só quando há itens dos dois lados
+  function separacaoAtiva(){
+    if(tipoReceitaAtual() !== 'auto') return null;
+    const p = partesReceita();
+    return Object.keys(p.duas).length && Object.keys(p.comum).length ? p : null;
+  }
+  // Tipo de receita para quem gera uma só (sem separação ativa)
+  function tipoEfetivo(){
+    const t = tipoReceitaAtual();
+    if(t !== 'auto') return t;
+    return Object.keys(selected).length && Object.values(selected).every(precisaDuasVias) ? 'controle' : 'comum';
+  }
+  // Roda fn com outra seleção no lugar da atual (prévia, impressão e .docx de cada parte)
+  function comSelecao(sel, ori, fn){
+    const s0 = selected, o0 = selectedOrient;
+    selected = sel; selectedOrient = ori;
+    try{ return fn(); } finally { selected = s0; selectedOrient = o0; }
+  }
+
+  // HTML da prévia de um tipo de receita, com a seleção atual (selected/selectedOrient)
+  function htmlPrevia(tipo){
     const nomePaciente = el('nomePaciente').value.trim();
     const peso = el('peso').value;
     const medEntries = Object.entries(selected);
     const orientEntries = Object.entries(selectedOrient);
-    const tipo = tipoReceitaAtual();
     const local = localAtual();
     const dataStr = new Date().toLocaleDateString('pt-BR');
     const vazio = medEntries.length === 0 && orientEntries.length === 0;
@@ -1267,7 +1299,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
     if(tipo === 'controle'){
       const muni = municipioDoLocal(local);
-      paper.innerHTML = muni
+      return muni
         ? `
           <div class="vias-lado-a-lado">
             ${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}
@@ -1280,11 +1312,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
             ${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}
           </div>
         `;
-      return;
     }
 
     if(vazio){
-      paper.innerHTML = `
+      return `
         ${logosHtml()}
         <div class="receita-head">
           <div class="paciente"><span class="lbl">Paciente</span>${escapeHtml(nomePaciente || '—')}</div>
@@ -1292,10 +1323,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         </div>
         <div class="receita-vazia">Selecione condições ou medicamentos ao lado.<br>A receita é montada aqui, ao vivo.</div>
       `;
-      return;
     }
 
-    paper.innerHTML = `
+    return `
       ${logosHtml()}
       <div class="receita-head">
         <div class="paciente"><span class="lbl">Paciente</span>${escapeHtml(nomePaciente || '—')}</div>
@@ -1314,6 +1344,18 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         </div>
       </div>
     `;
+  }
+
+  // Na prévia separada, a receita comum vem primeiro e as 2 vias embaixo
+  function renderReceita(){
+    const paper = el('receitaPaper');
+    const sep = separacaoAtiva();
+    paper.classList.toggle('separada', !!sep);
+    paper.innerHTML = sep
+      ? `<div class="parte-comum">${comSelecao(sep.comum, sep.orientComum, () => htmlPrevia('comum'))}</div>`
+        + `<div class="separador-vias"><span>Receituário de controle especial — 2 vias</span></div>`
+        + `<div class="parte-duas">${comSelecao(sep.duas, sep.orientDuas, () => htmlPrevia('controle'))}</div>`
+      : htmlPrevia(tipoEfetivo());
   }
 
   // ---------- Chips de condições mais usadas ----------
@@ -1338,6 +1380,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // ---------- Paciente pediátrico (peso / idade) ----------
   const numBR = n => String(n).replace('.', ',');
   const AUTO_PED_KEY = 'auto-pediatria';
+  // "Separar sozinho sempre que precisar": receita comum com antimicrobiano ou
+  // controlado passa sozinha para "Separar sozinho" (até o tipo ser escolhido à mão)
+  const SEPARAR_KEY = 'separar-auto';
+  let separarSuspenso = false;
+  function separarSempreAtivo(){
+    try{ return localStorage.getItem(SEPARAR_KEY) === '1'; }catch(e){ return false; }
+  }
   function pesoAtualKg(){
     const v = parseFloat(String(el('peso').value).replace(',', '.'));
     return v > 0 ? v : null;
@@ -1452,6 +1501,30 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         bar.appendChild(div);
       }
     });
+    // Receita em 2 vias: sugere separar quando o tipo não combina com os itens
+    const valores = Object.values(selected);
+    const de2 = valores.filter(precisaDuasVias), resto = valores.filter(it => !precisaDuasVias(it));
+    const nomesDe = l => escapeHtml(l.map(it => it.nome).join(', '));
+    const tipoSel = tipoReceitaAtual();
+    const chkSeparar = `<label class="aviso-check"><input type="checkbox" data-acao="separar-sempre" ${separarSempreAtivo() ? 'checked' : ''}> Separar sozinho sempre que precisar</label>`;
+    if(tipoSel === 'comum' && de2.length){
+      const motivos = [...new Set(de2.map(it => window.VIAS.ROTULO[window.VIAS.classificar(it)] || 'marcado por você'))].join(', ');
+      bar.appendChild(avisoHtml('teal', '&#8645;',
+        `<b>${nomesDe(de2)}</b> ${de2.length === 1 ? 'precisa' : 'precisam'} de receita em 2 vias (${escapeHtml(motivos)}).`
+        + (resto.length ? ' Dá para separar: isso no receituário de 2 vias e o resto, com as orientações, na receita comum — numa impressão só.' : '') + chkSeparar,
+        `<button type="button" data-acao="separar-auto">${resto.length ? 'Separar sozinho' : 'Usar 2 vias'}</button>`));
+    } else if(tipoSel === 'controle' && de2.length && resto.length){
+      bar.appendChild(avisoHtml('teal', '&#8645;',
+        `<b>${nomesDe(resto)}</b> não ${resto.length === 1 ? 'precisa' : 'precisam'} de 2 vias. Dá para separar: só ${nomesDe(de2)} no receituário de 2 vias e o resto na receita comum.`,
+        `<button type="button" data-acao="separar-auto">Separar sozinho</button>`));
+    } else if(tipoSel === 'auto' && de2.length && resto.length){
+      bar.appendChild(avisoHtml('teal', '&#8645;',
+        `<b>Receita separada:</b> 2 vias — ${nomesDe(de2)}; comum — ${nomesDe(resto)}${Object.keys(selectedOrient).length ? ' e as orientações' : ''}. Clique em “2 vias” ou “comum” no item para trocar de lado.` + chkSeparar));
+    }
+    const notifB = valores.filter(it => window.VIAS.classificar(it) === 'notificacao');
+    if(notifB.length) bar.appendChild(avisoHtml('amber', '&#9888;',
+      `<b>${nomesDe(notifB)}</b> ${notifB.length === 1 ? 'exige' : 'exigem'} Notificação de Receita B (azul), que este app não imprime: preencha também a notificação.`));
+
     renderSugestoesPadroes(bar);
   }
 
@@ -1864,6 +1937,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
   let convertendoAuto = false;
   function renderTudo(){
+    if(separarSempreAtivo() && !separarSuspenso && tipoReceitaAtual() === 'comum' && Object.values(selected).some(precisaDuasVias)){
+      document.querySelector('input[name=tipoReceita][value="auto"]').checked = true;
+    }
     // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido
     if(!convertendoAuto && autoPediatriaAtiva() && !autoPedSuspensa){
       const meses = idadeAtualMeses();
@@ -1921,7 +1997,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   async function copiarTexto(){
-    const texto = gerarTextoPuro();
+    const sep = separacaoAtiva();
+    const texto = sep
+      ? comSelecao(sep.comum, sep.orientComum, gerarTextoPuro) + '\n— RECEITA EM 2 VIAS (CONTROLE ESPECIAL) —\n' + comSelecao(sep.duas, sep.orientDuas, gerarTextoPuro)
+      : gerarTextoPuro();
     try{
       await navigator.clipboard.writeText(texto);
       showToast('Texto copiado');
@@ -2061,7 +2140,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return paras;
   }
 
-  function gerarDocComum(dados){
+  const montarDocx = (soSecoes, opcoes) => soSecoes ? opcoes : new docx.Document(opcoes);
+
+  function gerarDocComum(dados, soSecoes){
     const { Document, Paragraph, TextRun, AlignmentType, ImageRun, BorderStyle } = docx;
     const muni = municipioDoLocal(localAtual());
     const brasao = muni && muni.brasao();
@@ -2092,7 +2173,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         children: [ new TextRun({ text: 'PREFEITURA MUNICIPAL DO CARMO DO PARANAÍBA', bold: true, size: 20, color: '666666' }) ]
       })
     ];
-    return new Document({
+    return montarDocx(soSecoes, {
       sections: [{
         properties: { page: { size: { width: 11906, height: 16838 } } },
         children: [
@@ -2171,7 +2252,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return [ table, new Paragraph({ spacing: { before: 100 } }), ...receitaParas, dataPar, new Paragraph({ spacing: { before: 200 } }), rodapeTable ];
   }
 
-  function gerarDocControleEspecial(dados){
+  function gerarDocControleEspecial(dados, soSecoes){
     const { Document, Table, TableRow, TableCell, WidthType, VerticalAlign } = docx;
     const via1 = blocoViaDocx(dados, '1ª VIA FARMÁCIA');
     const via2 = blocoViaDocx(dados, '2ª VIA PACIENTE');
@@ -2199,7 +2280,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       ]
     });
 
-    return new Document({
+    return montarDocx(soSecoes, {
       sections: [{
         properties: { page: { size: { width: 11906, height: 16838, orientation: 'landscape' } } },
         children: [ masterTable ]
@@ -2246,7 +2327,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return [ table, new Paragraph({ spacing: { before: 100 } }), ...receitaParas, dataPar, new Paragraph({ spacing: { before: 200 } }), rodapeTable ];
   }
 
-  function gerarDocControleEspecialMunicipio(muni, dados){
+  function gerarDocControleEspecialMunicipio(muni, dados, soSecoes){
     const { Document, Table, TableRow, TableCell, WidthType, VerticalAlign } = docx;
     const via1 = blocoViaDocxMunicipio(muni, dados, '1ª VIA FARMÁCIA');
     const via2 = blocoViaDocxMunicipio(muni, dados, '2ª VIA PACIENTE');
@@ -2274,7 +2355,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       ]
     });
 
-    return new Document({
+    return montarDocx(soSecoes, {
       sections: [{
         properties: { page: { size: { width: 11906, height: 16838, orientation: 'landscape' } } },
         children: [ masterTable ]
@@ -2306,12 +2387,19 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       return;
     }
     const dados = coletarDadosReceita();
-    const tipo = document.querySelector('input[name=tipoReceita]:checked').value;
+    const tipo = tipoEfetivo();
+    const sep = separacaoAtiva();
     try{
       await garantirDocxCarregado();
-      const doc = tipo === 'controle'
-        ? (municipioDoLocal(localAtual()) ? gerarDocControleEspecialMunicipio(municipioDoLocal(localAtual()), dados) : gerarDocControleEspecial(dados))
-        : gerarDocComum(dados);
+      const muni = municipioDoLocal(localAtual());
+      const docControle = (d, soSecoes) => muni ? gerarDocControleEspecialMunicipio(muni, d, soSecoes) : gerarDocControleEspecial(d, soSecoes);
+      // separada: um arquivo só, com a receita comum (retrato) e as 2 vias (paisagem)
+      const doc = sep
+        ? new docx.Document({ sections: [
+            ...gerarDocComum(comSelecao(sep.comum, sep.orientComum, coletarDadosReceita), true).sections,
+            ...docControle(comSelecao(sep.duas, sep.orientDuas, coletarDadosReceita), true).sections
+          ] })
+        : tipo === 'controle' ? docControle(dados) : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2388,6 +2476,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       e.preventDefault();
       el(e.shiftKey ? 'btnMesmoPaciente' : 'btnLimpar').click();
     }
+  });
+
+  // Trocar o item de lado (2 vias × comum) em "Separar sozinho"
+  el('receitaPaper').addEventListener('click', (e) => {
+    const btn = e.target.closest('.vias-item');
+    if(!btn || !selected[btn.dataset.sel]) return;
+    selected[btn.dataset.sel].vias2 = !precisaDuasVias(selected[btn.dataset.sel]);
+    renderTudo();
   });
 
   // Espaço de parágrafo antes de uma orientação (botão ¶ na prévia)
@@ -2580,7 +2676,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   };
   el('peso').addEventListener('input', aoMudarPesoOuIdade);
   el('idade').addEventListener('input', aoMudarPesoOuIdade);
-  document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', renderReceita));
+  document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', () => {
+    if(tipoReceitaAtual() !== 'auto') separarSuspenso = true;   // escolheu o tipo à mão: não separa sozinho
+    renderTudo();
+  }));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
   el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
   el('btnDocx').addEventListener('click', async () => { await baixarDocx(); registrarHistorico('docx'); });
@@ -2682,7 +2781,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;}
       .via-box-patos-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;font-size:11px;}
       .receita-vazia-mini{padding:20px 6px;color:#4B5A55;font-size:12.5px;text-align:center;}
-      .rm-item, .edit-item-btn, .par-item, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia{ display:none !important; }
     `;
   }
 
@@ -2710,9 +2809,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // (pensadas só pra medir a altura da via numa div invisível) nunca vazem pro
   // resto do documento — inclusive a pré-visualização real da receita, que usa
   // as mesmas classes (.via-box, .item-linha etc).
-  function scopeCssParaProbe(css){
+  function scopeCssParaProbe(css){ return scopeCss(css, '#fitProbe'); }
+  function scopeCss(css, escopo){
     return css.replace(/([^{}]+)\{/g, (m, selectors) =>
-      selectors.split(',').map(s => '#fitProbe ' + s.trim()).join(', ') + '{'
+      selectors.split(',').map(s => escopo + ' ' + s.trim()).join(', ') + '{'
     );
   }
 
@@ -2860,38 +2960,35 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
   }
 
-  el('btnImprimir').addEventListener('click', () => {
-    const ehControle = tipoReceitaAtual() === 'controle';
+  // Folhas do controle especial (2 vias lado a lado), já paginadas, com a seleção atual
+  function folhasControle(){
     const local = localAtual();
-    let paperHtml;
-    let fitScale = 1;
+    let paperHtml, fitScale = 1;
+    const nomePaciente = el('nomePaciente').value.trim();
+    const peso = el('peso').value;
+    const medEntries = Object.entries(selected);
+    const orientEntries = Object.entries(selectedOrient);
+    const dataStr = new Date().toLocaleDateString('pt-BR');
 
-    if(ehControle){
-      const nomePaciente = el('nomePaciente').value.trim();
-      const peso = el('peso').value;
-      const medEntries = Object.entries(selected);
-      const orientEntries = Object.entries(selectedOrient);
-      const dataStr = new Date().toLocaleDateString('pt-BR');
-
-      if(medEntries.length === 0 && orientEntries.length === 0){
-        paperHtml = el('receitaPaper').innerHTML;
-      } else {
-        const encaixe = calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr);
-        fitScale = encaixe.scale;
-        const muni = municipioDoLocal(local);
-        const montarFolha = corpoHtml => muni
-          ? `<div class="vias-lado-a-lado">${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
-          : `<div class="vias-lado-a-lado">${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`;
-        paperHtml = encaixe.paginas.map((corpo, i) => {
-          const folha = montarFolha(corpo);
-          return i === 0 ? folha : `<div class="folha-seguinte">${folha}</div>`;
-        }).join('');
-      }
+    if(medEntries.length === 0 && orientEntries.length === 0){
+      paperHtml = htmlPrevia('controle');
     } else {
-      paperHtml = el('receitaPaper').innerHTML;
+      const encaixe = calcularEncaixeControle(local, medEntries, orientEntries, peso, nomePaciente, dataStr);
+      fitScale = encaixe.scale;
+      const muni = municipioDoLocal(local);
+      const montarFolha = corpoHtml => muni
+        ? `<div class="vias-lado-a-lado">${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtmlMunicipio(muni, nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`
+        : `<div class="vias-lado-a-lado">${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '1ª VIA FARMÁCIA')}${viaBoxHtml(nomePaciente, dataStr, corpoHtml, '2ª VIA PACIENTE', 'via-2')}</div>`;
+      paperHtml = encaixe.paginas.map((corpo, i) => {
+        const folha = montarFolha(corpo);
+        return i === 0 ? folha : `<div class="folha-seguinte">${folha}</div>`;
+      }).join('');
     }
+    return { paperHtml, fitScale };
+  }
 
-    const printStyles = `
+  function estilosImpressao(ehControle, fitScale){
+    return `
       ${ehControle ? '@page{ size: landscape; margin: 12mm; }' : '@page{ size: portrait; margin: 14mm 16mm; }'}
       body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#16241F; padding:34px 38px; max-width:${ehControle ? '1000px' : '700px'}; margin:0 auto;}
       .folha-seguinte{ page-break-before: always; }
@@ -2922,7 +3019,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-footer > div{flex:1;padding:9px 12px;font-size:10.5px;color:#4B5A55;line-height:1.7;}
       .via-box-footer > div:first-child{border-right:1.5px solid #16241F;}
       .via-box-footer b{color:#16241F;}
-      .rm-item, .edit-item-btn, .par-item, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia{ display:none !important; }
       .assinatura-bloco{margin-top:50px;padding-top:16px;border-top:1px dashed #D7DEDA;display:flex;align-items:flex-end;justify-content:center;gap:28px;}
       .carimbo-box{width:190px;height:88px;flex:none;border:1.5px dashed #D7DEDA;border-radius:6px;display:flex;align-items:center;justify-content:center;}
       .carimbo-box span{font-size:10.5px;color:#D7DEDA;text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
@@ -2973,6 +3070,29 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       ${ehControle ? fitBodyCss(fitScale) : ''}
       @media print{ body{padding:0;} }
     `;
+  }
+
+  el('btnImprimir').addEventListener('click', () => {
+    const sep = separacaoAtiva();
+    let paperHtml, printStyles;
+    if(sep){
+      // receita comum (retrato) e, na folha seguinte, as 2 vias (paisagem)
+      const comum = comSelecao(sep.comum, sep.orientComum, () => htmlPrevia('comum'));
+      const ctl = comSelecao(sep.duas, sep.orientDuas, folhasControle);
+      paperHtml = `<div class="parte-comum">${comum}</div><div class="parte-duas">${ctl.paperHtml}</div>`;
+      printStyles = estilosImpressao(false, 1) + `
+      @page vias2{ size: landscape; margin: 12mm; }
+      body{ max-width:1000px; }
+      .parte-comum{ max-width:700px; margin:0 auto; }
+      .parte-duas{ page: vias2; break-before: page; }
+      ` + scopeCss(fitBodyCss(ctl.fitScale), '.parte-duas');
+    } else {
+      const ehControle = tipoEfetivo() === 'controle';
+      let fitScale = 1;
+      if(ehControle){ ({ paperHtml, fitScale } = folhasControle()); }
+      else paperHtml = el('receitaPaper').innerHTML;
+      printStyles = estilosImpressao(ehControle, fitScale);
+    }
     const printWindow = window.open('', '_blank');
     if(!printWindow){
       showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
@@ -2993,11 +3113,21 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!b) return;
     if(b.dataset.acao === 'converter-ped') executarConversao(false);
     if(b.dataset.acao === 'desfazer-ped') desfazerConversao();
+    if(b.dataset.acao === 'separar-auto'){
+      document.querySelector('input[name=tipoReceita][value="auto"]').checked = true;
+      separarSuspenso = false;
+      renderTudo();
+    }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
     if(b.dataset.acao === 'padrao-adiar'){ padroes.adiadas[b.dataset.chave] = (padroes.n[b.dataset.chave] || 0) + PADROES_MIN; savePadroes(); renderTudo(); }
     if(b.dataset.acao === 'padrao-dispensar'){ padroes.dispensadas[b.dataset.chave] = true; savePadroes(); renderTudo(); }
   });
   el('avisoBar').addEventListener('change', (e) => {
+    if(e.target.matches('input[data-acao="separar-sempre"]')){
+      try{ localStorage.setItem(SEPARAR_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
+      if(e.target.checked){ separarSuspenso = false; renderTudo(); }
+      return;
+    }
     if(!e.target.matches('input[data-acao="auto-ped"]')) return;
     try{ localStorage.setItem(AUTO_PED_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
     if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
@@ -3005,7 +3135,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // Nova receita: próximo paciente (limpa tudo)
   el('btnLimpar').addEventListener('click', () => {
     finalizarAtendimento();
-    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
@@ -3014,7 +3144,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // nas 2 vias e sintomáticos na comum). Mantém nome, idade, peso e os rascunhos
   // de encaminhamento/atestado; limpa remédios e orientações.
   el('btnMesmoPaciente').addEventListener('click', () => {
-    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     renderTudo();
     const nome = el('nomePaciente').value.trim();
     showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos');

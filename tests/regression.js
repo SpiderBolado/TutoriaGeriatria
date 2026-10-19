@@ -941,6 +941,78 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Separar sozinho: ATB nas 2 vias e o resto + orientacoes na comum (previa, impressao, docx, copia) ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const partes = () => page.evaluate(() => {
+      const nomes = (sel) => [...document.querySelectorAll(sel + ' .nome-med')].map((e) => e.textContent.trim());
+      return { comum: nomes('#receitaPaper .parte-comum'), duas: [...new Set(nomes('#receitaPaper .parte-duas'))],
+        orientComum: document.querySelectorAll('#receitaPaper .parte-comum .orientacoes-bloco li').length,
+        orientDuas: document.querySelectorAll('#receitaPaper .parte-duas .orientacoes-bloco li').length };
+    });
+    await page.fill('#nomePaciente', 'Paciente Separado');
+    await selectCondicao(page, 'ITU');   // Fosfomicina (antimicrobiano) + Dipirona + Pyridium + orientacoes
+    await page.waitForTimeout(200);
+    const sugestao = await barra();
+    await page.click('#avisoBar button[data-acao="separar-auto"]');
+    await page.waitForTimeout(250);
+    const separado = await partes();
+    // trocar a Dipirona de lado e voltar
+    await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .parte-comum .vias-item')].find((b) => /Dipirona/.test(b.closest('.item-linha').textContent)).click());
+    await page.waitForTimeout(200);
+    const trocado = await partes();
+    await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .parte-duas .vias-item')].find((b) => /Dipirona/.test(b.closest('.item-linha').textContent)).click());
+    await page.waitForTimeout(200);
+    // impressao: retrato + paisagem no mesmo PDF
+    await page.click('#btnImprimir');
+    await page.waitForTimeout(500);
+    const html = (await page.evaluate(() => window.__prints)).pop() || '';
+    const p2 = await browser.newPage();
+    await p2.setContent(html, { waitUntil: 'load' });
+    const pdf = await p2.pdf({ preferCSSPageSize: true });
+    const caixas = (pdf.toString('latin1').match(/\/MediaBox\s*\[[^\]]*\]/g) || []).map((m) => { const n = m.match(/[\d.]+/g).map(Number); return n[2] > n[3] ? 'paisagem' : 'retrato'; });
+    const botoesVisiveis = await p2.evaluate(() => [...document.querySelectorAll('.vias-item, .par-item, .edit-item-btn, .rm-item')].filter((b) => getComputedStyle(b).display !== 'none').length);
+    await p2.close();
+    // .docx: duas secoes, a segunda em paisagem
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btnDocx')]);
+    const os = require('os'); const path = require('path');
+    const arq = path.join(os.tmpdir(), 'separado.docx'); await dl.saveAs(arq);
+    const xml = require('child_process').execSync(`unzip -p ${arq} word/document.xml`).toString();
+    const secoes = (xml.match(/<w:sectPr/g) || []).length;
+    const paisagem = /w:orient="landscape"/.test(xml);
+    const docxTexto = xml.replace(/<[^>]+>/g, ' ');
+    // copia
+    await page.click('#btnCopiar');
+    await page.waitForTimeout(200);
+    const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+    // "Separar sozinho sempre": na proxima receita com ATB, separa sem pedir
+    await page.check('#avisoBar input[data-acao="separar-sempre"]');
+    await page.reload();   // app reaberto: o tipo volta a "Comum"
+    await page.waitForTimeout(400);
+    const tipoAoAbrir = await page.evaluate(() => document.querySelector('input[name=tipoReceita]:checked').value);
+    await selectCondicao(page, 'ITU');
+    await page.waitForTimeout(250);
+    const sozinho = await page.evaluate(() => document.querySelector('input[name=tipoReceita]:checked').value);
+    const ok = /Fosfomicina Trometamol 3g precisa de receita em 2 vias \(antimicrobiano\)/.test(sugestao)
+      && separado.duas.join('|') === 'Fosfomicina Trometamol 3g' && separado.comum.includes('Dipirona 500mg') && !separado.comum.includes('Fosfomicina Trometamol 3g')
+      && separado.orientComum > 0 && separado.orientDuas === 0
+      && trocado.duas.includes('Dipirona 500mg') && !trocado.comum.includes('Dipirona 500mg')
+      && caixas.length >= 2 && caixas[0] === 'retrato' && caixas[caixas.length - 1] === 'paisagem' && botoesVisiveis === 0
+      && secoes === 2 && paisagem && /Fosfomicina/.test(docxTexto) && /Dipirona/.test(docxTexto)
+      && /RECEITA EM 2 VIAS/.test(copiado) && copiado.indexOf('Dipirona') < copiado.indexOf('RECEITA EM 2 VIAS') && copiado.indexOf('Fosfomicina') > copiado.indexOf('RECEITA EM 2 VIAS')
+      && tipoAoAbrir === 'comum' && sozinho === 'auto'
+      && consoleErrors.length === 0;
+    record('separar sozinho: ATB nas 2 vias, resto e orientacoes na comum (previa, troca de lado, PDF retrato+paisagem, docx, copia, sempre)', ok,
+      JSON.stringify({ sugestao: sugestao.slice(0, 160), separado, trocado, caixas, botoesVisiveis, secoes, paisagem, copiado: copiado.slice(0, 80), tipoAoAbrir, sozinho, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
