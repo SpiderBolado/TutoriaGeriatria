@@ -243,7 +243,7 @@
     });
     eff.orientacoes.forEach(o => {
       const id = 'cond:'+nome+':or:'+o.idx;
-      if(selectedOrient[id]) selectedOrient[id] = { texto: o.texto, origemCondicao: nome };
+      if(selectedOrient[id]) selectedOrient[id] = Object.assign({}, selectedOrient[id], { texto: o.texto, origemCondicao: nome });
     });
   }
 
@@ -837,7 +837,7 @@
     if(orientEntries.length){
       html += `<div class="orientacoes-bloco"><div class="via-titulo">Orientações</div><ul>`;
       orientEntries.forEach(([id, o]) => {
-        html += `<li>${escapeHtml(o.texto)} <button class="edit-item-btn" data-orient="${escapeHtml(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeHtml(id)}" title="Remover da receita">&times;</button></li>`;
+        html += `<li${o.espacoAntes ? ' class="espaco-antes"' : ''}>${escapeHtml(o.texto)} <button class="par-item" data-orient="${escapeHtml(id)}" aria-pressed="${o.espacoAntes ? 'true' : 'false'}" title="${o.espacoAntes ? 'Tirar o espaço antes desta orientação' : 'Dar um espaço (novo parágrafo) antes desta orientação'}">&para;</button><button class="edit-item-btn" data-orient="${escapeHtml(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeHtml(id)}" title="Remover da receita">&times;</button></li>`;
       });
       html += `</ul></div>`;
     }
@@ -1614,7 +1614,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
     if(orientacoes.length){
       out += `ORIENTAÇÕES\n`;
-      orientacoes.forEach(o => { out += `- ${o.texto}\n`; });
+      orientacoes.forEach(o => { out += `${o.espacoAntes ? '\n' : ''}- ${o.texto}\n`; });
     }
     return out;
   }
@@ -1691,7 +1691,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function coletarDadosReceita(){
     const peso = el('peso').value;
     const itens = Object.values(selected);
-    const orientacoes = Object.values(selectedOrient).map(o => o.texto);
+    const orientacoes = Object.values(selectedOrient).map(o => ({ texto: o.texto, espacoAntes: !!o.espacoAntes }));
 
     const viaOrder = [];
     const grupos = {};
@@ -1755,8 +1755,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         spacing: { before: 220, after: 60 },
         children: [ new TextRun({ text: 'ORIENTAÇÕES', bold: true, size: 20 }) ]
       }));
+      // cada linha do texto vira uma quebra de linha no mesmo item; espacoAntes abre um parágrafo
       dados.orientacoes.forEach(o => {
-        paras.push(new Paragraph({ bullet: { level: 0 }, children: [ new TextRun({ text: o, size: 20 }) ] }));
+        paras.push(new Paragraph({
+          bullet: { level: 0 },
+          ...(o.espacoAntes ? { spacing: { before: 200 } } : {}),
+          children: String(o.texto).split('\n').map((linha, i) => new TextRun({ text: linha, size: 20, ...(i ? { break: 1 } : {}) }))
+        }));
       });
     }
     return paras;
@@ -2091,6 +2096,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
   });
 
+  // Espaço de parágrafo antes de uma orientação (botão ¶ na prévia)
+  el('receitaPaper').addEventListener('click', (e) => {
+    const btn = e.target.closest('.par-item');
+    if(!btn || !selectedOrient[btn.dataset.orient]) return;
+    selectedOrient[btn.dataset.orient].espacoAntes = !selectedOrient[btn.dataset.orient].espacoAntes;
+    renderTudo();
+  });
+
   // Remoção de itens direto pelo papel da receita (delegação)
   el('receitaPaper').addEventListener('click', (e) => {
     const btn = e.target.closest('.rm-item');
@@ -2387,7 +2400,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .item-pos{margin:2px 0 0 ${s(24)}px;font-size:${s(12.5)}px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:${s(22)}px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
-      .orientacoes-bloco li{font-size:${s(12.5)}px;color:#4B5A55;margin-bottom:${s(6)}px;}
+      .orientacoes-bloco li{font-size:${s(12.5)}px;color:#4B5A55;margin-bottom:${s(6)}px;white-space:pre-line;}
+      .orientacoes-bloco li.espaco-antes{margin-top:${s(14)}px;}
       .continuacao-nota{font-size:${s(11)}px;font-style:italic;color:#4B5A55;margin-bottom:${s(8)}px;}
     `;
   }
@@ -2478,7 +2492,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         listaAberta = true;
       } else if(e.tipo === 'orientItem'){
         if(!listaAberta){ html += `<div class="orientacoes-bloco"><ul>`; listaAberta = true; }
-        html += `<li>${escapeHtml(e.o.texto)}</li>`;
+        html += `<li${e.o.espacoAntes ? ' class="espaco-antes"' : ''}>${escapeHtml(e.o.texto)}</li>`;
       }
     });
     if(listaAberta) html += `</ul></div>`;
@@ -2644,7 +2658,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .item-pos{margin:2px 0 0 24px;font-size:12.5px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:22px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
-      .orientacoes-bloco li{font-size:12.5px;color:#4B5A55;margin-bottom:6px;}
+      .orientacoes-bloco li{font-size:12.5px;color:#4B5A55;margin-bottom:6px;white-space:pre-line;}
+      .orientacoes-bloco li.espaco-antes{margin-top:14px;}
       .assinatura{margin-top:44px;padding-top:10px;text-align:center;font-size:12px;color:#4B5A55;}
       .assinatura .linha{width:260px;border-top:1px solid #16241F;margin:0 auto 6px auto;}
       /* Evita que a paginação nativa do navegador quebre um item ou bloco no

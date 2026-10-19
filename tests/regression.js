@@ -701,6 +701,47 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Orientacoes: quebra de linha do texto e espaco de paragrafo (previa, impressao, copia, .docx) ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    const context = page.context();
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await selectCondicao(page, 'DRGE');   // tem orientacao com lista numerada em varias linhas
+    await page.waitForTimeout(200);
+    const lis = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .orientacoes-bloco li')]
+      .map((li) => ({ esp: li.classList.contains('espaco-antes'), mt: getComputedStyle(li).marginTop, h: li.getBoundingClientRect().height, ws: getComputedStyle(li).whiteSpace })));
+    const antes = await lis();
+    await page.evaluate(() => document.querySelectorAll('#receitaPaper .orientacoes-bloco li .par-item')[2].click());
+    await page.waitForTimeout(200);
+    const depois = await lis();
+    await page.click('#btnImprimir');
+    await page.waitForTimeout(400);
+    const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    await page.click('#btnCopiar');
+    await page.waitForTimeout(200);
+    const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btnDocx')]);
+    const fs = require('fs'); const os = require('os'); const path = require('path');
+    const arq = path.join(os.tmpdir(), 'orient-paragrafo.docx'); await dl.saveAs(arq);
+    const xml = require('child_process').execSync(`unzip -p ${arq} word/document.xml`).toString();
+    // desmarca de novo: volta ao normal
+    await page.evaluate(() => document.querySelectorAll('#receitaPaper .orientacoes-bloco li .par-item')[2].click());
+    await page.waitForTimeout(150);
+    const desfeito = await lis();
+    const ok = antes.every((l) => !l.esp && l.ws === 'pre-line') && depois[2].esp && depois[2].mt === '14px' && !depois[1].esp
+      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso)
+      && /\n\n- /.test(copiado.split('ORIENTAÇÕES')[1] || '')
+      && /<w:spacing w:before="200"\/>/.test(xml) && (xml.match(/<w:br\/>/g) || []).length >= 3
+      && !desfeito[2].esp && consoleErrors.length === 0;
+    record('orientacoes: quebra de linha e espaco de paragrafo (previa, impressao, copia, docx)', ok,
+      JSON.stringify({ antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
