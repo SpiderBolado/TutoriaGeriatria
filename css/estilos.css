@@ -1071,6 +1071,8 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   .carimbo-box{width:100%;max-width:190px;}
   .assinatura-linha-wrap{width:100%;max-width:260px;}
   .vias-lado-a-lado{flex-direction:column;align-items:stretch;}
+  /* empilhadas, a base flex 0 + overflow:hidden encolhia cada via até sobrar só a borda */
+  .vias-lado-a-lado .via-box{flex:none;}
   .via-box-header .via-label{width:auto;min-width:96px;}
   .rm-item, .edit-item-btn{width:30px;height:30px;}
 }
