@@ -647,6 +647,60 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Atestado: afastamento com periodo e CID so com autorizacao; comparecimento; acompanhante; impressao ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Atestado');
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    const texto = () => page.inputValue('#atTexto');
+    const aberto = await page.evaluate(() => document.getElementById('atestadoOverlay').classList.contains('show'));
+    const t1 = await texto();
+    await page.fill('#atData', '2026-10-19');
+    await page.fill('#atInicio', '2026-10-19');
+    await page.fill('#atHora', '08:30');
+    await page.click('.at-dias-rapidos button[data-dias="3"]');
+    await page.fill('#atCid', 'J06.9');
+    const semAutorizacao = await texto();
+    await page.check('#atCidAutorizado');
+    const comCid = await texto();
+    await page.click('#btnImprimirAtestado');
+    await page.waitForTimeout(400);
+    const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    await page.check('input[name=atTipo][value="comparecimento"]');
+    await page.fill('#atHoraInicio', '07:10');
+    await page.fill('#atHoraFim', '09:00');
+    const comparecimento = await texto();
+    const titulo = await page.textContent('#atTitulo');
+    await page.check('input[name=atTipo][value="acompanhante"]');
+    await page.fill('#atAcompanhante', 'Fulana Acompanhante');
+    const acompanhante = await texto();
+    await page.keyboard.press('Escape');
+    const fechou = await page.evaluate(() => !document.getElementById('atestadoOverlay').classList.contains('show'));
+    // reabrir nao carrega o CID do paciente anterior; Rio Paranaiba muda a cidade
+    await page.evaluate(() => { const r = document.querySelector('input[name=localReceita][value="rio"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    await page.check('input[name=atTipo][value="afastamento"]');
+    const reaberto = await texto();
+    const cidLimpo = (await page.inputValue('#atCid')) === '' && !(await page.isChecked('#atCidAutorizado'));
+    const ok = aberto && /Atesto, para os devidos fins, que Paciente Atestado esteve em atendimento médico/.test(t1) && /01 \(um\) dia/.test(t1)
+      && /03 \(três\) dias de afastamento de suas atividades, de 19\/10\/2026 a 21\/10\/2026\./.test(semAutorizacao) && !/J06\.9/.test(semAutorizacao)
+      && /CID-10: J06\.9\./.test(comCid) && /às 08:30/.test(comCid)
+      && /Atestado médico/.test(impresso) && /CID-10: J06\.9/.test(impresso) && /Paciente Atestado/.test(impresso) && /Carmo do Paranaíba, \d+ de /.test(impresso)
+      && /esteve nesta unidade para atendimento médico no dia 19\/10\/2026, das 07:10 às 09:00\./.test(comparecimento) && titulo === 'Declaração de comparecimento'
+      && /Fulana Acompanhante esteve nesta unidade no dia 19\/10\/2026, das 07:10 às 09:00, acompanhando Paciente Atestado/.test(acompanhante)
+      && fechou && cidLimpo && /^Atesto/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
+      && consoleErrors.length === 0;
+    record('atestado: afastamento (periodo, CID com autorizacao), comparecimento, acompanhante e impressao', ok,
+      JSON.stringify({ aberto, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
