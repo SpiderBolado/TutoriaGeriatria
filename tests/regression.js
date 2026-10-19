@@ -647,6 +647,101 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Atestado: afastamento com periodo e CID so com autorizacao; comparecimento; acompanhante; impressao ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Atestado');
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    const texto = () => page.inputValue('#atTexto');
+    const aberto = await page.evaluate(() => document.getElementById('atestadoOverlay').classList.contains('show'));
+    const t1 = await texto();
+    await page.fill('#atData', '2026-10-19');
+    await page.fill('#atInicio', '2026-10-19');
+    await page.fill('#atHora', '08:30');
+    await page.click('.at-dias-rapidos button[data-dias="3"]');
+    await page.fill('#atCid', 'J06.9');
+    const semAutorizacao = await texto();
+    await page.check('#atCidAutorizado');
+    const comCid = await texto();
+    await page.click('#btnImprimirAtestado');
+    await page.waitForTimeout(400);
+    const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    await page.check('input[name=atTipo][value="comparecimento"]');
+    await page.fill('#atHoraInicio', '07:10');
+    await page.fill('#atHoraFim', '09:00');
+    const comparecimento = await texto();
+    const titulo = await page.textContent('#atTitulo');
+    await page.check('input[name=atTipo][value="acompanhante"]');
+    await page.fill('#atAcompanhante', 'Fulana Acompanhante');
+    const acompanhante = await texto();
+    await page.keyboard.press('Escape');
+    const fechou = await page.evaluate(() => !document.getElementById('atestadoOverlay').classList.contains('show'));
+    // reabrir nao carrega o CID do paciente anterior; Rio Paranaiba muda a cidade
+    await page.evaluate(() => { const r = document.querySelector('input[name=localReceita][value="rio"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    await page.check('input[name=atTipo][value="afastamento"]');
+    const reaberto = await texto();
+    const cidLimpo = (await page.inputValue('#atCid')) === '' && !(await page.isChecked('#atCidAutorizado'));
+    const ok = aberto && /Atesto, para os devidos fins, que Paciente Atestado esteve em atendimento médico/.test(t1) && /01 \(um\) dia/.test(t1)
+      && /03 \(três\) dias de afastamento de suas atividades, de 19\/10\/2026 a 21\/10\/2026\./.test(semAutorizacao) && !/J06\.9/.test(semAutorizacao)
+      && /CID-10: J06\.9\./.test(comCid) && /às 08:30/.test(comCid)
+      && /Atestado médico/.test(impresso) && /CID-10: J06\.9/.test(impresso) && /Paciente Atestado/.test(impresso) && /Carmo do Paranaíba, \d+ de /.test(impresso)
+      && /esteve nesta unidade para atendimento médico no dia 19\/10\/2026, das 07:10 às 09:00\./.test(comparecimento) && titulo === 'Declaração de comparecimento'
+      && /Fulana Acompanhante esteve nesta unidade no dia 19\/10\/2026, das 07:10 às 09:00, acompanhando Paciente Atestado/.test(acompanhante)
+      && fechou && cidLimpo && /^Atesto/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
+      && consoleErrors.length === 0;
+    record('atestado: afastamento (periodo, CID com autorizacao), comparecimento, acompanhante e impressao', ok,
+      JSON.stringify({ aberto, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Orientacoes: quebra de linha do texto e espaco de paragrafo (previa, impressao, copia, .docx) ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    const context = page.context();
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await selectCondicao(page, 'DRGE');   // tem orientacao com lista numerada em varias linhas
+    await page.waitForTimeout(200);
+    const lis = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .orientacoes-bloco li')]
+      .map((li) => ({ esp: li.classList.contains('espaco-antes'), mt: getComputedStyle(li).marginTop, h: li.getBoundingClientRect().height, ws: getComputedStyle(li).whiteSpace })));
+    const antes = await lis();
+    await page.evaluate(() => document.querySelectorAll('#receitaPaper .orientacoes-bloco li .par-item')[2].click());
+    await page.waitForTimeout(200);
+    const depois = await lis();
+    await page.click('#btnImprimir');
+    await page.waitForTimeout(400);
+    const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    await page.click('#btnCopiar');
+    await page.waitForTimeout(200);
+    const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btnDocx')]);
+    const fs = require('fs'); const os = require('os'); const path = require('path');
+    const arq = path.join(os.tmpdir(), 'orient-paragrafo.docx'); await dl.saveAs(arq);
+    const xml = require('child_process').execSync(`unzip -p ${arq} word/document.xml`).toString();
+    // desmarca de novo: volta ao normal
+    await page.evaluate(() => document.querySelectorAll('#receitaPaper .orientacoes-bloco li .par-item')[2].click());
+    await page.waitForTimeout(150);
+    const desfeito = await lis();
+    const ok = antes.every((l) => !l.esp && l.ws === 'pre-line') && depois[2].esp && depois[2].mt === '14px' && !depois[1].esp
+      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso)
+      && /\n\n- /.test(copiado.split('ORIENTAÇÕES')[1] || '')
+      && /<w:spacing w:before="200"\/>/.test(xml) && (xml.match(/<w:br\/>/g) || []).length >= 3
+      && !desfeito[2].esp && consoleErrors.length === 0;
+    record('orientacoes: quebra de linha e espaco de paragrafo (previa, impressao, copia, docx)', ok,
+      JSON.stringify({ antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

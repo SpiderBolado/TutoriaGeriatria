@@ -243,7 +243,7 @@
     });
     eff.orientacoes.forEach(o => {
       const id = 'cond:'+nome+':or:'+o.idx;
-      if(selectedOrient[id]) selectedOrient[id] = { texto: o.texto, origemCondicao: nome };
+      if(selectedOrient[id]) selectedOrient[id] = Object.assign({}, selectedOrient[id], { texto: o.texto, origemCondicao: nome });
     });
   }
 
@@ -837,7 +837,7 @@
     if(orientEntries.length){
       html += `<div class="orientacoes-bloco"><div class="via-titulo">Orientações</div><ul>`;
       orientEntries.forEach(([id, o]) => {
-        html += `<li>${escapeHtml(o.texto)} <button class="edit-item-btn" data-orient="${escapeHtml(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeHtml(id)}" title="Remover da receita">&times;</button></li>`;
+        html += `<li${o.espacoAntes ? ' class="espaco-antes"' : ''}>${escapeHtml(o.texto)} <button class="par-item" data-orient="${escapeHtml(id)}" aria-pressed="${o.espacoAntes ? 'true' : 'false'}" title="${o.espacoAntes ? 'Tirar o espaço antes desta orientação' : 'Dar um espaço (novo parágrafo) antes desta orientação'}">&para;</button><button class="edit-item-btn" data-orient="${escapeHtml(id)}" title="Editar item">&#x270E;</button><button class="rm-item" data-orient="${escapeHtml(id)}" title="Remover da receita">&times;</button></li>`;
       });
       html += `</ul></div>`;
     }
@@ -911,15 +911,16 @@ ${dataStr}`;
   }
 
   function imprimirEncaminhamento(){
-    const texto = el('encTexto').value;
-    const nomePaciente = el('encNomePaciente').value.trim();
+    imprimirDocumentoSimples('Encaminhamento', el('encTexto').value, el('encNomePaciente').value.trim());
+  }
+
+  // Folha simples com o cabeçalho do local (logos + paciente + data) e um texto
+  // corrido: usada pelo encaminhamento e pelo atestado.
+  function imprimirDocumentoSimples(titulo, texto, nomePaciente){
     const dataStr = new Date().toLocaleDateString('pt-BR');
-    const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '';
-    const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
-    const labelAssinatura = (medicoNome || medicoCrm) ? [medicoNome, medicoCrm].filter(Boolean).join(' — ') : 'Assinatura do médico';
 
     const corpoHtml = `
-      <div class="encaminhamento-titulo">Encaminhamento</div>
+      <div class="encaminhamento-titulo">${escapeHtml(titulo)}</div>
       <div class="encaminhamento-texto">${escapeHtml(texto)}</div>
     `;
 
@@ -957,7 +958,7 @@ ${dataStr}`;
       return;
     }
     printWindow.document.write(
-      '<html><head><title>Encaminhamento</title><meta charset="UTF-8">' +
+      '<html><head><title>' + escapeHtml(titulo) + '</title><meta charset="UTF-8">' +
       '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>'
     );
     printWindow.document.close();
@@ -965,8 +966,9 @@ ${dataStr}`;
     setTimeout(() => { printWindow.print(); }, 250);
   }
 
-  async function copiarEncaminhamento(){
-    const texto = el('encTexto').value;
+  function copiarEncaminhamento(){ return copiarTextoSimples(el('encTexto').value); }
+
+  async function copiarTextoSimples(texto){
     try{
       await navigator.clipboard.writeText(texto);
       showToast('Texto copiado');
@@ -981,6 +983,106 @@ ${dataStr}`;
       document.body.removeChild(ta);
       showToast('Texto copiado');
     }
+  }
+
+  // ---------- Atestado ----------
+  // Atestado de afastamento (dias) ou declaração de comparecimento/acompanhante.
+  // O CID só entra com autorização expressa do paciente (Resolução CFM 1.658/2002).
+  const UNIDADES_EXTENSO = ['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+  const DEZENAS_EXTENSO = ['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+  const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const TITULOS_ATESTADO = { afastamento: 'Atestado médico', comparecimento: 'Declaração de comparecimento', acompanhante: 'Declaração de acompanhante' };
+
+  function numeroPorExtenso(n){
+    if(n < 20) return UNIDADES_EXTENSO[n];
+    const d = Math.floor(n / 10), u = n % 10;
+    return DEZENAS_EXTENSO[d] + (u ? ' e ' + UNIDADES_EXTENSO[u] : '');
+  }
+  // "AAAA-MM-DD" do <input type=date> como data local (new Date("AAAA-MM-DD") seria UTC e voltaria um dia)
+  function dataDoCampo(v){
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || '');
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  const isoDia = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const horaAgora = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const dataBR = d => d ? d.toLocaleDateString('pt-BR') : '__/__/____';
+  const dataPorExtenso = d => `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+  // "às 08:30", mas "à 01:30" / "das 08:00", mas "da 01:00"
+  const horaCom = (prep, h) => (h && h.startsWith('01:') ? prep.replace(/s$/, '') : prep) + ' ' + (h || '__:__');
+
+  function cidadeDoLocal(){
+    const muni = municipioDoLocal(localAtual());
+    return muni ? muni.nome : 'Carmo do Paranaíba';
+  }
+  function tipoAtestado(){
+    const r = document.querySelector('input[name=atTipo]:checked');
+    return r ? r.value : 'afastamento';
+  }
+
+  function montarTextoAtestado(){
+    const tipo = tipoAtestado();
+    const nome = el('atNomePaciente').value.trim() || '(nome do paciente)';
+    const doc = el('atDocumento').value.trim();
+    const quem = doc ? `${nome}, documento ${doc},` : nome;
+    const data = dataDoCampo(el('atData').value);
+    const h1 = el('atHoraInicio').value, h2 = el('atHoraFim').value;
+    let corpo;
+    if(tipo === 'afastamento'){
+      const dias = Math.max(1, Math.min(99, parseInt(el('atDias').value, 10) || 1));
+      const inicio = dataDoCampo(el('atInicio').value) || data;
+      let periodo = '';
+      if(inicio){
+        const fim = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + dias - 1);
+        periodo = dias === 1 ? `, no dia ${dataBR(inicio)}` : `, de ${dataBR(inicio)} a ${dataBR(fim)}`;
+      }
+      const cid = el('atCid').value.trim();
+      const cidTxt = cid && el('atCidAutorizado').checked ? ` CID-10: ${cid}.` : '';
+      corpo = `Atesto, para os devidos fins, que ${quem} esteve em atendimento médico nesta unidade no dia ${dataBR(data)}, ${horaCom('às', el('atHora').value)}, e necessita de ${String(dias).padStart(2, '0')} (${numeroPorExtenso(dias)}) ${dias === 1 ? 'dia' : 'dias'} de afastamento de suas atividades${periodo}.${cidTxt}`;
+    } else if(tipo === 'comparecimento'){
+      corpo = `Declaro, para os devidos fins, que ${quem} esteve nesta unidade para atendimento médico no dia ${dataBR(data)}, ${horaCom('das', h1)} ${horaCom('às', h2)}.`;
+    } else {
+      const acomp = el('atAcompanhante').value.trim() || '(nome do acompanhante)';
+      corpo = `Declaro, para os devidos fins, que ${acomp} esteve nesta unidade no dia ${dataBR(data)}, ${horaCom('das', h1)} ${horaCom('às', h2)}, acompanhando ${quem} em atendimento médico.`;
+    }
+    const medicoNome = (el('medicoNome') && el('medicoNome').value.trim()) || '(nome do médico)';
+    const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
+    const assinatura = [medicoNome, medicoCrm].filter(Boolean).join(' — ');
+    return `${corpo}
+
+${cidadeDoLocal()}, ${dataPorExtenso(new Date())}.
+
+
+_________________________________
+${assinatura}`;
+  }
+
+  function atualizarPreviaAtestado(){
+    const tipo = tipoAtestado();
+    el('atestadoOverlay').dataset.tipo = tipo;
+    el('atTitulo').textContent = TITULOS_ATESTADO[tipo];
+    const dias = el('atDias').value;
+    document.querySelectorAll('.at-dias-rapidos button').forEach(b => b.setAttribute('aria-pressed', b.dataset.dias === dias ? 'true' : 'false'));
+    el('atTexto').value = montarTextoAtestado();
+  }
+
+  // Cada abertura começa do zero para o paciente atual: CID, documento e
+  // acompanhante não passam de um paciente para o outro.
+  function abrirAtestado(){
+    const hoje = isoDia(new Date()), agora = horaAgora();
+    el('atNomePaciente').value = el('nomePaciente').value.trim();
+    ['atDocumento', 'atAcompanhante', 'atCid', 'atHoraInicio'].forEach(id => { el(id).value = ''; });
+    el('atCidAutorizado').checked = false;
+    el('atData').value = hoje;
+    el('atInicio').value = hoje;
+    el('atHora').value = agora;
+    el('atHoraFim').value = agora;
+    el('atDias').value = '1';
+    atualizarPreviaAtestado();
+    el('atestadoOverlay').classList.add('show');
+  }
+
+  function imprimirAtestado(){
+    imprimirDocumentoSimples(TITULOS_ATESTADO[tipoAtestado()], el('atTexto').value, el('atNomePaciente').value.trim());
   }
 
   function viaBoxHtml(nomePaciente, dataStr, corpoHtml, label, extraClass){
@@ -1512,7 +1614,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
     if(orientacoes.length){
       out += `ORIENTAÇÕES\n`;
-      orientacoes.forEach(o => { out += `- ${o.texto}\n`; });
+      orientacoes.forEach(o => { out += `${o.espacoAntes ? '\n' : ''}- ${o.texto}\n`; });
     }
     return out;
   }
@@ -1589,7 +1691,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function coletarDadosReceita(){
     const peso = el('peso').value;
     const itens = Object.values(selected);
-    const orientacoes = Object.values(selectedOrient).map(o => o.texto);
+    const orientacoes = Object.values(selectedOrient).map(o => ({ texto: o.texto, espacoAntes: !!o.espacoAntes }));
 
     const viaOrder = [];
     const grupos = {};
@@ -1653,8 +1755,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         spacing: { before: 220, after: 60 },
         children: [ new TextRun({ text: 'ORIENTAÇÕES', bold: true, size: 20 }) ]
       }));
+      // cada linha do texto vira uma quebra de linha no mesmo item; espacoAntes abre um parágrafo
       dados.orientacoes.forEach(o => {
-        paras.push(new Paragraph({ bullet: { level: 0 }, children: [ new TextRun({ text: o, size: 20 }) ] }));
+        paras.push(new Paragraph({
+          bullet: { level: 0 },
+          ...(o.espacoAntes ? { spacing: { before: 200 } } : {}),
+          children: String(o.texto).split('\n').map((linha, i) => new TextRun({ text: linha, size: 20, ...(i ? { break: 1 } : {}) }))
+        }));
       });
     }
     return paras;
@@ -1989,6 +2096,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
   });
 
+  // Espaço de parágrafo antes de uma orientação (botão ¶ na prévia)
+  el('receitaPaper').addEventListener('click', (e) => {
+    const btn = e.target.closest('.par-item');
+    if(!btn || !selectedOrient[btn.dataset.orient]) return;
+    selectedOrient[btn.dataset.orient].espacoAntes = !selectedOrient[btn.dataset.orient].espacoAntes;
+    renderTudo();
+  });
+
   // Remoção de itens direto pelo papel da receita (delegação)
   el('receitaPaper').addEventListener('click', (e) => {
     const btn = e.target.closest('.rm-item');
@@ -2196,6 +2311,27 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   el('btnCopiarEncaminhamento').addEventListener('click', copiarEncaminhamento);
   el('btnImprimirEncaminhamento').addEventListener('click', imprimirEncaminhamento);
 
+  // Atestado
+  el('btnAtestado').addEventListener('click', abrirAtestado);
+  const closeAtestadoModal = () => el('atestadoOverlay').classList.remove('show');
+  el('btnFecharAtestado').addEventListener('click', closeAtestadoModal);
+  el('atestadoOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'atestadoOverlay') closeAtestadoModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && el('atestadoOverlay').classList.contains('show')) closeAtestadoModal();
+  });
+  ['atNomePaciente', 'atDocumento', 'atAcompanhante', 'atData', 'atHora', 'atHoraInicio', 'atHoraFim', 'atDias', 'atInicio', 'atCid']
+    .forEach(id => el(id).addEventListener('input', atualizarPreviaAtestado));
+  el('atCidAutorizado').addEventListener('change', atualizarPreviaAtestado);
+  document.querySelectorAll('input[name=atTipo]').forEach(r => r.addEventListener('change', atualizarPreviaAtestado));
+  document.querySelectorAll('.at-dias-rapidos button').forEach(b => b.addEventListener('click', () => {
+    el('atDias').value = b.dataset.dias;
+    atualizarPreviaAtestado();
+  }));
+  el('btnCopiarAtestado').addEventListener('click', () => copiarTextoSimples(el('atTexto').value));
+  el('btnImprimirAtestado').addEventListener('click', imprimirAtestado);
+
   el('medicoNome').addEventListener('change', saveMedico);
   el('medicoCrm').addEventListener('change', saveMedico);
   el('unidadeSaude').addEventListener('input', renderReceita);
@@ -2264,7 +2400,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .item-pos{margin:2px 0 0 ${s(24)}px;font-size:${s(12.5)}px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:${s(22)}px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
-      .orientacoes-bloco li{font-size:${s(12.5)}px;color:#4B5A55;margin-bottom:${s(6)}px;}
+      .orientacoes-bloco li{font-size:${s(12.5)}px;color:#4B5A55;margin-bottom:${s(6)}px;white-space:pre-line;}
+      .orientacoes-bloco li.espaco-antes{margin-top:${s(14)}px;}
       .continuacao-nota{font-size:${s(11)}px;font-style:italic;color:#4B5A55;margin-bottom:${s(8)}px;}
     `;
   }
@@ -2355,7 +2492,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         listaAberta = true;
       } else if(e.tipo === 'orientItem'){
         if(!listaAberta){ html += `<div class="orientacoes-bloco"><ul>`; listaAberta = true; }
-        html += `<li>${escapeHtml(e.o.texto)}</li>`;
+        html += `<li${e.o.espacoAntes ? ' class="espaco-antes"' : ''}>${escapeHtml(e.o.texto)}</li>`;
       }
     });
     if(listaAberta) html += `</ul></div>`;
@@ -2521,7 +2658,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .item-pos{margin:2px 0 0 24px;font-size:12.5px;color:#4B5A55;}
       .orientacoes-bloco{margin-top:22px;}
       .orientacoes-bloco ul{margin:8px 0 0 0;padding-left:18px;}
-      .orientacoes-bloco li{font-size:12.5px;color:#4B5A55;margin-bottom:6px;}
+      .orientacoes-bloco li{font-size:12.5px;color:#4B5A55;margin-bottom:6px;white-space:pre-line;}
+      .orientacoes-bloco li.espaco-antes{margin-top:14px;}
       .assinatura{margin-top:44px;padding-top:10px;text-align:center;font-size:12px;color:#4B5A55;}
       .assinatura .linha{width:260px;border-top:1px solid #16241F;margin:0 auto 6px auto;}
       /* Evita que a paginação nativa do navegador quebre um item ou bloco no
