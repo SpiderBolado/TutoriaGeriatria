@@ -681,7 +681,13 @@ async function run(url) {
     const acompanhante = await texto();
     await page.keyboard.press('Escape');
     const fechou = await page.evaluate(() => !document.getElementById('atestadoOverlay').classList.contains('show'));
-    // reabrir nao carrega o CID do paciente anterior; Rio Paranaiba muda a cidade
+    // mesmo paciente: o rascunho volta como estava
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    const rascunhoMantido = (await page.inputValue('#atAcompanhante')) === 'Fulana Acompanhante' && (await page.isChecked('input[name=atTipo][value="acompanhante"]'));
+    await page.keyboard.press('Escape');
+    // outro paciente: nao carrega o CID do anterior; Rio Paranaiba muda a cidade
+    await page.fill('#nomePaciente', 'Outro Paciente');
     await page.evaluate(() => { const r = document.querySelector('input[name=localReceita][value="rio"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
     await page.click('#btnAtestado');
     await page.waitForTimeout(150);
@@ -694,10 +700,10 @@ async function run(url) {
       && /Atestado médico/.test(impresso) && /CID-10: J06\.9/.test(impresso) && /Paciente Atestado/.test(impresso) && /Carmo do Paranaíba, \d+ de /.test(impresso)
       && /esteve nesta unidade para atendimento médico no dia 19\/10\/2026, das 07:10 às 09:00\./.test(comparecimento) && titulo === 'Declaração de comparecimento'
       && /Fulana Acompanhante esteve nesta unidade no dia 19\/10\/2026, das 07:10 às 09:00, acompanhando Paciente Atestado/.test(acompanhante)
-      && fechou && cidLimpo && /^Atesto/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
+      && fechou && rascunhoMantido && cidLimpo && /^Atesto/.test(reaberto) && /Outro Paciente/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
       && consoleErrors.length === 0;
     record('atestado: afastamento (periodo, CID com autorizacao), comparecimento, acompanhante e impressao', ok,
-      JSON.stringify({ aberto, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
+      JSON.stringify({ aberto, rascunhoMantido, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
     await browser.close();
   }
 
@@ -742,6 +748,119 @@ async function run(url) {
       && !desfeito[2].esp && consoleErrors.length === 0;
     record('orientacoes: quebra de linha e espaco de paragrafo (previa, impressao, copia, docx)', ok,
       JSON.stringify({ botoesNaImpressao, antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Clique fora nao apaga texto: janelas de edicao, encaminhamento (rascunho) e edicao na lista ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    page.on('dialog', (d) => d.dismiss());
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Rascunho');
+    await selectCondicao(page, 'Enxaqueca');
+    await page.waitForTimeout(200);
+    const cantoDoFundo = async (id) => { const b = await page.$(`#${id}`); const r = await b.boundingBox(); await page.mouse.click(r.x + 5, r.y + 5); await page.waitForTimeout(150); };
+    const aberta = (id) => page.evaluate((i) => document.getElementById(i).classList.contains('show'), id);
+
+    // 1) editar item da receita: clique no fundo nao fecha; Esc com alteracao pergunta (aqui: cancela)
+    await page.evaluate(() => document.querySelector('#receitaPaper .edit-item-btn[data-sel]').click());
+    await page.waitForTimeout(150);
+    await page.fill('#editItemPosologia', 'POSOLOGIA DIGITADA');
+    await cantoDoFundo('editItemOverlay');
+    const editAbertaAposClique = await aberta('editItemOverlay');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    const editAbertaAposEsc = await aberta('editItemOverlay');
+    const editTexto = await page.inputValue('#editItemPosologia');
+    await page.click('#btnCancelEditItem');
+
+    // 2) encaminhamento: clique no fundo nao fecha; fechar e reabrir mantem o texto; Recomecar gera de novo
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    await page.fill('#encTexto', 'TEXTO ESCRITO A MAO');
+    await cantoDoFundo('encaminhamentoOverlay');
+    const encAbertaAposClique = await aberta('encaminhamentoOverlay');
+    await page.click('#btnFecharEncaminhamento');
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    const encReaberto = await page.inputValue('#encTexto');
+    const recomecarVisivel = await page.isVisible('#btnRecomecarEncaminhamento');
+    await page.click('#btnRecomecarEncaminhamento');
+    const encRecomecado = await page.inputValue('#encTexto');
+    await page.fill('#encTexto', 'OUTRO RASCUNHO');
+    await page.click('#btnFecharEncaminhamento');
+    await page.click('#btnLimpar');
+    await page.fill('#nomePaciente', 'Paciente Rascunho');
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    const encAposNovaReceita = await page.inputValue('#encTexto');
+    await page.click('#btnFecharEncaminhamento');
+
+    // 3) edicao na lista: marcar outra condicao e mudar o peso redesenham a lista sem perder o que foi digitado
+    await page.fill('#search', 'Enxaqueca');
+    await page.waitForTimeout(250);
+    await page.evaluate(() => {
+      const card = [...document.querySelectorAll('#listaContainer .card')].find((c) => c.querySelector('.card-head .nome')?.textContent.trim() === 'Enxaqueca');
+      card.querySelector('.card-head').click();
+    });
+    await page.waitForTimeout(150);
+    await page.evaluate(() => document.querySelector('#listaContainer .sub-row .ef-edit').click());
+    await page.waitForTimeout(150);
+    await page.fill('#listaContainer .edit-form .ef-pos', 'EDICAO NA LISTA');
+    await page.fill('#peso', '30');
+    await page.waitForTimeout(600);
+    await page.evaluate(() => document.querySelector('#listaContainer .sub-row input[type=checkbox]').click());
+    await page.waitForTimeout(250);
+    const lista = await page.evaluate(() => document.querySelector('#listaContainer .edit-form .ef-pos')?.value || '(sem formulario)');
+    await page.click('#listaContainer .edit-form .ef-cancel');
+    await page.waitForTimeout(150);
+    const semFormulario = await page.evaluate(() => !document.querySelector('#listaContainer .edit-form'));
+
+    const ok = editAbertaAposClique && editAbertaAposEsc && editTexto === 'POSOLOGIA DIGITADA'
+      && encAbertaAposClique && encReaberto === 'TEXTO ESCRITO A MAO' && recomecarVisivel && /^Encaminho Paciente Rascunho/.test(encRecomecado)
+      && /^Encaminho Paciente Rascunho/.test(encAposNovaReceita)
+      && lista === 'EDICAO NA LISTA' && semFormulario
+      && consoleErrors.length === 0;
+    record('clique fora nao apaga texto (edicao de item, encaminhamento com rascunho, edicao na lista)', ok,
+      JSON.stringify({ editAbertaAposClique, editAbertaAposEsc, editTexto, encAbertaAposClique, encReaberto, recomecarVisivel, encRecomecado: encRecomecado.slice(0, 40), encAposNovaReceita: encAposNovaReceita.slice(0, 40), lista, semFormulario, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Mesmo paciente: limpa so a receita e mantem nome, idade e peso; Nova receita limpa tudo ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const estado = () => page.evaluate(() => ({
+      nome: document.getElementById('nomePaciente').value, idade: document.getElementById('idade').value, peso: document.getElementById('peso').value,
+      itens: document.querySelectorAll('#receitaPaper .nome-med').length, orient: document.querySelectorAll('#receitaPaper .orientacoes-bloco li').length
+    }));
+    await page.fill('#nomePaciente', 'Maria Mesmo Paciente');
+    await page.fill('#idade', '40');
+    await page.fill('#peso', '62');
+    await selectCondicao(page, 'ITU');
+    await page.waitForTimeout(200);
+    const antes = await estado();
+    await page.click('#btnMesmoPaciente');
+    await page.waitForTimeout(200);
+    const mesmo = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.keyboard.press('Control+Shift+Enter');
+    await page.waitForTimeout(200);
+    const atalho = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+    const nova = await estado();
+    const ok = antes.itens > 0 && antes.orient > 0
+      && mesmo.nome === 'Maria Mesmo Paciente' && mesmo.idade === '40' && mesmo.peso === '62' && mesmo.itens === 0 && mesmo.orient === 0
+      && atalho.nome === 'Maria Mesmo Paciente' && atalho.itens === 0
+      && nova.nome === '' && nova.idade === '' && nova.peso === '' && nova.itens === 0
+      && consoleErrors.length === 0;
+    record('mesmo paciente mantem nome/idade/peso; nova receita limpa tudo', ok, JSON.stringify({ antes, mesmo, atalho, nova, consoleErrors }));
     await browser.close();
   }
 

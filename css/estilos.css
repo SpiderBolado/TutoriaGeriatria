@@ -1015,6 +1015,8 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   margin-top:4px;padding-top:14px;border-top:1px solid var(--line);
 }
 .enc-texto{min-height:220px;line-height:1.55;}
+.modal-actions .btn-recomecar{margin-right:auto;}
+.modal-actions .btn[hidden]{display:none;}
 
 /* ---------- Atestado ---------- */
 .at-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
