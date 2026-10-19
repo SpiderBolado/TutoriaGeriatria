@@ -103,7 +103,8 @@ assert.strictEqual(regraPara(Object.assign(item('Dipirona 500mg'), { convertidoP
 assert.strictEqual(regraPara(item('Dipirona 500 mg/mL')), null);
 // dextrometorfano em xarope é removido mesmo sendo líquido (incluiLiquidos)
 assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 48).acao, 'remover');
-assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 96), null);
+assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 96).acao, 'remover');   // 6 a 12 anos: a dose de adulto é o dobro
+assert.strictEqual(regraPara(item('Dextrometorfano 15mg/5mL (Xarope)'), 156), null);
 // colírio, pomada e injetável não viram gotas/xarope (nem geram aviso de "sem regra")
 assert.strictEqual(regraPara(item('Prednisolona 1% - Colírio', 'x', { via: 'Oftálmico' })), null);
 assert.strictEqual(regraPara(item('Dipirona 1g/2mL', 'x', { via: 'Intramuscular' })), null);

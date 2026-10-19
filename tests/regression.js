@@ -626,7 +626,10 @@ async function run(url) {
     await page.goto(url);
     await page.evaluate(() => {
       localStorage.removeItem('overrides-catalogo');
-      localStorage.setItem('overrides-condicoes', JSON.stringify({ Vertigem: { meds: { 0: { removido: true }, 1: { posologia: 'CINARIZINA EDITADA' } }, orientacoes: {} } }));
+      localStorage.setItem('overrides-condicoes', JSON.stringify({
+        Vertigem: { meds: { 0: { removido: true }, 1: { posologia: 'CINARIZINA EDITADA' } }, orientacoes: {} },
+        TCE: { meds: { 0: { posologia: 'DIPIRONA EDITADA' }, 1: { posologia: 'MECLIN EDITADO' } }, orientacoes: {} }
+      }));
     });
     const ler = async () => {
       await page.reload();
@@ -640,10 +643,12 @@ async function run(url) {
     const r2 = await ler();   // segunda carga nao pode deslocar de novo
     const versao = await page.evaluate(() => localStorage.getItem('overrides-catalogo'));
     const salvo = await page.evaluate(() => JSON.parse(localStorage.getItem('overrides-condicoes')).Vertigem.meds);
+    const salvoTce = await page.evaluate(() => JSON.parse(localStorage.getItem('overrides-condicoes')).TCE.meds);
     const ok = /CINARIZINA EDITADA/.test(r1) && /Domperidona/.test(r1) && r1 === r2
-      && versao === '2' && JSON.stringify(salvo) === JSON.stringify({ 0: { posologia: 'CINARIZINA EDITADA' } })
+      && versao === '3' && JSON.stringify(salvo) === JSON.stringify({ 0: { posologia: 'CINARIZINA EDITADA' } })
+      && JSON.stringify(salvoTce) === JSON.stringify({ 0: { posologia: 'DIPIRONA EDITADA' } })
       && consoleErrors.length === 0;
-    record('edicoes salvas acompanham a remocao do Meclin na Vertigem', ok, JSON.stringify({ r1: r1.slice(0, 300), iguais: r1 === r2, versao, salvo, consoleErrors }));
+    record('edicoes salvas acompanham a remocao do Meclin (Vertigem e TCE)', ok, JSON.stringify({ r1: r1.slice(0, 300), iguais: r1 === r2, versao, salvo, salvoTce, consoleErrors }));
     await browser.close();
   }
 

@@ -58,10 +58,10 @@
       aviso: '50 mg/kg/dia de 6/6 h (otite pode pedir dose maior). Frasco de 100 mL: confira a quantidade.',
       fonte: 'Bula: 25–50 mg/kg/dia; teto 500 mg/dose.' },
     { match: /^sulfametoxazol\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 8,
-      por: { nome: 'Sulfametoxazol + Trimetoprima 40+8mg/mL', qtde: '01 Frasco', via: 'Oral', fator: 0.375, max: 20, idadeMinMeses: 2,
+      por: { nome: 'Sulfametoxazol + Trimetoprima 40+8mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.375, max: 20, idadeMinMeses: 2,
         posologiaBase: 'Tomar DOSE mL, de 12/12 horas, {duracao}.' },
       duracaoPadrao: 'por 07 dias',
-      aviso: 'mg calculados como trimetoprima (6 mg/kg/dia). Na ITU, considere 0,5 mL/kg. Evitar na deficiência de G6PD.',
+      aviso: 'mg calculados como trimetoprima (6 mg/kg/dia). Na ITU, considere 0,5 mL/kg. Evitar na deficiência de G6PD. Frasco de 100 mL: confira a quantidade.',
       fonte: 'Bula BR (TMP 6 mg/kg/dia de 12/12 h); teto = 800/160 mg.' },
     { match: /^prednis(on|olon)a\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 3,
       por: { nome: 'Prednisolona 3mg/mL', qtde: '01 Frasco', via: 'Oral', fator: 0.3, max: 13,
@@ -108,7 +108,7 @@
       [/^cinarizina\b/, 144, 'Cinarizina: removida — de uso adulto; considere ondansetrona se náusea.'],
       [/^domperidona\b/, 144, 'Domperidona: removida — não usar em menores de 12 anos ou abaixo de 35 kg; considere ondansetrona.'],
       [/^bromoprida\b/, 144, 'Bromoprida: removida — sem posologia pediátrica para o comprimido; considere ondansetrona.'],
-      [/^dextrometorfano\b/, 72, 'Dextrometorfano: removido — antitussígeno não indicado em crianças pequenas; prefira lavagem nasal e mel (> 1 ano).', true],
+      [/^dextrometorfano\b/, 144, 'Dextrometorfano: removido — não indicado em crianças pequenas, e a dose de adulto (10 mL) é o dobro da de 6 a 12 anos (bula: 05 mL de 6/6 a 8/8 horas); se for manter (≥ 6 anos), prescreva à parte com a dose da idade. Prefira lavagem nasal e mel (> 1 ano).', true],
       [/^clonazepam\b/, 216, 'Clonazepam: removido — segurança não estabelecida em menores de 18 anos.'],
       [/^fluoxetina\b/, 144, 'Fluoxetina: removida — exige avaliação especializada em criança.'],
       [/^colchicina\b/, 216, 'Colchicina: removida — sem uso pediátrico pertinente nesta condição.'],
@@ -128,7 +128,7 @@
       [/^naproxeno\b/, 144, 'Naproxeno: abaixo de 12 anos, prefira o ibuprofeno em gotas.'],
       [/^acido mefenamico\b/, 168, 'Ácido mefenâmico: contraindicado em menores de 14 anos.'],
       [/^acido tranexamico\b/, 144, 'Ácido tranexâmico: só após a menarca.'],
-      [/^diclofenaco\b/, 168, 'Diclofenaco gel: não recomendado em menores de 14 anos.'],
+      [/^diclofenaco\b/, 168, 'Diclofenaco: comprimido contraindicado e gel não recomendado em menores de 14 anos (bula); para dor, prefira o ibuprofeno em gotas.'],
       [/^flurbiprofeno\b/, 144, 'Flurbiprofeno pastilha: não indicado em menores de 12 anos.'],
       [/^flogoral\b/, 72, 'Flogoral pastilha: contraindicado em menores de 6 anos (risco de engasgo).'],
       [/^sumatriptano\b/, 144, 'Sumatriptano: retirar abaixo de 12 anos.'],
@@ -140,7 +140,9 @@
       [/^ivermectina\b/, 60, 'Ivermectina: contraindicada abaixo de 15 kg ou de 5 anos; considere permetrina.'],
       [/^terbinafina\b/, 144, 'Terbinafina em criança é por peso: < 20 kg 62,5 mg; 20–40 kg 125 mg; > 40 kg 250 mg.'],
       [/^fluconazol\b/, 144, 'Fluconazol em criança: 6 mg/kg no 1º dia e 3 mg/kg/dia depois (a partir de 6 meses); na candidíase oral, prefira nistatina.'],
-      [/^aciclovir\b/, 144, 'Aciclovir em criança depende da indicação (varicela: 20 mg/kg/dose 4x/dia, máx. 800 mg/dose, a partir de 2 anos) — ajustar manualmente.'],
+      [/^nistatina\b.*(suspens|100\.?000)/, 144, 'Nistatina suspensão em criança (bula): lactentes 01 a 02 mL (prematuros e baixo peso 01 mL), 04 vezes ao dia, metade de cada lado da boca, sem bochecho; crianças maiores 01 a 06 mL. A posologia de adulto (bochechar 05 mL) precisa ser ajustada.'],
+      [/^aciclovir\b(?!.*(pomada|creme|%|0\.05))/, 144, 'Aciclovir em criança depende da indicação (varicela: 20 mg/kg/dose 4x/dia, máx. 800 mg/dose, a partir de 2 anos) — ajustar manualmente.'],
+      [/^oseltamivir\b/, 144, 'Oseltamivir em criança é por peso, de 12/12 horas por 05 dias: até 15 kg 30 mg; > 15 a 23 kg 45 mg; > 23 a 40 kg 60 mg; > 40 kg 75 mg. Abaixo de 1 ano: 3 mg/kg por dose (9 a 11 meses: 3,5 mg/kg).'],
       [/^sulfadiazina\b/, 2, 'Sulfadiazina de prata: contraindicada nos primeiros 2 meses de vida.'],
       [/^olopatadina\b/, 36, 'Olopatadina colírio: a partir de 3 anos.', true],
       [/^ciclopentolato\b/, 144, 'Ciclopentolato: cautela em lactentes e crianças pequenas.'],
@@ -164,7 +166,7 @@
     // mesmo princípio ativo não viram gotas/xarope
     const oral = ehOral(it);
     const regra = REGRAS.find(r => r.match.test(n) && !(r.exceto && r.exceto.test(n))
-      && (r.acao !== 'substituir' || (oral && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
+      && (r.acao !== 'substituir' || (oral && !itemPorPeso(it) && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
     if(!regra) return null;
     if(regra.idadeLimiteMeses && typeof idadeMeses === 'number' && idadeMeses >= regra.idadeLimiteMeses) return null;
     return regra;
