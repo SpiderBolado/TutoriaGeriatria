@@ -442,7 +442,7 @@ const DATA = {
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
+          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
           "via": "Oral",
           "fator": 0.6,
           "max": 40,
@@ -463,7 +463,7 @@ const DATA = {
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (Temperatura axilar maior ou igual a 37,8ºC)",
+          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
           "via": "Oral",
           "fator": 0.6,
           "max": 40,
@@ -1832,7 +1832,7 @@ const DATA = {
       "orientacoes": [
         "Manter dieta rica em laticínios.",
         "Realizar acompanhamento laboratorial (Cálcio iônico) em 07 dias.",
-        "Considerar checar magnésio sérico — hipomagnesemia é causa comum de hipocalcemia que não responde à reposição de cálcio isolada.",
+        "Realizar também a dosagem de magnésio no sangue, junto com o exame de cálcio.",
         "Procure atendimento de urgência IMEDIATAMENTE se surgir formigamento ao redor da boca, cãibras ou espasmos musculares importantes (tetania), convulsão, ou palpitações — sinais de hipocalcemia grave."
       ]
     },
@@ -1841,14 +1841,14 @@ const DATA = {
         {
           "nome": "Ibuprofeno 600 mg",
           "qtde": "15 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, iniciando 01 dia antes do ciclo, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias, iniciando 01 dia antes da data prevista da menstruação (ou logo no início da dor).",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Buscopan composto",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor abdominal intensa.",
+          "posologia": "Tomar 01 comprimido, de 08/08 horas, se dor abdominal intensa. O Buscopan Composto já contém dipirona: não tomar no mesmo horário que a Dipirona.",
           "via": "Oral",
           "fator": null
         },
@@ -1862,7 +1862,8 @@ const DATA = {
       ],
       "orientacoes": [
         "Aplicar compressas quentes na região pélvica.",
-        "Buscar avaliação ginecológica para estudo da causa (ex: Endometriose, miomas)."
+        "Buscar avaliação ginecológica para estudo da causa (ex: Endometriose, miomas).",
+        "Procure atendimento imediatamente se: dor muito forte que não melhora com os remédios, febre, sangramento muito intenso, tontura ou desmaio, ou se houver atraso menstrual ou chance de gravidez."
       ]
     },
     "Colite Inespecífica": {
@@ -1892,7 +1893,7 @@ const DATA = {
       "orientacoes": [
         "Manter dieta leve, evitando laticínios e alimentos gordurosos.",
         "Procurar atendimento médico se febre, sangramento retal ou dor intensa e progressiva.",
-        "Manter boa hidratação oral — diarreia predispõe a desidratação, especialmente em idosos."
+        "Manter boa hidratação oral — a diarreia predispõe à desidratação, especialmente em idosos."
       ]
     },
     "Alopecia Areata": {
@@ -1900,7 +1901,7 @@ const DATA = {
         {
           "nome": "Valerato de Betametasona 1mg/g Pomada",
           "qtde": "01 Tubo",
-          "posologia": "Aplicar fina camada, sobre a placa de alopecia, de 12/12 horas, por 30 dias.",
+          "posologia": "Aplicar fina camada sobre as falhas (áreas sem cabelo), de 12/12 horas, por 30 dias.",
           "via": "Tópico",
           "fator": null
         }
@@ -1922,7 +1923,7 @@ const DATA = {
         {
           "nome": "Ciclopentolato 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota no olho acometido, 02 a 03 vezes ao dia (ajustar conforme gravidade/dor), por 05 dias — esquema definitivo deve ser ajustado pelo oftalmologista no encaminhamento.",
+          "posologia": "Aplicar 01 gota no olho acometido, 02 a 03 vezes ao dia, por 05 dias ou conforme orientação do oftalmologista. A pupila fica dilatada e a visão embaçada: não dirigir durante o uso.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -1935,7 +1936,7 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Encaminhamento **IMEDIATO** para avaliação oftalmológica especializada (acompanhamento de PIO).",
+        "Encaminhamento IMEDIATO para avaliação oftalmológica especializada (inclusive para medir e acompanhar a pressão do olho).",
         "Usar óculos escuros — a fotofobia costuma ser importante.",
         "Não usar lentes de contato durante o tratamento.",
         "Não interromper o colírio de corticoide abruptamente por conta própria — o desmame deve ser orientado pelo oftalmologista.",
@@ -2034,13 +2035,13 @@ const DATA = {
         {
           "nome": "Flurbiprofeno 8,75mg",
           "qtde": "01 Caixa",
-          "posologia": "Consumir 01 pastilha, de 08/08 horas, se dor na garganta.",
+          "posologia": "Dissolver lentamente na boca 01 pastilha, de 08/08 horas, se dor na garganta, por no máximo 03 dias.",
           "via": "Oral",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Evitar exercícios físicos por 03 a 04 semanas (risco de ruptura esplênica).",
+        "Evitar exercícios físicos por 03 a 04 semanas (risco de rompimento do baço).",
         "Manter repouso relativo e hidratação adequada.",
         "Procure atendimento de urgência IMEDIATAMENTE se dificuldade para respirar ou para engolir a saliva, dor forte no lado esquerdo da barriga (abaixo das costelas) ou no ombro esquerdo, tontura ou desmaio, ou pele/olhos amarelados.",
         "Evitar amoxicilina ou ampicilina durante a doença (podem causar manchas na pele e não tratam a mononucleose, que é causada por vírus)."
@@ -2064,14 +2065,14 @@ const DATA = {
         },
         {
           "nome": "Meias de Compressão Graduada",
-          "qtde": "01 Unidade",
+          "qtde": "01 Par",
           "posologia": "Utilizar durante o dia.",
           "via": "Externo",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Manter a perna elevada ao máximo.",
+        "Ao ficar sentado ou deitado, manter a perna elevada. Continuar caminhando normalmente durante o dia e evitar ficar muito tempo parado.",
         "Encaminhamento para Angiologia/Cirurgia Vascular.",
         "Solicitado USG Doppler venoso do membro acometido, para avaliar a extensão do trombo e descartar trombose venosa profunda. Trombo com 5 cm ou mais e a mais de 3 cm da junção safeno-femoral/safeno-poplítea: considerar fondaparinux 2,5mg SC 1x/dia (ou heparina de baixo peso molecular em dose profilática) por 45 dias. Trombo a 3 cm ou menos da junção, ou TVP associada: anticoagulação em dose plena (tratar como TVP).",
         "Procure atendimento de urgência IMEDIATAMENTE se surgir inchaço de toda a perna, dor forte na panturrilha, vermelhidão subindo em direção à virilha, falta de ar súbita, dor no peito ou tosse com sangue — podem ser sinais de trombose venosa profunda ou embolia pulmonar."
@@ -2095,7 +2096,7 @@ const DATA = {
         },
         {
           "nome": "Meias de Compressão Graduada",
-          "qtde": "01 Unidade",
+          "qtde": "01 Par",
           "posologia": "Utilizar durante o dia.",
           "via": "Externo",
           "fator": null
@@ -2147,27 +2148,27 @@ const DATA = {
         {
           "nome": "Aciclovir 400mg",
           "qtde": "70 Comprimidos",
-          "posologia": "Reservar para suspeita de Síndrome de Ramsay Hunt (vesículas/otalgia associadas) — uso rotineiro em Paralisia de Bell idiopática típica tem benefício incerto pela evidência atual. Se indicado: Tomar 02 comprimidos (800mg), de 4/4 horas (5 vezes ao dia, respeitando o intervalo noturno), por 07 dias.",
+          "posologia": "Tomar 02 comprimidos (800mg), de 04/04 horas, 05 vezes ao dia (sem a dose da madrugada), por 07 dias.",
           "via": "Oral",
           "fator": null
         },
         {
           "nome": "Lacrifilm",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, de 04/04 horas, para proteção da córnea (olho pode não fechar completamente).",
-          "via": "Tópico",
+          "posologia": "Aplicar 01 gota no olho do lado paralisado, de 04/04 horas, para proteger a córnea (o olho pode não fechar completamente).",
+          "via": "Oftálmico",
           "fator": null
         },
         {
           "nome": "Pomada Lubrificante Oftálmica",
           "qtde": "01 Bisnaga",
-          "posologia": "Aplicar à noite, ao deitar, se lagoftalmo/olho seco (não fechar bem o olho durante o sono).",
+          "posologia": "Aplicar no olho do lado paralisado, à noite, ao deitar, se o olho não fechar bem durante o sono ou ficar seco.",
           "via": "Oftálmico",
           "fator": null
         }
       ],
       "orientacoes": [
-        "Atenção: se houver fraqueza também em braço/perna, dificuldade de fala, ou a testa NÃO for afetada (só a parte inferior do rosto), suspeitar de AVC — encaminhar para emergência com urgência, não é Paralisia de Bell típica.",
+        "Procure a emergência IMEDIATAMENTE (SAMU 192) se surgir fraqueza ou dormência em braço ou perna, dificuldade para falar ou para entender, confusão, tontura forte ou dor de cabeça intensa, porque podem ser sinais de AVC. Procure atendimento também se o olho do lado paralisado ficar vermelho, dolorido ou com a visão embaçada.",
         "Proteger o olho (óculos escuros durante o dia, tampão ou óculos de natação à noite) — risco de lesão de córnea se o olho não fechar bem.",
         "Iniciar fisioterapia facial precoce.",
         "A maioria recupera em semanas a poucos meses; buscar reavaliação se não houver início de melhora em 3 semanas."
@@ -2178,7 +2179,7 @@ const DATA = {
         {
           "nome": "Clonazepam 0,5mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, sublingual, somente se crise de ansiedade intensa e isolada.",
+          "posologia": "Colocar 01 comprimido sob a língua, somente se crise de pânico ou de ansiedade intensa.",
           "via": "Sublingual",
           "fator": null
         },
@@ -2231,9 +2232,9 @@ const DATA = {
       ],
       "orientacoes": [
         "Manter dieta pastosa ou líquida se dor à mastigação.",
-        "Encaminhar para avaliação de imagem (RX/TC de face) e cirurgia buco-maxilo-facial se suspeita de fratura, deformidade, má oclusão dentária ou os sinais de alarme abaixo.",
-        "Se paciente em uso de anticoagulante ou antiagregante (varfarina, DOAC, AAS, clopidogrel), encaminhar para avaliação de imagem (TC de crânio) mesmo em trauma leve, pelo risco de hematoma intracraniano.",
-        "Se houver ferimento associado, avaliar/atualizar profilaxia antitetânica.",
+        "Se notar deformidade no rosto ou que os dentes não encaixam como antes ao fechar a boca, procure atendimento: pode ser fratura, que precisa de exame de imagem (raio-X ou tomografia da face) e de avaliação com cirurgião bucomaxilofacial.",
+        "Se você usa remédio que afina o sangue (varfarina, rivaroxabana, apixabana, dabigatrana, AAS ou clopidogrel), avise o médico antes de ir embora: mesmo em pancada leve no rosto ou na cabeça pode ser necessária tomografia da cabeça, pelo risco de sangramento dentro do crânio.",
+        "Se houver ferimento, confira sua vacina antitetânica; se não estiver em dia, procure a sala de vacinação da Unidade de Saúde.",
         "Retornar imediatamente se: visão dupla, perda ou piora da visão, olho \"saltado\" ou dor forte no olho, dor intensa, sangramento nasal/oral persistente, saída de líquido claro pelo nariz, dormência de face, sonolência, vômitos ou confusão."
       ]
     },
@@ -2285,8 +2286,8 @@ const DATA = {
         },
         {
           "nome": "Amoxicilina + Clavulanato 875/125 mg",
-          "qtde": "20 Comprimidos",
-          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 10 dias.",
+          "qtde": "10 Comprimidos",
+          "posologia": "Tomar 01 comprimido, de 12/12 horas, por 05 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2305,7 +2306,8 @@ const DATA = {
         "É essencial comparecer a TODAS as doses da vacina nas datas marcadas (geralmente dias 0, 3, 7 e 14) — faltar ou atrasar uma dose compromete a proteção.",
         "Se possível, observe o animal agressor (cão ou gato) por 10 dias: se ele permanecer saudável nesse período, pode ser possível interromper o esquema vacinal conforme orientação médica; animais selvagens (morcegos, macacos) ou que não podem ser observados são sempre considerados de alto risco.",
         "Procure atendimento imediato se o ferimento apresentar sinais de infecção (vermelhidão, pus, febre).",
-        "Não existe tratamento para a raiva depois que os sintomas começam — por isso é fundamental não interromper o esquema preventivo."
+        "Não existe tratamento para a raiva depois que os sintomas começam — por isso é fundamental não interromper o esquema preventivo.",
+        "Se o cão ou gato agressor adoecer, morrer, desaparecer ou mudar de comportamento durante os 10 dias de observação, procure a Unidade de Saúde imediatamente: o tratamento precisa ser iniciado ou completado."
       ]
     },
     "Pós-Extração Dentária": {
@@ -2335,7 +2337,8 @@ const DATA = {
       "orientacoes": [
         "Aplicar gelo na região da bochecha (face) nas primeiras 24 horas.",
         "Evitar bochechos nas primeiras 24 horas.",
-        "Evitar fumar, usar canudo ou cuspir com força nas primeiras 48-72h — risco de alveolite seca."
+        "Evitar fumar, usar canudo ou cuspir com força nas primeiras 48-72h — risco de alveolite seca.",
+        "Se sangrar: morder com firmeza uma gaze dobrada sobre o local por 30 minutos, sem ficar trocando. Procure atendimento se o sangramento não parar, ou se houver febre, pus, inchaço que aumenta depois do 3º dia, dificuldade para abrir a boca, para engolir ou para respirar."
       ]
     },
     "Disfunção Temporomandibular": {
@@ -2350,7 +2353,7 @@ const DATA = {
         {
           "nome": "Ciclobenzaprina 10mg",
           "qtde": "05 Comprimidos",
-          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
+          "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias. Pode causar sonolência e boca seca: não dirigir e não ingerir bebida alcoólica.",
           "via": "Oral",
           "fator": null
         }
@@ -2380,7 +2383,7 @@ const DATA = {
         {
           "nome": "Ciclopentolato 1% - Colírio",
           "qtde": "01 Frasco",
-          "posologia": "Aplicar 01 gota, 01 vez ao dia, ao deitar (se dor intensa). Suspender e procurar atendimento se dor ocular intensa, halos visuais ou embaçamento súbito após o uso.",
+          "posologia": "Aplicar 01 gota em cada olho afetado, 01 vez ao dia, ao deitar, se dor forte. A visão pode ficar embaçada até o dia seguinte: não dirigir. Se, após o uso, a dor no olho piorar muito, com visão embaçada, halos ao redor das luzes, dor de cabeça ou vômitos, suspender e procurar atendimento imediatamente.",
           "via": "Oftálmico",
           "fator": null
         }
@@ -2462,7 +2465,7 @@ const DATA = {
       "orientacoes": [
         "Manter higiene local rigorosa.",
         "Retornar se dor intensa, febre ou aumento do volume.",
-        "Se houver flutuação (coleção de pus), a drenagem é o tratamento principal — antibiótico isolado pode não ser suficiente."
+        "Se a lesão amolecer e formar uma bolsa de pus, retorne à Unidade de Saúde: pode ser preciso drenar (abrir) o abscesso, e só o antibiótico pode não resolver. Não esprema nem fure a lesão em casa."
       ]
     },
     "Exposição a Agente Químico (Pele/Olho)": {
@@ -2492,8 +2495,8 @@ const DATA = {
       "meds": [
         {
           "nome": "Metoclopramida 10mg",
-          "qtde": "30 Comprimidos",
-          "posologia": "Tomar 01 comprimido, 30 minutos antes das refeições, de 08/08 horas.",
+          "qtde": "15 Comprimidos",
+          "posologia": "Tomar 01 comprimido, 30 minutos antes das refeições, de 08/08 horas, por no máximo 05 dias. Se surgirem movimentos involuntários (rigidez no pescoço, olhos virados para cima, tremores), suspender e procurar atendimento.",
           "via": "Oral",
           "fator": null
         },
@@ -2533,7 +2536,7 @@ const DATA = {
         {
           "nome": "Azitromicina 500mg",
           "qtde": "03 Comprimidos",
-          "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 03 dias. Pode ser usada sozinha (se suspeita de germe atípico — início mais arrastado, tosse seca, sem toxemia importante) ou junto com um dos esquemas de Amoxicilina acima, conforme avaliação clínica.",
+          "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 03 dias.",
           "via": "Oral",
           "fator": null
         },
@@ -2574,16 +2577,16 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração difícil ou muito acelerada\n2. Lábios ou pontas dos dedos ficando arroxeados ou azulados\n3. Muita confusão, sonolência forte ou desmaio\n4. Febre alta que não passa mesmo com o remédio certo, ou você perceber que está piorando de modo geral",
-        "Volte na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando, para ver como está evoluindo e cuidar de outras questões de saúde que você tenha."
+        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração difícil ou muito acelerada\n2. Lábios ou pontas dos dedos ficando arroxeados ou azulados\n3. Muita confusão, sonolência forte ou desmaio\n4. Febre que continua depois de 48 a 72 horas de antibiótico, ou se você perceber que está piorando de modo geral\n5. Vômitos que impedem tomar o antibiótico ou beber líquidos",
+        "Volte à Unidade Básica de Saúde em 02 a 03 dias para reavaliação, mesmo se estiver melhorando, para ver como está evoluindo e cuidar de outras questões de saúde que você tenha."
       ]
     },
     "Pneumonia (Criança)": {
       "meds": [
         {
           "nome": "Amoxicilina 50mg/mL",
-          "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE mL, de 08/08 horas, por 07 a 10 dias.",
+          "qtde": "02 Frascos",
+          "posologia": "Tomar DOSE mL, de 08/08 horas, por 07 dias.",
           "via": "Oral",
           "fator": 0.33,
           "max": 20,
@@ -2592,7 +2595,7 @@ const DATA = {
         {
           "nome": "Azitromicina 40mg/mL - 1º dia",
           "qtde": "01 Frasco",
-          "posologia": "Alternativa se suspeita de germe atípico (criança escolar, início insidioso, tosse seca arrastada, sem toxemia) — não usar junto com a Amoxicilina. Tomar DOSE mL, 01 vez, no 1º dia.",
+          "posologia": "Tomar DOSE mL, 01 vez, no 1º dia.",
           "via": "Oral",
           "fator": 0.25,
           "max": 12,
@@ -2600,7 +2603,7 @@ const DATA = {
         },
         {
           "nome": "Azitromicina 40mg/mL - 2º ao 5º dia",
-          "qtde": "01 Frasco",
+          "qtde": "(mesmo frasco)",
           "posologia": "Continuação do esquema acima. Tomar DOSE mL, 01 vez ao dia, do 2º ao 5º dia.",
           "via": "Oral",
           "fator": 0.125,
@@ -2610,7 +2613,7 @@ const DATA = {
         {
           "nome": "Dipirona 500 mg/mL",
           "qtde": "01 Frasco",
-          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8ºC).",
+          "posologia": "Tomar DOSE gotas, de 06/06 horas, se dor ou febre (temperatura axilar maior ou igual a 37,8 °C).",
           "via": "Oral",
           "fator": 0.6,
           "max": 40,
@@ -2631,7 +2634,7 @@ const DATA = {
           "posologia": "Dar DOSE gotas, de 08/08 horas, se dor ou febre, por no máximo 05 dias.",
           "via": "Oral",
           "fator": 0.5,
-          "max": 20,
+          "max": 10,
           "idadeMinMeses": 6
         },
         {
@@ -2646,7 +2649,7 @@ const DATA = {
         {
           "nome": "Ondansetrona 4mg (Comprimido)",
           "qtde": "06 Comprimidos",
-          "posologia": "Tomar DOSE, se náuseas ou vômitos importantes, até de 08/08 horas.",
+          "posologia": "Tomar DOSE, se náuseas ou vômitos importantes, até de 08/08 horas, por no máximo 02 dias.",
           "via": "Oral",
           "fator": null,
           "faixas": [
@@ -2672,8 +2675,8 @@ const DATA = {
         }
       ],
       "orientacoes": [
-        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração muito rápida, ou aparecerem \"covinhas\" entre as costelas a cada respiração\n2. Lábios ou unhas ficando arroxeados ou azulados\n3. A criança parar de querer mamar, comer ou beber água\n4. A criança ficar muito sonolenta, difícil de acordar, ou tiver uma crise (convulsão)",
-        "Leve a criança de volta na Unidade Básica de Saúde para acompanhamento, mesmo se estiver melhorando, para ver como está evoluindo."
+        "Procure atendimento IMEDIATAMENTE se:\n1. Respiração muito rápida, ou aparecerem \"covinhas\" entre as costelas a cada respiração\n2. Lábios ou unhas ficando arroxeados ou azulados\n3. A criança parar de querer mamar, comer ou beber água\n4. A criança ficar muito sonolenta, difícil de acordar, ou tiver uma crise (convulsão)\n5. A criança vomitar tudo o que come ou bebe, ou a febre continuar depois de 48 a 72 horas de antibiótico",
+        "Leve a criança de volta à Unidade Básica de Saúde em 02 a 03 dias para acompanhamento, mesmo se estiver melhorando, para ver como está evoluindo."
       ]
     }
   },
@@ -2766,10 +2769,10 @@ const DATA = {
   "medicamentos": [
     {
       "nome": "Acetato de Hidrocortisona Creme",
-      "concentracao": "10mg",
+      "concentracao": "10 mg/g (1%)",
       "forma": "",
       "qtde": "01 Tubo",
-      "posologia": "",
+      "posologia": "Aplicar fina camada sobre a lesão, massageando suavemente, de 06/06 horas. Após melhora dos sintomas, aplicar 01 vez ao dia.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -2784,15 +2787,15 @@ const DATA = {
     },
     {
       "nome": "Aciclovir",
-      "concentracao": "0.05",
+      "concentracao": "5% - Creme",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar fina camada sobre as lesões, de 04/04 horas, por 05 dias.",
       "tempo": "",
       "via": "Tópico"
     },
     {
-      "nome": "Ácido Mefenamico",
+      "nome": "Ácido Mefenâmico",
       "concentracao": "500mg",
       "forma": "",
       "qtde": "15 Comprimidos",
@@ -2804,8 +2807,8 @@ const DATA = {
       "nome": "Ácido Tranexâmico",
       "concentracao": "250mg",
       "forma": "",
-      "qtde": "15 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, por 05 dias.",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 02 comprimidos (500 mg), de 08/08 horas, por 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -2813,8 +2816,8 @@ const DATA = {
       "nome": "Amitriptilina",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -2828,7 +2831,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Amoxicilina + Clavulonato comprimido",
+      "nome": "Amoxicilina + Clavulanato comprimido",
       "concentracao": "875/125mg",
       "forma": "",
       "qtde": "20 Comprimidos",
@@ -2837,13 +2840,15 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Amoxicilina + Clavulonato xarope",
-      "concentracao": "500+125mg/5mL",
+      "nome": "Amoxicilina + Clavulanato Suspensão Oral",
+      "concentracao": "400+57mg/5mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL, de 12/12 horas, por 07 dias.",
+      "posologia": "Tomar DOSE mL, de 12/12 horas, por 07 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "fator": 0.28,
+      "max": 11
     },
     {
       "nome": "Artrotop",
@@ -2859,7 +2864,7 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "",
-      "posologia": "",
+      "posologia": "Em água morna, realizar banho de assento, 02 a 03 vezes ao dia, por 10 a 15 minutos.",
       "tempo": "",
       "via": "Externo"
     },
@@ -2883,12 +2888,12 @@ const DATA = {
     },
     {
       "nome": "Betatrinta",
-      "concentracao": "5mg/2mL",
+      "concentracao": "(5mg + 2mg)/mL",
       "forma": "",
       "qtde": "01 Ampola",
-      "posologia": "Aplicação Intramuscular profunda em glúteo.",
+      "posologia": "Aplicar 01 ampola (1 mL), por via intramuscular profunda, no glúteo, em dose única.",
       "tempo": "",
-      "via": "Injetável"
+      "via": "Intramuscular"
     },
     {
       "nome": "Bromoprida",
@@ -2904,12 +2909,12 @@ const DATA = {
       "concentracao": "50mcg",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Aplicar 02 jatos de 12/12 horas por 03 semanas.",
+      "posologia": "Aplicar 02 jatos em cada narina, de 12/12 horas, por 03 semanas.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Nasal"
     },
     {
-      "nome": "Buscopam Composto",
+      "nome": "Buscopan Composto",
       "concentracao": "",
       "forma": "",
       "qtde": "01 Caixa",
@@ -2922,7 +2927,7 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "Contínuo",
-      "posologia": "Tomar 02 comprimidos pela manhã contínuo",
+      "posologia": "Tomar 02 comprimidos, pela manhã, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -2930,8 +2935,8 @@ const DATA = {
       "nome": "Carbonato de Cálcio",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "60 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, junto às refeições.",
       "tempo": "",
       "via": "Oral"
     },
@@ -2940,7 +2945,7 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Aplicar 01 gota no olho acometido de 08/08 horas enquanto perceção de \"areia nos olhos\"",
+      "posologia": "Aplicar 01 gota no olho acometido, de 08/08 horas, enquanto houver sensação de \"areia nos olhos\".",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -2958,7 +2963,7 @@ const DATA = {
       "concentracao": "1g",
       "forma": "",
       "qtde": "12 Ampolas",
-      "posologia": "Fazer 02 ampolas + 100mL de S.F. 0.9%, de 24/24 horas, por 06 dias.",
+      "posologia": "Fazer 02 ampolas + 100mL de S.F. 0,9%, de 24/24 horas, por 06 dias.",
       "tempo": "",
       "via": "Intravenoso"
     },
@@ -2975,8 +2980,8 @@ const DATA = {
       "nome": "Cetoconazol",
       "concentracao": "2% - Creme",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar fina camada sobre a lesão e 02 cm ao redor, 01 vez ao dia, por 02 semanas.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -2984,7 +2989,7 @@ const DATA = {
       "nome": "Cetoprofeno",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "",
+      "qtde": "10 Comprimidos",
       "posologia": "Tomar 01 comprimido de 12/12 horas por até 05 dias se dor intensa.",
       "tempo": "",
       "via": "Oral"
@@ -3011,8 +3016,8 @@ const DATA = {
       "nome": "Cinarizina",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "Tomar 01 comprimido de 8/8 horas por 05 dias ou cessação da tontura. Tomar após as refeições.",
+      "qtde": "15 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, após as refeições, por 05 dias ou até a tontura passar.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3020,8 +3025,8 @@ const DATA = {
       "nome": "Ciprofloxacino",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "Tomar 01 comprimido de 8/8 horas por 07 dias.",
+      "qtde": "14 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, por 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3030,7 +3035,7 @@ const DATA = {
       "concentracao": "HFA 50mcg",
       "forma": "",
       "qtde": "Contínuo",
-      "posologia": "Agora: Inalar 06 jatos de 06/06 horas por 02 dias.\nApós isso: Inalar 06 jatos de 12/12 horas por 03 dias.\nPor fim: Inalar 06 jatos se tosse ou cheira",
+      "posologia": "Agora: Inalar 06 jatos de 06/06 horas por 02 dias.\nApós isso: Inalar 06 jatos de 12/12 horas por 03 dias.\nPor fim: Inalar 06 jatos se tosse ou chieira.\nEnxaguar a boca com água após cada uso.",
       "tempo": "",
       "via": "Inalatório"
     },
@@ -3038,26 +3043,26 @@ const DATA = {
       "nome": "Clonazepam",
       "concentracao": "2,5mg/mL",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Tomar ____ gotas, à noite, pelo menor tempo possível. Não dirigir nem ingerir bebida alcoólica.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Clorexidina aquosa",
-      "concentracao": "0.5% - Solução",
+      "concentracao": "0,5% - Solução",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Lavar a ferida com soro fisiológico e, em seguida, aplicar a solução, de 12/12 horas, até a cicatrização.",
       "tempo": "",
       "via": "Externo"
     },
     {
       "nome": "Colchicina",
-      "concentracao": "0.5mg",
+      "concentracao": "0,5mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "10 Comprimidos",
+      "posologia": "Tomar 02 comprimidos (1mg) agora e mais 01 comprimido (0,5mg) após 1 hora. Se necessário, continuar com 01 comprimido de 12/12 horas por mais 2 a 3 dias, no máximo. Suspender se tiver diarreia.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3075,7 +3080,7 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "",
-      "posologia": "Aplicar compressas banhadas em líquido quente sobre o local acometido por 10 minutos de 6/6 horas",
+      "posologia": "Aplicar compressas mornas (nunca quentes, para não queimar a pele) sobre o local acometido, por 10 minutos, de 06/06 horas.",
       "tempo": "",
       "via": "Externo"
     },
@@ -3089,8 +3094,8 @@ const DATA = {
       "via": "Externo"
     },
     {
-      "nome": "Deflazacort",
-      "concentracao": "Creme",
+      "nome": "Desonida",
+      "concentracao": "0,05% - Creme",
       "forma": "",
       "qtde": "01 Bisnaga",
       "posologia": "Aplicar fina camada em região acometida, de 08/08 horas, por 05 dias.",
@@ -3099,10 +3104,10 @@ const DATA = {
     },
     {
       "nome": "Dexclorfeniramina",
-      "concentracao": "Pomada",
+      "concentracao": "Creme 10mg/g",
       "forma": "",
       "qtde": "01 Bisnaga",
-      "posologia": "Aplicar fina camada em lesões 2 vezes ao dia",
+      "posologia": "Aplicar fina camada sobre as lesões, de 12/12 horas, se coceira, sem cobrir o local. Não aplicar em áreas extensas da pele nem nos olhos, boca, nariz ou genitais.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3117,7 +3122,7 @@ const DATA = {
     },
     {
       "nome": "Diclofenaco dietilamônio gel",
-      "concentracao": "11.6mg/g",
+      "concentracao": "11,6mg/g",
       "forma": "",
       "qtde": "01 Tubo",
       "posologia": "Aplicar fina camada sobre o local doloroso de 06/06 horas por 01 semana",
@@ -3125,7 +3130,7 @@ const DATA = {
       "via": "Externo - Tópico"
     },
     {
-      "nome": "Diosmina + Hesperidina maior",
+      "nome": "Diosmina + Hesperidina",
       "concentracao": "900/100mg",
       "forma": "",
       "qtde": "01 Caixa",
@@ -3134,7 +3139,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Diosmina + Hesperidina menor",
+      "nome": "Diosmina + Hesperidina",
       "concentracao": "450/50mg",
       "forma": "",
       "qtde": "01 Caixa",
@@ -3179,10 +3184,10 @@ const DATA = {
     },
     {
       "nome": "Dolutegravir",
-      "concentracao": "75mg",
+      "concentracao": "50mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "28 Comprimidos",
+      "posologia": "Tomar 01 comprimido ao dia, por 28 dias. Não tomar junto com antiácidos nem com suplementos de cálcio, ferro, magnésio ou zinco (tomar o Dolutegravir 2 horas antes ou 6 horas depois deles).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3191,7 +3196,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Tomar 01 comprimido 30 minutos, antes do almoço e antes do jantar",
+      "posologia": "Tomar 01 comprimido, 30 minutos antes do almoço e 30 minutos antes do jantar, por no máximo 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3209,16 +3214,17 @@ const DATA = {
       "concentracao": "Pastilha",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Dissolver 01 pastilha sobre a lingua de 06/06 horas por 07 dias ou até melhora da dor.\nNão se alimentar em até 30 minutos após o uso da medicação",
+      "posologia": "Dissolver 01 pastilha sobre a língua, de 06/06 horas, por até 07 dias ou até melhora da dor.\nNão comer nem beber nos 30 minutos após o uso.",
       "tempo": "",
-      "via": "Externo"
+      "via": "Oral",
+      "idadeMinMeses": 72
     },
     {
       "nome": "Floratil",
       "concentracao": "250mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, por 05 dias.",
+      "posologia": "Tomar 01 cápsula, de 12/12 horas, por 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3227,7 +3233,7 @@ const DATA = {
       "concentracao": "150mg",
       "forma": "",
       "qtde": "01 Comprimido",
-      "posologia": "Tomar 01 comprimido.",
+      "posologia": "Tomar 01 comprimido, em dose única. Não tomar se estiver grávida ou com chance de gravidez.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3242,12 +3248,13 @@ const DATA = {
     },
     {
       "nome": "Flurbiprofeno",
-      "concentracao": "8.75mg",
+      "concentracao": "8,75mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Dissolver 01 pastilha sobre a lingua de 06/06 horas por 07 dias ou até melhora da dor.",
+      "posologia": "Dissolver lentamente na boca 01 pastilha, de 06/06 horas, se dor de garganta, por no máximo 03 dias. Não usar junto com outros anti-inflamatórios (como ibuprofeno ou diclofenaco).",
       "tempo": "",
-      "via": "Externo"
+      "via": "Oral",
+      "idadeMinMeses": 144
     },
     {
       "nome": "Fosfomicina Trometamol",
@@ -3263,16 +3270,17 @@ const DATA = {
       "concentracao": "1mg/g",
       "forma": "",
       "qtde": "01 Bisnaga",
-      "posologia": "Aplicar na região acometida de 06/06 horas, por 05 dias.",
+      "posologia": "Aplicar fina camada na região acometida, 01 vez ao dia, por 05 dias.",
       "tempo": "",
-      "via": "Tópico"
+      "via": "Tópico",
+      "idadeMinMeses": 24
     },
     {
       "nome": "Hialuronato de sódio",
-      "concentracao": "0.15% - Gel",
+      "concentracao": "0,15% - Gel",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Aplicar 01 gota em cada olho, 01 vez ao dia, de preferência à noite.",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -3295,7 +3303,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Ibuprofeno ped",
+      "nome": "Ibuprofeno Gotas",
       "concentracao": "200mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
@@ -3303,24 +3311,55 @@ const DATA = {
       "tempo": "",
       "via": "Oral",
       "fator": 0.5,
-      "max": 20,
+      "max": 10,
       "idadeMinMeses": 6
     },
     {
       "nome": "Ivermectina",
       "concentracao": "6mg",
       "forma": "",
-      "qtde": "0,2mg/kg Comprimidos",
-      "posologia": "Tomar x Comprimidos agora.\nRepetir mesma dose em 01 semana",
+      "qtde": "06 Comprimidos",
+      "posologia": "Tomar DOSE agora e repetir a mesma dose após 07 dias.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "faixas": [
+        {
+          "ateKg": 14.99,
+          "valor": null
+        },
+        {
+          "ateKg": 24.99,
+          "valor": "1/2 comprimido (3 mg)"
+        },
+        {
+          "ateKg": 35.99,
+          "valor": "01 comprimido (6 mg)"
+        },
+        {
+          "ateKg": 50.99,
+          "valor": "01 e 1/2 comprimido (9 mg)"
+        },
+        {
+          "ateKg": 65.99,
+          "valor": "02 comprimidos (12 mg)"
+        },
+        {
+          "ateKg": 79.99,
+          "valor": "02 e 1/2 comprimidos (15 mg)"
+        },
+        {
+          "ateKg": 999,
+          "valor": "03 comprimidos (18 mg)"
+        }
+      ],
+      "pesoMinKg": 15
     },
     {
       "nome": "Lacrifilm",
       "concentracao": "",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Aplicar 01 gota em cada olho, de 04/04 horas ou sempre que necessário.",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -3337,8 +3376,8 @@ const DATA = {
       "nome": "Lamivudina/Tenofovir",
       "concentracao": "300/300mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "28 Comprimidos",
+      "posologia": "Tomar 01 comprimido ao dia, por 28 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3347,7 +3386,7 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "",
-      "posologia": "Realizar lavagem com serigna, conforme orientado em consultório.",
+      "posologia": "Realizar lavagem com seringa, conforme orientado em consultório.",
       "tempo": "",
       "via": "Nasal"
     },
@@ -3355,17 +3394,17 @@ const DATA = {
       "nome": "Levonorgestrel / Etinilestradiol",
       "concentracao": "150 / 30mcg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Cartela",
+      "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 21 dias. Depois, fazer pausa de 07 dias e começar a nova cartela no 8º dia.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Lidocaína gel",
-      "concentracao": "0.05",
+      "concentracao": "5%",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Tubo",
+      "posologia": "Aplicar fina camada sobre a área dolorosa, até 04 vezes ao dia, se dor. Não aplicar sobre feridas abertas.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3374,7 +3413,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Tomar 01 comprimido ao dia, se coçeira ou secreção nasal",
+      "posologia": "Tomar 01 comprimido ao dia, se coceira ou secreção nasal.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3385,23 +3424,24 @@ const DATA = {
       "qtde": "01 Caixa",
       "posologia": "Tomar 01 comprimido de 6/6 horas se náuseas ou vômitos",
       "tempo": "",
-      "via": "Oral"
+      "via": "Oral",
+      "idadeMinMeses": 144
     },
     {
       "nome": "Meia de Compressão Graduada",
       "concentracao": "3/4 - 20 a 30 mmHg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Par",
+      "posologia": "Calçar pela manhã, ao levantar, antes de iniciar a movimentação, e retirar à noite.",
       "tempo": "",
       "via": "Externo"
     },
     {
       "nome": "Meloxicam",
-      "concentracao": "7.5mg",
+      "concentracao": "7,5mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, se dor, por até 10 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3410,13 +3450,13 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, se náusea ou vômitos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Metoclopramida gotas",
-      "concentracao": "",
+      "concentracao": "4mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
       "posologia": "Dar DOSE gotas, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
@@ -3430,8 +3470,8 @@ const DATA = {
       "nome": "Metronidazol",
       "concentracao": "250mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "28 Comprimidos",
+      "posologia": "Tomar 02 comprimidos, de 12/12 horas, por 07 dias. Não ingerir bebida alcoólica durante o tratamento e até 01 dia depois.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3439,8 +3479,8 @@ const DATA = {
       "nome": "Mupirocina",
       "concentracao": "2% - Pomada",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar fina camada sobre as lesões, de 08/08 horas, por 05 dias.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3448,13 +3488,13 @@ const DATA = {
       "nome": "Naproxeno",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "10 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, se dor, por no máximo 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
-      "nome": "Nebacetim Pomada",
+      "nome": "Nebacetin Pomada",
       "concentracao": "",
       "forma": "",
       "qtde": "01 Bisnaga",
@@ -3466,35 +3506,35 @@ const DATA = {
       "nome": "Neomicina + Bacitracina",
       "concentracao": "5mg + 250UI/g - Pomada",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar fina camada sobre a ferida, após limpeza local, de 12/12 horas, por até 10 dias.",
       "tempo": "",
       "via": "Tópico"
     },
     {
-      "nome": "Nistatina",
-      "concentracao": "Pomada",
+      "nome": "Nistatina Creme Vaginal",
+      "concentracao": "25.000 UI/g",
       "forma": "",
       "qtde": "01 Tubo",
-      "posologia": "Aplicar em vagina ao deitar, por 14 dias.",
+      "posologia": "Aplicar 01 aplicador cheio (4 g) na vagina, ao deitar, por 14 dias.",
       "tempo": "",
-      "via": "Tópico"
+      "via": "Vaginal"
     },
     {
-      "nome": "Nistatina Pomada",
-      "concentracao": "25.000u/g",
+      "nome": "Nistatina Creme Vaginal",
+      "concentracao": "25.000 UI/g",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar 01 aplicador cheio (4 g) na vagina, ao deitar, por 14 dias.",
       "tempo": "",
-      "via": "Tópico"
+      "via": "Vaginal"
     },
     {
       "nome": "Nistatina Suspensão Oral",
-      "concentracao": "100.000 Ui/mL",
+      "concentracao": "100.000 UI/mL",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "03 Frascos",
+      "posologia": "Bochechar 05 mL, 04 vezes ao dia, mantendo na boca o máximo de tempo possível antes de engolir, por 07 a 14 dias (manter até 48 horas após o desaparecimento das lesões).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3502,8 +3542,8 @@ const DATA = {
       "nome": "Olopatadina",
       "concentracao": "1mg/mL",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Aplicar 01 gota no olho acometido, de 12/12 horas, por 05 dias.",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -3520,17 +3560,17 @@ const DATA = {
       "nome": "Paracetamol",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Caixa",
+      "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Permetrina",
-      "concentracao": "5% - Pomada",
+      "concentracao": "5% - Creme",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar em todo o corpo, do pescoço para baixo (inclusive entre os dedos, sob as unhas, axilas, umbigo, nádegas, região genital e plantas dos pés), à noite, antes de dormir, e retirar com banho na manhã seguinte (após 8 a 14 horas). Em crianças pequenas e idosos, aplicar também no couro cabeludo, rosto e atrás das orelhas, evitando olhos e boca. Realizar por 02 noites seguidas. Após 01 semana, repetir por mais 01 noite.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3545,10 +3585,10 @@ const DATA = {
     },
     {
       "nome": "Prednisolona Colírio",
-      "concentracao": "0.01",
+      "concentracao": "1%",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Frasco",
+      "posologia": "Aplicar 01 gota no olho acometido, de 06/06 horas, até a avaliação oftalmológica. Não suspender por conta própria — o oftalmologista orientará a redução gradual.",
       "tempo": "",
       "via": "Oftálmico"
     },
@@ -3568,16 +3608,16 @@ const DATA = {
       "concentracao": "20mg",
       "forma": "",
       "qtde": "10 Comprimidos",
-      "posologia": "Tomar conforme esquema prescrito (dose e duração variam conforme a indicação clínica — curso curto ou desmame gradual).",
+      "posologia": "Tomar 02 comprimidos (40 mg), pela manhã, por 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Proctfis H",
-      "concentracao": "Ou Similar",
+      "concentracao": "ou similar",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar 02 cm da pomada na região anal, com massagem suave, de 08/08 horas, por 05 dias, se dor ou coceira.",
       "tempo": "",
       "via": "Retal"
     },
@@ -3594,8 +3634,8 @@ const DATA = {
       "nome": "Pyridium",
       "concentracao": "200mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "06 Drágeas",
+      "posologia": "Tomar 01 drágea, de 08/08 horas, por 02 dias. A urina fica alaranjada (efeito esperado do remédio).",
       "tempo": "",
       "via": "Oral"
     },
@@ -3603,8 +3643,8 @@ const DATA = {
       "nome": "Racecadotrila",
       "concentracao": "100mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Caixa",
+      "posologia": "Tomar 01 cápsula, de 08/08 horas, de preferência antes das refeições, enquanto durar a diarreia, por no máximo 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3640,13 +3680,13 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "04 Sachês",
-      "posologia": "Diluir 01 sachê em 01 Litro de água. Tomar formulação várias vezes ao dia.",
+      "posologia": "Diluir 01 sachê em 01 litro de água filtrada ou fervida (fria). Tomar aos goles, várias vezes ao dia, principalmente após cada evacuação líquida ou vômito. Usar em até 24 horas.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Soro Fisiológico",
-      "concentracao": "0.009",
+      "concentracao": "0,9%",
       "forma": "",
       "qtde": "",
       "posologia": "",
@@ -3657,17 +3697,17 @@ const DATA = {
       "nome": "Sulfadiazina de Prata",
       "concentracao": "1% - Creme",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Bisnaga",
+      "posologia": "Aplicar fina camada sobre as áreas afetadas, de 12/12 horas, após limpeza local com soro fisiológico.",
       "tempo": "",
       "via": "Tópico"
     },
     {
-      "nome": "Tansulozina",
-      "concentracao": "0.4mg",
+      "nome": "Tansulosina",
+      "concentracao": "0,4mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, após uma refeição, sempre no mesmo horário. Pode causar tontura ao se levantar, principalmente após a primeira dose: levante-se devagar.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3675,8 +3715,8 @@ const DATA = {
       "nome": "Terbinafina",
       "concentracao": "250mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido ao dia, por 30 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3685,13 +3725,13 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "01 Caixa",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, se diarreia persistente",
+      "posologia": "Tomar 01 cápsula, de 08/08 horas, de preferência antes das refeições, enquanto durar a diarreia, por no máximo 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Tobramicina",
-      "concentracao": "0.003",
+      "concentracao": "0,3%",
       "forma": "",
       "qtde": "",
       "posologia": "",
@@ -3702,8 +3742,8 @@ const DATA = {
       "nome": "Tramadol",
       "concentracao": "50mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Caixa",
+      "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor forte. Pode causar sonolência, tontura e enjoo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3711,8 +3751,8 @@ const DATA = {
       "nome": "Trimebutina",
       "concentracao": "200mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "30 Comprimidos",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, por 10 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3720,10 +3760,10 @@ const DATA = {
       "nome": "Trometamol Cetorolaco",
       "concentracao": "10mg",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Caixa",
+      "posologia": "Colocar 01 comprimido sob a língua e deixar dissolver, até de 06/06 horas, se dor importante, por no máximo 05 dias. Não partir nem mastigar.",
       "tempo": "",
-      "via": "Oral"
+      "via": "Sublingual"
     },
     {
       "nome": "Tropinal",
@@ -3738,8 +3778,8 @@ const DATA = {
       "nome": "Valerato de Betametasona",
       "concentracao": "1mg/g - Pomada",
       "forma": "",
-      "qtde": "",
-      "posologia": "",
+      "qtde": "01 Tubo",
+      "posologia": "Aplicar fina camada sobre a lesão, de 12/12 horas, por até 05 dias.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3754,10 +3794,10 @@ const DATA = {
     },
     {
       "nome": "Acetato De Medroxiprogesterona + Cipionato De Estradiol",
-      "concentracao": "25mg+5mg/mL",
+      "concentracao": "25mg + 5mg/0,5mL",
       "forma": "",
       "qtde": "01 Ampola",
-      "posologia": "Aplicar 01 ampola, por via intramuscular profunda, de 3 em 3 meses.",
+      "posologia": "Aplicar 01 ampola, por via intramuscular profunda, a cada 30 dias (a primeira aplicação entre o 1º e o 5º dia da menstruação).",
       "tempo": "",
       "via": "Intramuscular"
     },
@@ -3772,7 +3812,7 @@ const DATA = {
     },
     {
       "nome": "Ácido Fólico (vitamina B9)",
-      "concentracao": "0.2mg",
+      "concentracao": "0,2mg",
       "forma": "",
       "qtde": "30 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
@@ -3784,7 +3824,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia (ou 01 vez por semana, em dia diferente, se em uso concomitante de Metotrexato), conforme indicação.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3849,7 +3889,7 @@ const DATA = {
       "concentracao": "300mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção habitual). Não iniciar durante crise aguda de gota.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo. Não iniciar durante crise aguda de gota.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3858,7 +3898,7 @@ const DATA = {
       "concentracao": "200mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose de manutenção).",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3926,8 +3966,8 @@ const DATA = {
       "nome": "Azitromicina",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "03 Comprimidos",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, por 03 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3972,7 +4012,7 @@ const DATA = {
       "concentracao": "20mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo.",
+      "posologia": "Tomar ____ mL, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -3981,13 +4021,13 @@ const DATA = {
       "concentracao": "200mg",
       "forma": "",
       "qtde": "120 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose de manutenção habitual).",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Carvedilol",
-      "concentracao": "12.5mg",
+      "concentracao": "12,5mg",
       "forma": "",
       "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
@@ -3999,22 +4039,22 @@ const DATA = {
       "concentracao": "25mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose-alvo, conforme tolerância).",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Carvedilol",
-      "concentracao": "3.125mg",
+      "concentracao": "3,125mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas — dose inicial de titulação em insuficiência cardíaca; aumentar gradualmente conforme tolerância.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo, até a reavaliação para ajuste da dose.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Carvedilol",
-      "concentracao": "6.25mg",
+      "concentracao": "6,25mg",
       "forma": "",
       "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
@@ -4038,7 +4078,7 @@ const DATA = {
       "concentracao": "20mg/g",
       "forma": "",
       "qtde": "01 Tubo",
-      "posologia": "Aplicar fina camada de creme sobre a região afetada, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Aplicar fina camada de creme sobre a lesão e 02 cm ao redor, 01 vez ao dia, por 02 semanas.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -4047,7 +4087,7 @@ const DATA = {
       "concentracao": "500mg",
       "forma": "",
       "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, por ____ dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4074,7 +4114,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção).",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4089,12 +4129,12 @@ const DATA = {
     },
     {
       "nome": "Dexametasona",
-      "concentracao": "0.1mg/mL",
+      "concentracao": "0,1mg/mL - Elixir",
       "forma": "",
-      "qtde": "____",
-      "posologia": "Usar conforme orientação médica.",
+      "qtde": "01 Frasco",
+      "posologia": "Tomar ____ mL, ____ vezes ao dia, por ____ dias.",
       "tempo": "",
-      "via": "Outro"
+      "via": "Oral"
     },
     {
       "nome": "Dexametasona",
@@ -4107,7 +4147,7 @@ const DATA = {
     },
     {
       "nome": "Dexclorfeniramina Maleato",
-      "concentracao": "0.4mg/mL",
+      "concentracao": "0,4mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
       "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
@@ -4116,7 +4156,7 @@ const DATA = {
     },
     {
       "nome": "Dexclorfeniramina Maleato",
-      "concentracao": "2.0mg",
+      "concentracao": "2mg",
       "forma": "",
       "qtde": "____ Comprimidos",
       "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
@@ -4143,7 +4183,7 @@ const DATA = {
     },
     {
       "nome": "Digoxina",
-      "concentracao": "0.25mg",
+      "concentracao": "0,25mg",
       "forma": "",
       "qtde": "30 Comprimidos",
       "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
@@ -4154,8 +4194,8 @@ const DATA = {
       "nome": "Dipirona Sódica",
       "concentracao": "500mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "01 Caixa",
+      "posologia": "Tomar 01 comprimido, de 06/06 horas, se dor ou febre.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4186,7 +4226,7 @@ const DATA = {
       "concentracao": "20mg",
       "forma": "",
       "qtde": "360 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (dose-alvo, conforme tolerância e função renal).",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4200,7 +4240,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Fenitoina Sódica",
+      "nome": "Fenitoína Sódica",
       "concentracao": "100mg",
       "forma": "",
       "qtde": "90 Comprimidos",
@@ -4209,7 +4249,7 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Fenobarbital Sodico",
+      "nome": "Fenobarbital Sódico",
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
@@ -4218,11 +4258,11 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Fenobarbital Sodico",
+      "nome": "Fenobarbital Sódico",
       "concentracao": "40mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada, à noite, de uso contínuo.",
+      "posologia": "Tomar ____ gotas, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4285,7 +4325,7 @@ const DATA = {
       "concentracao": "2mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada em gotas, conforme prescrição.",
+      "posologia": "Tomar ____ gotas, ____ vezes ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4293,7 +4333,7 @@ const DATA = {
       "nome": "Haloperidol",
       "concentracao": "5mg",
       "forma": "",
-      "qtde": "30 Comprimidos",
+      "qtde": "60 Comprimidos",
       "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
@@ -4309,10 +4349,10 @@ const DATA = {
     },
     {
       "nome": "Heparina Sódica",
-      "concentracao": "5000ui/0.25ml",
+      "concentracao": "5.000 UI/0,25 mL",
       "forma": "",
       "qtde": "01 Ampola",
-      "posologia": "Aplicar 01 ampola, por via subcutâneo, conforme orientação médica.",
+      "posologia": "Aplicar 01 ampola, por via subcutânea, conforme orientação médica.",
       "tempo": "",
       "via": "Subcutâneo"
     },
@@ -4348,19 +4388,19 @@ const DATA = {
     },
     {
       "nome": "Insulina Humana Nph",
-      "concentracao": "100ui/mL",
+      "concentracao": "100 UI/mL",
       "forma": "",
-      "qtde": "01 Ampola",
-      "posologia": "Aplicar 01 ampola, por via subcutâneo, conforme orientação médica.",
+      "qtde": "____ Frascos-ampola (10 mL)",
+      "posologia": "Aplicar por via subcutânea, de uso contínuo: ____ unidades (UI) às ____ horas e ____ unidades (UI) às ____ horas. Fazer rodízio dos locais de aplicação.",
       "tempo": "",
       "via": "Subcutâneo"
     },
     {
       "nome": "Insulina Humana Regular",
-      "concentracao": "100ui/mL",
+      "concentracao": "100 UI/mL",
       "forma": "",
-      "qtde": "01 Ampola",
-      "posologia": "Aplicar 01 ampola, por via subcutâneo, conforme orientação médica.",
+      "qtde": "____ Frascos-ampola (10 mL)",
+      "posologia": "Aplicar ____ unidades (UI), por via subcutânea, 30 minutos antes de ____, de uso contínuo. Fazer rodízio dos locais de aplicação.",
       "tempo": "",
       "via": "Subcutâneo"
     },
@@ -4369,7 +4409,7 @@ const DATA = {
       "concentracao": "20mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas (respeitando intervalo livre de nitrato durante a noite, para evitar tolerância), de uso contínuo.",
+      "posologia": "Tomar 01 comprimido ao acordar e outro 07 horas depois (por exemplo, às 07 e às 14 horas), de uso contínuo. Não tomar à noite: a pausa noturna evita que o remédio perca o efeito.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4405,16 +4445,16 @@ const DATA = {
       "concentracao": "250+25mg",
       "forma": "",
       "qtde": "90 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas (preferir estômago vazio — 30-60 min antes ou 1h depois das refeições, quando possível), de uso contínuo — ajustar horários e dose conforme resposta motora.",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo, de preferência 30 a 60 minutos antes ou 01 hora depois das refeições.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Levonorgestrel + Etinilestradiol",
-      "concentracao": "0.15+0.03mg",
+      "concentracao": "0,15+0,03mg",
       "forma": "",
       "qtde": "01 Cartela",
-      "posologia": "Tomar 01 comprimido ao dia, por via oral, preferencialmente no mesmo horário, sem interrupção.",
+      "posologia": "Tomar 01 comprimido ao dia, no mesmo horário, por 21 dias. Depois, fazer pausa de 07 dias e começar a nova cartela no 8º dia.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4423,7 +4463,7 @@ const DATA = {
       "concentracao": "100mcg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4432,7 +4472,7 @@ const DATA = {
       "concentracao": "125mcg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4441,7 +4481,7 @@ const DATA = {
       "concentracao": "150mcg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4450,7 +4490,7 @@ const DATA = {
       "concentracao": "25mcg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4459,7 +4499,7 @@ const DATA = {
       "concentracao": "50mcg",
       "forma": "",
       "qtde": "180 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4468,7 +4508,7 @@ const DATA = {
       "concentracao": "75mcg",
       "forma": "",
       "qtde": "180 Comprimidos",
-      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Reavaliar TSH periodicamente para ajuste de dose.",
+      "posologia": "Tomar 01 comprimido, em jejum, pela manhã, 30 a 60 minutos antes do café da manhã, de uso contínuo. Fazer o exame de controle (TSH) nas datas orientadas pelo médico.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4533,7 +4573,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar 01 comprimido, de 08/08 horas, se náuseas ou vômitos, por no máximo 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4554,7 +4594,7 @@ const DATA = {
       "concentracao": "100mg/g",
       "forma": "",
       "qtde": "01 Bisnaga",
-      "posologia": "Aplicar 01 aplicador cheio de gel por via vaginal, ao deitar, por ____ dias.",
+      "posologia": "Aplicar 01 aplicador cheio de gel por via vaginal, ao deitar, por 05 dias.",
       "tempo": "",
       "via": "Vaginal"
     },
@@ -4563,58 +4603,58 @@ const DATA = {
       "concentracao": "20mg/g",
       "forma": "",
       "qtde": "01 Bisnaga",
-      "posologia": "Aplicar 01 aplicador cheio de creme por via vaginal, ao deitar, por ____ dias.",
+      "posologia": "Aplicar 01 aplicador cheio de creme por via vaginal, ao deitar, por 07 dias.",
       "tempo": "",
       "via": "Vaginal"
     },
     {
       "nome": "Neomicina + Bacitracina",
-      "concentracao": "5+250mg/g",
+      "concentracao": "5mg + 250UI/g",
       "forma": "",
       "qtde": "01 Tubo",
-      "posologia": "Aplicar fina camada de pomada sobre a região afetada, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Aplicar fina camada da pomada sobre a região afetada, após limpeza local, de 12/12 horas, por até 10 dias.",
       "tempo": "",
       "via": "Tópico"
     },
     {
-      "nome": "Nifedipino",
+      "nome": "Nifedipino Retard",
       "concentracao": "10mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo (preferir apresentação de liberação prolongada/retard quando disponível).",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Engolir inteiro, sem partir nem mastigar.",
       "tempo": "",
       "via": "Oral"
     },
     {
-      "nome": "Nifedipino",
+      "nome": "Nifedipino Retard",
       "concentracao": "20mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido (retard), de 12/12 horas ou 01 vez ao dia conforme apresentação, de uso contínuo.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, de uso contínuo. Engolir inteiro, sem partir nem mastigar.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Nistatina",
-      "concentracao": "100000ui/mL",
+      "concentracao": "100.000 UI/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar ____ mL por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Aplicar ____ mL na boca, 04 vezes ao dia, mantendo o máximo de tempo possível antes de engolir, por 07 a 14 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
-      "nome": "Nitrofurantoina",
+      "nome": "Nitrofurantoína",
       "concentracao": "100mg",
       "forma": "",
       "qtde": "28 Cápsulas",
-      "posologia": "Tomar 01 comprimido, de 06/06 horas, por 07 dias.",
+      "posologia": "Tomar 01 cápsula, de 06/06 horas, por 07 dias.",
       "tempo": "",
       "via": "Oral"
     },
     {
       "nome": "Noretisterona",
-      "concentracao": "0.35mg",
+      "concentracao": "0,35mg",
       "forma": "",
       "qtde": "01 Cartela",
       "posologia": "Tomar 01 comprimido ao dia, por via oral, preferencialmente no mesmo horário, sem interrupção.",
@@ -4635,7 +4675,7 @@ const DATA = {
       "concentracao": "400mg",
       "forma": "",
       "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "posologia": "Tomar 01 comprimido, de 12/12 horas, por ____ dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4662,7 +4702,7 @@ const DATA = {
       "concentracao": "50mg",
       "forma": "",
       "qtde": "60 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção).",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4670,8 +4710,8 @@ const DATA = {
       "nome": "Oseltamivir Fosfato",
       "concentracao": "75mg",
       "forma": "",
-      "qtde": "____ Cápsulas",
-      "posologia": "Tomar ____ cápsula(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "10 Cápsulas",
+      "posologia": "Tomar 01 cápsula, de 12/12 horas, por 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4687,7 +4727,7 @@ const DATA = {
       "max": 35
     },
     {
-      "nome": "Prednisolona Fosfato Sodico",
+      "nome": "Prednisolona Fosfato Sódico",
       "concentracao": "3mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
@@ -4711,7 +4751,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo (dose de manutenção em doença crônica, ex.: polimialgia reumática) — não suspender abruptamente; desmame gradual conforme orientação médica.",
+      "posologia": "Tomar 01 comprimido, pela manhã, de uso contínuo. Não suspender por conta própria: a redução da dose deve ser gradual, conforme orientação médica.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4719,8 +4759,8 @@ const DATA = {
       "nome": "Prometazina Cloridrato",
       "concentracao": "25mg",
       "forma": "",
-      "qtde": "____ Comprimidos",
-      "posologia": "Tomar ____ comprimido(s) por via oral, de ____ em ____ horas, por ____ dias.",
+      "qtde": "05 Comprimidos",
+      "posologia": "Tomar 01 comprimido, antes de dormir, por 05 dias.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4735,10 +4775,10 @@ const DATA = {
     },
     {
       "nome": "Sais De Reidratacao Oral (cloreto De Sódio + Glicose + Citrato De Sódio + Cloreto De Potássio)",
-      "concentracao": "3.5+20.0+2.9+1.5g",
+      "concentracao": "3,5+20+2,9+1,5g",
       "forma": "",
       "qtde": "____ Sachês",
-      "posologia": "Diluir o conteúdo do sachê em ____ mL de água filtrada e tomar ao longo do dia, conforme orientação médica.",
+      "posologia": "Diluir o conteúdo de 01 sachê em 01 litro de água filtrada ou fervida (fria) e tomar aos goles ao longo do dia, principalmente após cada evacuação líquida ou vômito. Usar em até 24 horas.",
       "tempo": "",
       "via": "Para Hidratação"
     },
@@ -4747,13 +4787,13 @@ const DATA = {
       "concentracao": "100mcg",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Inalar 02 jatos, se falta de ar ou chiado, até de 04/04 horas se necessário. Uso frequente (mais de 2-3x/semana) indica necessidade de reavaliar o tratamento de manutenção.",
+      "posologia": "Inalar 02 jatos, se falta de ar ou chiado, até de 04/04 horas. Se precisar usar mais de 2 vezes por semana, procure a Unidade de Saúde para rever o tratamento. Se precisar antes de 4 horas, procure atendimento de urgência.",
       "tempo": "",
       "via": "Inalatório"
     },
     {
       "nome": "Seringa Para Aplicação De Insulina -",
-      "concentracao": "0.3ml",
+      "concentracao": "0,3 mL",
       "forma": "",
       "qtde": "100 Unidades",
       "posologia": "Uma seringa por aplicação; não reutilizar.",
@@ -4762,7 +4802,7 @@ const DATA = {
     },
     {
       "nome": "Seringa Para Aplicação De Insulina -",
-      "concentracao": "1.0ml",
+      "concentracao": "1 mL",
       "forma": "",
       "qtde": "100 Unidades",
       "posologia": "Uma seringa por aplicação; não reutilizar.",
@@ -4770,10 +4810,10 @@ const DATA = {
       "via": "Externo"
     },
     {
-      "nome": "Sulfametoxazol + Trimetroprima",
+      "nome": "Sulfametoxazol + Trimetoprima",
       "concentracao": "40+8mg/mL",
       "forma": "",
-      "qtde": "01 Frasco",
+      "qtde": "02 Frascos",
       "posologia": "Tomar DOSE mL, de 12/12 horas, por 07 dias.",
       "tempo": "",
       "via": "Oral",
@@ -4782,7 +4822,7 @@ const DATA = {
       "idadeMinMeses": 2
     },
     {
-      "nome": "Sulfametoxazol + Trimetroprima",
+      "nome": "Sulfametoxazol + Trimetoprima",
       "concentracao": "400+80mg",
       "forma": "",
       "qtde": "____ Comprimidos",
@@ -4792,7 +4832,7 @@ const DATA = {
     },
     {
       "nome": "Sulfato Ferroso",
-      "concentracao": "122.97mg",
+      "concentracao": "122,97mg",
       "forma": "",
       "qtde": "30 Comprimidos",
       "posologia": "Tomar 01 comprimido, em jejum ou longe das refeições, 01 vez ao dia, por 03 a 06 meses (repor estoques) — pode causar escurecimento das fezes e desconforto gástrico.",
@@ -4804,7 +4844,7 @@ const DATA = {
       "concentracao": "125mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada, 01 vez ao dia, por 03 a 06 meses.",
+      "posologia": "Tomar ____ gotas, 01 vez ao dia, longe das refeições, por 03 a 06 meses. Pode escurecer as fezes.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4827,7 +4867,7 @@ const DATA = {
       "via": "Externo"
     },
     {
-      "nome": "Valproato De Sódio (ácido Valpróico)",
+      "nome": "Valproato de Sódio (Ácido Valproico)",
       "concentracao": "250mg",
       "forma": "",
       "qtde": "60 Comprimidos",
@@ -4836,11 +4876,11 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Valproato De Sódio (ácido Valpróico)",
+      "nome": "Valproato de Sódio (Ácido Valproico)",
       "concentracao": "50mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Tomar conforme dose individualizada, de 12/12 horas, de uso contínuo.",
+      "posologia": "Tomar ____ mL, de 12/12 horas, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4849,7 +4889,7 @@ const DATA = {
       "concentracao": "5mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar conforme dose individualizada (ajustada por RNI/INR), 01 vez ao dia, sempre no mesmo horário, de uso contínuo.",
+      "posologia": "Tomar ____ comprimido(s), 01 vez ao dia, sempre no mesmo horário, de uso contínuo. A dose é ajustada pelo exame de sangue (RNI): faça o exame nas datas marcadas.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4876,7 +4916,7 @@ const DATA = {
       "concentracao": "100mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (dose-alvo).",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -4966,7 +5006,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo — associado à estatina quando LDL não controlado com estatina isolada.",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5029,7 +5069,7 @@ const DATA = {
       "concentracao": "30mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo — pode ajudar em quadros com insônia/perda de apetite associados.",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo. Pode causar sonolência e aumento do apetite.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5047,7 +5087,7 @@ const DATA = {
       "concentracao": "300mg",
       "forma": "",
       "qtde": "90 Comprimidos",
-      "posologia": "Tomar 01 comprimido, de 08/08 horas, de uso contínuo (titular gradualmente a partir de dose menor).",
+      "posologia": "1º dia: tomar 01 comprimido à noite. 2º dia: 01 comprimido de 12/12 horas. A partir do 3º dia: 01 comprimido de 08/08 horas, de uso contínuo. Pode causar sonolência e tontura.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5101,7 +5141,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo (dose de manutenção, após titulação).",
+      "posologia": "Tomar 01 comprimido, à noite, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5110,7 +5150,7 @@ const DATA = {
       "concentracao": "10mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo (demência moderada a grave).",
+      "posologia": "Tomar 01 comprimido, 01 vez ao dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5146,7 +5186,7 @@ const DATA = {
       "concentracao": "7.000 UI",
       "forma": "",
       "qtde": "04 Cápsulas",
-      "posologia": "Tomar 01 cápsula, 01 vez por semana, de uso contínuo (dose de manutenção).",
+      "posologia": "Tomar 01 cápsula, 01 vez por semana, sempre no mesmo dia, de uso contínuo.",
       "tempo": "",
       "via": "Oral"
     },
@@ -5160,11 +5200,11 @@ const DATA = {
       "via": "Oral"
     },
     {
-      "nome": "Tansulozina",
+      "nome": "Tansulosina",
       "concentracao": "0,4mg",
       "forma": "",
       "qtde": "30 Comprimidos",
-      "posologia": "Tomar 01 comprimido, após uma refeição, sempre no mesmo horário, de uso contínuo (hiperplasia prostática benigna). Risco de hipotensão postural, especialmente após a primeira dose — orientar a levantar-se devagar.",
+      "posologia": "Tomar 01 comprimido, após uma refeição, sempre no mesmo horário, de uso contínuo (hiperplasia prostática benigna). Pode causar tontura ao se levantar, principalmente após a primeira dose: levante-se devagar.",
       "tempo": "",
       "via": "Oral"
     },
