@@ -738,10 +738,10 @@
       // Brasão em js/logos.js (LOGO_RIO_ICON_B64). Sem ele, o cabeçalho sai só com o nome.
       brasao: () => (typeof LOGO_RIO_ICON_B64 === 'string' && LOGO_RIO_ICON_B64) || null,
       nomeNoCabecalho: true,
-      unidadePadrao: 'Secretaria Municipal de Saúde',
-      fornecedor: [
-        'Prefeitura Municipal de Rio Paranaíba — Secretaria Municipal de Saúde'
-      ]
+      // Endereço da Secretaria (mesmo prédio da Prefeitura), conforme o site oficial e o CNES.
+      // O campo "Unidade de Saúde" substitui este padrão quando preenchido.
+      unidadePadrao: 'Secretaria Municipal de Saúde — Rua Capitão Franklin de Castro, 1065 — CEP 38810-000',
+      fornecedor: [] // em branco: a farmácia que dispensa preenche
     }
   };
   function municipioDoLocal(local){
@@ -1688,7 +1688,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       rows: [
         new TableRow({ children: [
           celulaDocx('Identificação do comprador\nNome:\nIdent.:                    Órgão emissor:\nEndereço:\nCidade:                     Estado:\nTelefone:', { width: 50, size: 16 }),
-          celulaDocx(['Identificação do fornecedor', ...muni.fornecedor, '', '_______________________________', 'Assinatura do farmacêutico        Data'].join('\n'), { width: 50, size: 16 })
+          celulaDocx(['Identificação do fornecedor', ...(muni.fornecedor.length ? muni.fornecedor : ['']), '', '_______________________________', 'Assinatura do farmacêutico        Data'].join('\n'), { width: 50, size: 16 })
         ]})
       ]
     });
