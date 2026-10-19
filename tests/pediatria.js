@@ -154,4 +154,19 @@ assert.strictEqual(doseDoItem(med('Pneumonia (Criança)', 'Dipirona 500 mg/mL'),
 assert.strictEqual(doseDoItem(med('Pneumonia (Criança)', 'Ondansetrona 4mg (Comprimido)'), 15).valor, '1/2 comprimido (2 mg)');
 assert.ok(!DATA.condicoes['Vertigem'].meds.some(m => /meclin/i.test(m.nome)));
 
+// ---------- Receita em 2 vias (js/vias.js) ----------
+const V = require('../js/vias');
+assert.strictEqual(V.classificar({ nome: 'Amoxicilina 500mg', via: 'Oral' }), 'antimicrobiano');
+assert.strictEqual(V.classificar({ nome: 'Amoxicilina + Clavulanato 875/125 mg', via: 'Oral' }), 'antimicrobiano');
+assert.strictEqual(V.classificar({ nome: 'Ceftriaxona 1g', via: 'Intravenoso' }), 'antimicrobiano');
+assert.strictEqual(V.classificar({ nome: 'Metronidazol 100mg/g', via: 'Vaginal' }), null);       // gel vaginal fica na comum
+assert.strictEqual(V.classificar({ nome: 'Neomicina + Bacitracina Pomada', via: 'Tópico' }), null);
+assert.strictEqual(V.classificar({ nome: 'Tramadol 50mg', via: 'Oral' }), 'controle');
+assert.strictEqual(V.classificar({ nome: 'Paracetamol + Codeína 500/30mg', via: 'Oral' }), 'controle');
+assert.strictEqual(V.classificar({ nome: 'Fluoxetina 20mg', via: 'Oral' }), 'controle');
+assert.strictEqual(V.classificar({ nome: 'Clonazepam 0,5mg', via: 'Sublingual' }), 'notificacao');
+assert.strictEqual(V.classificar({ nome: 'Dipirona 500mg', via: 'Oral' }), null);
+assert.strictEqual(V.classificar({ nome: 'Ciclobenzaprina 10mg', via: 'Oral' }), null);
+assert.strictEqual(V.classificar('Azitromicina 500mg'), 'antimicrobiano');                        // sem via = oral
+
 console.log('pediatria: OK');

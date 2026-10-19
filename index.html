@@ -73,6 +73,7 @@
         <div class="segmented">
           <label class="tipo-opt"><input type="radio" name="tipoReceita" value="comum" checked><span>Comum <small>1 via</small></span></label>
           <label class="tipo-opt"><input type="radio" name="tipoReceita" value="controle"><span>Controle especial <small>2 vias</small></span></label>
+          <label class="tipo-opt" title="Antimicrobiano e controlado vão para o receituário de 2 vias; o resto, com as orientações, para a receita comum — numa impressão só"><input type="radio" name="tipoReceita" value="auto"><span>Separar sozinho <small>2 vias + comum</small></span></label>
         </div>
       </fieldset>
 
@@ -215,6 +216,10 @@
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg>
           Nova receita
         </button>
+        <button id="btnMesmoPaciente" class="btn" type="button" title="Limpa remédios e orientações e mantém nome, idade e peso — para outra receita do mesmo paciente (ex.: antibiótico em 2 vias e sintomáticos na comum). Ctrl+Shift+Enter">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 8h5M19.5 5.5v5"/></svg>
+          Mesmo paciente
+        </button>
         <button id="btnPediatrica" class="btn" type="button" title="Troca por apresentações pediátricas (gotas) pelo peso e remove o que não é adequado para crianças">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="2.5"/><path d="M7 10.5 12 9l5 1.5M12 9v6M9 21l3-6 3 6"/></svg>
           Versão pediátrica
@@ -263,13 +268,13 @@
     <div class="ajuda-modal-body">
       <ol>
         <li><b>Preencha o paciente.</b> Digite o nome completo no campo "Paciente". Se for criança, informe o peso em kg — isso calcula automaticamente a dose de medicamentos com posologia por peso.</li>
-        <li><b>Escolha o tipo de receita e o local.</b> "Comum (1 via)" para receitas normais, ou "Controle especial (2 vias)" para medicamentos controlados (sai em duas vias, para farmácia e paciente). O local (Carmo do Paranaíba, Patos de Minas ou Rio Paranaíba) define o cabeçalho da prefeitura e fica salvo para as próximas receitas.</li>
+        <li><b>Escolha o tipo de receita e o local.</b> "Comum (1 via)" para receitas normais, "Controle especial (2 vias)" para antimicrobianos e controlados (sai em duas vias, para farmácia e paciente), ou "Separar sozinho": você monta tudo junto e o app põe o antibiótico/controlado nas 2 vias e o resto, com as orientações, na receita comum — numa impressão só. Em "Separar sozinho", o botão "2 vias"/"comum" em cada item troca o lado. O local (Carmo do Paranaíba, Patos de Minas ou Rio Paranaíba) define o cabeçalho da prefeitura e fica salvo para as próximas receitas.</li>
         <li><b>Busque e adicione condições/medicamentos.</b> Use a busca em "Prescrever" para encontrar uma condição clínica (adiciona todos os medicamentos daquela condição de uma vez) ou um medicamento específico.</li>
         <li><b>Ajuste se precisar.</b> Na prévia da receita, você pode editar um item só para este paciente (&#9998;) ou removê-lo (&times;). Nas orientações, &para; dá um espaço (novo parágrafo) antes da orientação, para separar blocos; quebras de linha digitadas no texto também saem na receita.</li>
         <li><b>Receita para criança.</b> Preencha o peso (e, se quiser, a idade: "4a", "8m", "1a6m"). Quando a receita tem remédio de adulto com versão pediátrica, aparece a sugestão "Converter agora": comprimidos viram gotas/suspensão com dose pelo peso (com teto por dose) e o que não serve para criança sai. Marque "Converter sozinho" para isso acontecer automaticamente quando a idade informada for menor que 12 anos. Leia os avisos (mostram a conta em mg/kg) e confira cada dose antes de imprimir; "Desfazer" volta como estava.</li>
         <li><b>Preencha seus dados (nome e CRM).</b> Em "Dados do médico". Eles ficam salvos neste computador para as próximas receitas; cada profissional deve conferir os seus ao usar o app pela primeira vez neste dispositivo.</li>
-        <li><b>Gere a receita.</b> "Imprimir / PDF" imprime direto; "Baixar .docx" gera um arquivo Word editável; "Copiar" copia como texto; "Encaminhar" monta um encaminhamento à atenção básica; "Atestado" monta atestado de afastamento ou declaração de comparecimento/acompanhante.</li>
-        <li><b>Atalhos:</b> <kbd>/</kbd> foca a busca; <kbd>Enter</kbd> na busca adiciona o primeiro resultado; <kbd>1</kbd>–<kbd>9</kbd> aplicam as condições mais usadas; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> limpa a receita para o próximo paciente.</li>
+        <li><b>Gere a receita.</b> "Nova receita" limpa tudo para o próximo paciente; "Mesmo paciente" limpa só os remédios e orientações e mantém nome, idade e peso (por exemplo, antibiótico nas 2 vias e depois os sintomáticos na receita comum). "Imprimir / PDF" imprime direto; "Baixar .docx" gera um arquivo Word editável; "Copiar" copia como texto; "Encaminhar" monta um encaminhamento à atenção básica; "Atestado" monta atestado de afastamento ou declaração de comparecimento/acompanhante.</li>
+        <li><b>Atalhos:</b> <kbd>/</kbd> foca a busca; <kbd>Enter</kbd> na busca adiciona o primeiro resultado; <kbd>1</kbd>–<kbd>9</kbd> aplicam as condições mais usadas; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> limpa a receita para o próximo paciente; <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> faz outra receita para o mesmo paciente.</li>
       </ol>
       <p class="ajuda-nota">Todos os dados (histórico, medicamentos personalizados, nome/CRM) ficam salvos apenas neste computador/navegador — nada é enviado para a internet. Use "Exportar meus dados" (em Ferramentas › Backup e ajustes) periodicamente para não perder suas personalizações. O botão ao lado do "?" alterna o tema claro/escuro; a receita impressa é sempre clara.</p>
     </div>
@@ -338,9 +343,10 @@
       <div class="field">
         <label for="encTexto">Texto do encaminhamento</label>
         <textarea id="encTexto" class="enc-texto"></textarea>
-        <div class="mini-note">Você pode editar este texto livremente antes de copiar ou imprimir.</div>
+        <div class="mini-note">Você pode editar este texto livremente antes de copiar ou imprimir. Fechar a janela não apaga o que você escreveu: ao reabrir para o mesmo paciente, o texto está como você deixou.</div>
       </div>
       <div class="modal-actions">
+        <button id="btnRecomecarEncaminhamento" class="btn btn-outline btn-recomecar" type="button" hidden title="Gera o texto de novo a partir dos campos acima (descarta a edição à mão)">Recomeçar texto</button>
         <button id="btnCopiarEncaminhamento" class="btn btn-outline" type="button">Copiar texto</button>
         <button id="btnImprimirEncaminhamento" class="btn btn-primary" type="button">Imprimir</button>
       </div>
@@ -416,6 +422,7 @@
         <div class="mini-note">O texto se atualiza conforme os campos acima; você pode editá-lo antes de copiar ou imprimir. O CID só entra com a autorização do paciente (Resolução CFM 1.658/2002).</div>
       </div>
       <div class="modal-actions">
+        <button id="btnRecomecarAtestado" class="btn btn-outline btn-recomecar" type="button" hidden title="Gera o texto de novo a partir dos campos acima (descarta a edição à mão)">Recomeçar texto</button>
         <button id="btnCopiarAtestado" class="btn btn-outline" type="button">Copiar texto</button>
         <button id="btnImprimirAtestado" class="btn btn-primary" type="button">Imprimir</button>
       </div>
@@ -426,6 +433,7 @@
 <script src="js/dados.js"></script>
 <script src="js/logos.js"></script>
 <script src="js/pediatria.js"></script>
+<script src="js/vias.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -669,6 +669,12 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   font-weight:600;cursor:pointer;
 }
 .aviso button:hover{background:var(--amber);color:#fff;}
+/* Sugestões do uso: uma ação principal e duas discretas */
+.aviso-acoes{margin-left:auto;flex:none;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;max-width:46%;}
+.aviso-acoes button{margin-left:0;}
+.aviso.teal .aviso-acoes button.sec{border-color:transparent;font-weight:500;text-decoration:underline;text-underline-offset:3px;padding:4px 6px;}
+.aviso.teal .aviso-acoes button.sec:hover{background:transparent;color:var(--teal-dark);text-decoration-thickness:2px;}
+@media (max-width:520px){ .aviso{flex-wrap:wrap;} .aviso-acoes{max-width:none;width:100%;justify-content:flex-start;} }
 
 /* ---------- Papel da receita (sempre claro, igual à impressão) ---------- */
 .receita-paper{
@@ -787,6 +793,17 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 .orientacoes-bloco li .rm-item:hover{background:#FBEAE8;}
 .orientacoes-bloco li .edit-item-btn:hover{background:var(--teal-wash);}
 .pos-vazia{color:var(--amber);font-weight:600;font-size:11.5px;}
+
+/* Separar sozinho: lado de cada item e divisória entre as duas receitas */
+.vias-item{
+  flex:none;align-self:center;border:1px solid #D7DEDA;background:#FFFFFF;color:#4B5A55;
+  border-radius:999px;padding:1px 8px;font:600 10.5px/1.5 inherit;letter-spacing:.02em;cursor:pointer;
+}
+.vias-item.em-duas{border-color:#0A4F41;background:#E4EFEC;color:#0A4F41;}
+.vias-item:hover{border-color:#0A4F41;}
+.via-2 .vias-item{display:none;}
+.separador-vias{display:flex;align-items:center;gap:10px;margin:28px 0 14px;color:#0A4F41;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.separador-vias::before, .separador-vias::after{content:"";flex:1;border-top:1.5px dashed #9CB7AF;}
 
 /* ---------- Layout "Controle Especial" (2 vias, formato de caixa) ---------- */
 .vias-lado-a-lado{
@@ -1015,6 +1032,8 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   margin-top:4px;padding-top:14px;border-top:1px solid var(--line);
 }
 .enc-texto{min-height:220px;line-height:1.55;}
+.modal-actions .btn-recomecar{margin-right:auto;}
+.modal-actions .btn[hidden]{display:none;}
 
 /* ---------- Atestado ---------- */
 .at-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
@@ -1137,5 +1156,5 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   .receita-scroll{overflow:visible;padding:0;margin:0;}
   .receita-paper{border:none;padding:0;box-shadow:none;}
   .via-box.via-2{break-before:page;page-break-before:always;}
-  .rm-item, .edit-item-btn, .par-item, .screen-only, .pos-vazia{display:none !important;}
+  .rm-item, .edit-item-btn, .par-item, .vias-item, .screen-only, .pos-vazia{display:none !important;}
 }

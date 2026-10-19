@@ -686,7 +686,13 @@ async function run(url) {
     const acompanhante = await texto();
     await page.keyboard.press('Escape');
     const fechou = await page.evaluate(() => !document.getElementById('atestadoOverlay').classList.contains('show'));
-    // reabrir nao carrega o CID do paciente anterior; Rio Paranaiba muda a cidade
+    // mesmo paciente: o rascunho volta como estava
+    await page.click('#btnAtestado');
+    await page.waitForTimeout(150);
+    const rascunhoMantido = (await page.inputValue('#atAcompanhante')) === 'Fulana Acompanhante' && (await page.isChecked('input[name=atTipo][value="acompanhante"]'));
+    await page.keyboard.press('Escape');
+    // outro paciente: nao carrega o CID do anterior; Rio Paranaiba muda a cidade
+    await page.fill('#nomePaciente', 'Outro Paciente');
     await page.evaluate(() => { const r = document.querySelector('input[name=localReceita][value="rio"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
     await page.click('#btnAtestado');
     await page.waitForTimeout(150);
@@ -699,10 +705,10 @@ async function run(url) {
       && /Atestado médico/.test(impresso) && /CID-10: J06\.9/.test(impresso) && /Paciente Atestado/.test(impresso) && /Carmo do Paranaíba, \d+ de /.test(impresso)
       && /esteve nesta unidade para atendimento médico no dia 19\/10\/2026, das 07:10 às 09:00\./.test(comparecimento) && titulo === 'Declaração de comparecimento'
       && /Fulana Acompanhante esteve nesta unidade no dia 19\/10\/2026, das 07:10 às 09:00, acompanhando Paciente Atestado/.test(acompanhante)
-      && fechou && cidLimpo && /^Atesto/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
+      && fechou && rascunhoMantido && cidLimpo && /^Atesto/.test(reaberto) && /Outro Paciente/.test(reaberto) && /Rio Paranaíba, \d+ de /.test(reaberto)
       && consoleErrors.length === 0;
     record('atestado: afastamento (periodo, CID com autorizacao), comparecimento, acompanhante e impressao', ok,
-      JSON.stringify({ aberto, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
+      JSON.stringify({ aberto, rascunhoMantido, t1: t1.slice(0, 200), semAutorizacao: semAutorizacao.slice(0, 260), comCid: comCid.slice(0, 260), comparecimento: comparecimento.slice(0, 200), titulo, acompanhante: acompanhante.slice(0, 200), fechou, cidLimpo, reaberto: reaberto.slice(-120), consoleErrors }));
     await browser.close();
   }
 
@@ -726,6 +732,9 @@ async function run(url) {
     await page.click('#btnImprimir');
     await page.waitForTimeout(400);
     const impresso = (await page.evaluate(() => window.__prints)).pop() || '';
+    const pImp = await browser.newPage(); await pImp.setContent(impresso);
+    const botoesNaImpressao = await pImp.evaluate(() => [...document.querySelectorAll('.par-item, .edit-item-btn, .rm-item')].filter((b) => getComputedStyle(b).display !== 'none').length);
+    await pImp.close();
     await page.click('#btnCopiar');
     await page.waitForTimeout(200);
     const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
@@ -738,12 +747,274 @@ async function run(url) {
     await page.waitForTimeout(150);
     const desfeito = await lis();
     const ok = antes.every((l) => !l.esp && l.ws === 'pre-line') && depois[2].esp && depois[2].mt === '14px' && !depois[1].esp
-      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso)
+      && (impresso.match(/class="espaco-antes"/g) || []).length === 1 && /white-space:pre-line/.test(impresso) && botoesNaImpressao === 0
       && /\n\n- /.test(copiado.split('ORIENTAÇÕES')[1] || '')
       && /<w:spacing w:before="200"\/>/.test(xml) && (xml.match(/<w:br\/>/g) || []).length >= 3
       && !desfeito[2].esp && consoleErrors.length === 0;
     record('orientacoes: quebra de linha e espaco de paragrafo (previa, impressao, copia, docx)', ok,
-      JSON.stringify({ antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+      JSON.stringify({ botoesNaImpressao, antes: antes.slice(0, 4), depois: depois.slice(0, 4), impressoEsp: (impresso.match(/class="espaco-antes"/g) || []).length, copiado: (copiado.split('ORIENTAÇÕES')[1] || '').slice(0, 160), brs: (xml.match(/<w:br\/>/g) || []).length, before200: /<w:spacing w:before="200"\/>/.test(xml), consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Clique fora nao apaga texto: janelas de edicao, encaminhamento (rascunho) e edicao na lista ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    page.on('dialog', (d) => d.dismiss());
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.fill('#nomePaciente', 'Paciente Rascunho');
+    await selectCondicao(page, 'Enxaqueca');
+    await page.waitForTimeout(200);
+    const cantoDoFundo = async (id) => { const b = await page.$(`#${id}`); const r = await b.boundingBox(); await page.mouse.click(r.x + 5, r.y + 5); await page.waitForTimeout(150); };
+    const aberta = (id) => page.evaluate((i) => document.getElementById(i).classList.contains('show'), id);
+
+    // 1) editar item da receita: clique no fundo nao fecha; Esc com alteracao pergunta (aqui: cancela)
+    await page.evaluate(() => document.querySelector('#receitaPaper .edit-item-btn[data-sel]').click());
+    await page.waitForTimeout(150);
+    await page.fill('#editItemPosologia', 'POSOLOGIA DIGITADA');
+    await cantoDoFundo('editItemOverlay');
+    const editAbertaAposClique = await aberta('editItemOverlay');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    const editAbertaAposEsc = await aberta('editItemOverlay');
+    const editTexto = await page.inputValue('#editItemPosologia');
+    await page.click('#btnCancelEditItem');
+
+    // 2) encaminhamento: clique no fundo nao fecha; fechar e reabrir mantem o texto; Recomecar gera de novo
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    await page.fill('#encTexto', 'TEXTO ESCRITO A MAO');
+    await cantoDoFundo('encaminhamentoOverlay');
+    const encAbertaAposClique = await aberta('encaminhamentoOverlay');
+    await page.click('#btnFecharEncaminhamento');
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    const encReaberto = await page.inputValue('#encTexto');
+    const recomecarVisivel = await page.isVisible('#btnRecomecarEncaminhamento');
+    await page.click('#btnRecomecarEncaminhamento');
+    const encRecomecado = await page.inputValue('#encTexto');
+    await page.fill('#encTexto', 'OUTRO RASCUNHO');
+    await page.click('#btnFecharEncaminhamento');
+    await page.click('#btnLimpar');
+    await page.fill('#nomePaciente', 'Paciente Rascunho');
+    await page.click('#btnEncaminhamento');
+    await page.waitForTimeout(150);
+    const encAposNovaReceita = await page.inputValue('#encTexto');
+    await page.click('#btnFecharEncaminhamento');
+
+    // 3) edicao na lista: marcar outra condicao e mudar o peso redesenham a lista sem perder o que foi digitado
+    await page.fill('#search', 'Enxaqueca');
+    await page.waitForTimeout(250);
+    await page.evaluate(() => {
+      const card = [...document.querySelectorAll('#listaContainer .card')].find((c) => c.querySelector('.card-head .nome')?.textContent.trim() === 'Enxaqueca');
+      card.querySelector('.card-head').click();
+    });
+    await page.waitForTimeout(150);
+    await page.evaluate(() => document.querySelector('#listaContainer .sub-row .ef-edit').click());
+    await page.waitForTimeout(150);
+    await page.fill('#listaContainer .edit-form .ef-pos', 'EDICAO NA LISTA');
+    await page.fill('#peso', '30');
+    await page.waitForTimeout(600);
+    await page.evaluate(() => document.querySelector('#listaContainer .sub-row input[type=checkbox]').click());
+    await page.waitForTimeout(250);
+    const lista = await page.evaluate(() => document.querySelector('#listaContainer .edit-form .ef-pos')?.value || '(sem formulario)');
+    await page.click('#listaContainer .edit-form .ef-cancel');
+    await page.waitForTimeout(150);
+    const semFormulario = await page.evaluate(() => !document.querySelector('#listaContainer .edit-form'));
+
+    const ok = editAbertaAposClique && editAbertaAposEsc && editTexto === 'POSOLOGIA DIGITADA'
+      && encAbertaAposClique && encReaberto === 'TEXTO ESCRITO A MAO' && recomecarVisivel && /^Encaminho Paciente Rascunho/.test(encRecomecado)
+      && /^Encaminho Paciente Rascunho/.test(encAposNovaReceita)
+      && lista === 'EDICAO NA LISTA' && semFormulario
+      && consoleErrors.length === 0;
+    record('clique fora nao apaga texto (edicao de item, encaminhamento com rascunho, edicao na lista)', ok,
+      JSON.stringify({ editAbertaAposClique, editAbertaAposEsc, editTexto, encAbertaAposClique, encReaberto, recomecarVisivel, encRecomecado: encRecomecado.slice(0, 40), encAposNovaReceita: encAposNovaReceita.slice(0, 40), lista, semFormulario, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Mesmo paciente: limpa so a receita e mantem nome, idade e peso; Nova receita limpa tudo ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const estado = () => page.evaluate(() => ({
+      nome: document.getElementById('nomePaciente').value, idade: document.getElementById('idade').value, peso: document.getElementById('peso').value,
+      itens: document.querySelectorAll('#receitaPaper .nome-med').length, orient: document.querySelectorAll('#receitaPaper .orientacoes-bloco li').length
+    }));
+    await page.fill('#nomePaciente', 'Maria Mesmo Paciente');
+    await page.fill('#idade', '40');
+    await page.fill('#peso', '62');
+    await selectCondicao(page, 'ITU');
+    await page.waitForTimeout(200);
+    const antes = await estado();
+    await page.click('#btnMesmoPaciente');
+    await page.waitForTimeout(200);
+    const mesmo = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.keyboard.press('Control+Shift+Enter');
+    await page.waitForTimeout(200);
+    const atalho = await estado();
+    await selectCondicao(page, 'Enxaqueca');
+    await page.click('#btnLimpar');
+    await page.waitForTimeout(200);
+    const nova = await estado();
+    const ok = antes.itens > 0 && antes.orient > 0
+      && mesmo.nome === 'Maria Mesmo Paciente' && mesmo.idade === '40' && mesmo.peso === '62' && mesmo.itens === 0 && mesmo.orient === 0
+      && atalho.nome === 'Maria Mesmo Paciente' && atalho.itens === 0
+      && nova.nome === '' && nova.idade === '' && nova.peso === '' && nova.itens === 0
+      && consoleErrors.length === 0;
+    record('mesmo paciente mantem nome/idade/peso; nova receita limpa tudo', ok, JSON.stringify({ antes, mesmo, atalho, nova, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Padroes de uso: mudanca repetida em 3 atendimentos vira sugestao; aplicar muda o padrao ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.open = () => ({ document: { write(){}, close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const NOVA = 'Tomar 01 comprimido, de 08/08 horas, se dor.';
+    // atendimento = Dor Muscular sem a Ciclobenzaprina, com Dipirona editada e Omeprazol acrescentado;
+    // o 2o atendimento e feito em duas receitas do mesmo paciente (nao pode contar a "remocao" da 1a parte)
+    // remove da receita, um por vez (cada clique redesenha a receita), os itens cujo nome casa com re
+    const removerItens = async (re) => {
+      for (;;) {
+        const tirou = await page.evaluate((src) => {
+          const b = [...document.querySelectorAll('#receitaPaper .rm-item[data-sel]')].find((x) => new RegExp(src).test(x.closest('.item-linha').textContent));
+          if (b) b.click();
+          return !!b;
+        }, re);
+        if (!tirou) return;
+        await page.waitForTimeout(60);
+      }
+    };
+    const atendimento = async (i, dividido) => {
+      await page.fill('#nomePaciente', 'Paciente ' + i);
+      await selectCondicao(page, 'Dor Muscular');
+      await removerItens('Ciclobenzaprina');
+      await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .edit-item-btn[data-sel]')].find((x) => /Dipirona/.test(x.closest('.item-linha').textContent)).click());
+      await page.fill('#editItemPosologia', NOVA);
+      await page.click('#btnSaveEditItem');
+      await page.fill('#search', 'Omeprazol'); await page.waitForTimeout(250);
+      await page.evaluate(() => { const c = [...document.querySelectorAll('#listaContainer .card.med-avulso')].find((x) => /^Omeprazol/.test(x.querySelector('.nome')?.textContent.trim() || '')); c.querySelector('input[type=checkbox]').click(); });
+      await page.waitForTimeout(150);
+      if(dividido){
+        // 1a receita so com a Dipirona; 2a (Mesmo paciente) com o resto
+        await removerItens('^(?:(?!Dipirona).)*$');
+        await page.click('#btnImprimir'); await page.waitForTimeout(150);
+        await page.click('#btnMesmoPaciente');
+        await selectCondicao(page, 'Dor Muscular');
+        await removerItens('Ciclobenzaprina|Dipirona');
+        await page.fill('#search', 'Omeprazol'); await page.waitForTimeout(250);
+        await page.evaluate(() => { const c = [...document.querySelectorAll('#listaContainer .card.med-avulso')].find((x) => /^Omeprazol/.test(x.querySelector('.nome')?.textContent.trim() || '')); c.querySelector('input[type=checkbox]').click(); });
+        await page.waitForTimeout(150);
+      }
+      await page.click('#btnImprimir'); await page.waitForTimeout(150);
+      await page.click('#btnLimpar'); await page.waitForTimeout(150);
+    };
+    await atendimento(1, false);
+    await atendimento(2, true);
+    await selectCondicao(page, 'Dor Muscular');
+    const depoisDe2 = await barra();
+    await page.click('#btnLimpar');
+    await atendimento(3, false);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(200);
+    const depoisDe3 = await barra();
+    // aplica as tres sugestoes
+    for (let k = 0; k < 3; k++) {
+      const b = await page.$('#avisoBar button[data-acao="padrao-aplicar"]');
+      if (!b) break;
+      await b.click(); await page.waitForTimeout(250);
+    }
+    await page.click('#btnLimpar');
+    await page.reload(); await page.waitForTimeout(400);
+    await selectCondicao(page, 'Dor Muscular');
+    await page.waitForTimeout(200);
+    const receita = await page.evaluate(() => document.querySelector('#receitaPaper').innerText.replace(/\s+/g, ' '));
+    const semSugestao = !/Sugestão do seu uso/.test(await barra());
+    const ok = !/Sugestão do seu uso/.test(depoisDe2)
+      && /Sugestão do seu uso/.test(depoisDe3) && /Dipirona/.test(depoisDe3) && /tirou .*Ciclobenzaprina|acrescentou .*Omeprazol/.test(depoisDe3)
+      && receita.includes(NOVA) && !/Ciclobenzaprina/.test(receita) && /Omeprazol/.test(receita)
+      && semSugestao && consoleErrors.length === 0;
+    record('padroes de uso: sugere apos 3 atendimentos (receita dividida conta como 1) e aplicar muda o padrao', ok,
+      JSON.stringify({ depoisDe2: depoisDe2.slice(0, 200), depoisDe3: depoisDe3.slice(0, 500), receita: receita.slice(0, 400), semSugestao, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Separar sozinho: ATB nas 2 vias e o resto + orientacoes na comum (previa, impressao, docx, copia) ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
+    const partes = () => page.evaluate(() => {
+      const nomes = (sel) => [...document.querySelectorAll(sel + ' .nome-med')].map((e) => e.textContent.trim());
+      return { comum: nomes('#receitaPaper .parte-comum'), duas: [...new Set(nomes('#receitaPaper .parte-duas'))],
+        orientComum: document.querySelectorAll('#receitaPaper .parte-comum .orientacoes-bloco li').length,
+        orientDuas: document.querySelectorAll('#receitaPaper .parte-duas .orientacoes-bloco li').length };
+    });
+    await page.fill('#nomePaciente', 'Paciente Separado');
+    await selectCondicao(page, 'ITU');   // Fosfomicina (antimicrobiano) + Dipirona + Pyridium + orientacoes
+    await page.waitForTimeout(200);
+    const sugestao = await barra();
+    await page.click('#avisoBar button[data-acao="separar-auto"]');
+    await page.waitForTimeout(250);
+    const separado = await partes();
+    // trocar a Dipirona de lado e voltar
+    await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .parte-comum .vias-item')].find((b) => /Dipirona/.test(b.closest('.item-linha').textContent)).click());
+    await page.waitForTimeout(200);
+    const trocado = await partes();
+    await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .parte-duas .vias-item')].find((b) => /Dipirona/.test(b.closest('.item-linha').textContent)).click());
+    await page.waitForTimeout(200);
+    // impressao: retrato + paisagem no mesmo PDF
+    await page.click('#btnImprimir');
+    await page.waitForTimeout(500);
+    const html = (await page.evaluate(() => window.__prints)).pop() || '';
+    const p2 = await browser.newPage();
+    await p2.setContent(html, { waitUntil: 'load' });
+    const pdf = await p2.pdf({ preferCSSPageSize: true });
+    const caixas = (pdf.toString('latin1').match(/\/MediaBox\s*\[[^\]]*\]/g) || []).map((m) => { const n = m.match(/[\d.]+/g).map(Number); return n[2] > n[3] ? 'paisagem' : 'retrato'; });
+    const botoesVisiveis = await p2.evaluate(() => [...document.querySelectorAll('.vias-item, .par-item, .edit-item-btn, .rm-item')].filter((b) => getComputedStyle(b).display !== 'none').length);
+    await p2.close();
+    // .docx: duas secoes, a segunda em paisagem
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btnDocx')]);
+    const os = require('os'); const path = require('path');
+    const arq = path.join(os.tmpdir(), 'separado.docx'); await dl.saveAs(arq);
+    const xml = require('child_process').execSync(`unzip -p ${arq} word/document.xml`).toString();
+    const secoes = (xml.match(/<w:sectPr/g) || []).length;
+    const paisagem = /w:orient="landscape"/.test(xml);
+    const docxTexto = xml.replace(/<[^>]+>/g, ' ');
+    // copia
+    await page.click('#btnCopiar');
+    await page.waitForTimeout(200);
+    const copiado = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+    // "Separar sozinho sempre": na proxima receita com ATB, separa sem pedir
+    await page.check('#avisoBar input[data-acao="separar-sempre"]');
+    await page.reload();   // app reaberto: o tipo volta a "Comum"
+    await page.waitForTimeout(400);
+    const tipoAoAbrir = await page.evaluate(() => document.querySelector('input[name=tipoReceita]:checked').value);
+    await selectCondicao(page, 'ITU');
+    await page.waitForTimeout(250);
+    const sozinho = await page.evaluate(() => document.querySelector('input[name=tipoReceita]:checked').value);
+    const ok = /Fosfomicina Trometamol 3g precisa de receita em 2 vias \(antimicrobiano\)/.test(sugestao)
+      && separado.duas.join('|') === 'Fosfomicina Trometamol 3g' && separado.comum.includes('Dipirona 500mg') && !separado.comum.includes('Fosfomicina Trometamol 3g')
+      && separado.orientComum > 0 && separado.orientDuas === 0
+      && trocado.duas.includes('Dipirona 500mg') && !trocado.comum.includes('Dipirona 500mg')
+      && caixas.length >= 2 && caixas[0] === 'retrato' && caixas[caixas.length - 1] === 'paisagem' && botoesVisiveis === 0
+      && secoes === 2 && paisagem && /Fosfomicina/.test(docxTexto) && /Dipirona/.test(docxTexto)
+      && /RECEITA EM 2 VIAS/.test(copiado) && copiado.indexOf('Dipirona') < copiado.indexOf('RECEITA EM 2 VIAS') && copiado.indexOf('Fosfomicina') > copiado.indexOf('RECEITA EM 2 VIAS')
+      && tipoAoAbrir === 'comum' && sozinho === 'auto'
+      && consoleErrors.length === 0;
+    record('separar sozinho: ATB nas 2 vias, resto e orientacoes na comum (previa, troca de lado, PDF retrato+paisagem, docx, copia, sempre)', ok,
+      JSON.stringify({ sugestao: sugestao.slice(0, 160), separado, trocado, caixas, botoesVisiveis, secoes, paisagem, copiado: copiado.slice(0, 80), tipoAoAbrir, sozinho, consoleErrors }));
     await browser.close();
   }
 
