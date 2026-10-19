@@ -464,6 +464,10 @@ async function run(url) {
     await selectCondicao(page, 'Dor Muscular');
     const larguras = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vw: window.innerWidth }));
     record('celular sem rolagem horizontal (390px)', larguras.doc <= 390 && larguras.vw <= 390, JSON.stringify(larguras));
+    await page.click('label.tipo-opt:has(input[name="tipoReceita"][value="controle"])');
+    await page.waitForTimeout(250);
+    const alturasVias = await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .via-box')].map((v) => Math.round(v.getBoundingClientRect().height)));
+    record('celular: vias do controle especial visiveis', alturasVias.length === 2 && alturasVias.every((h) => h > 200), JSON.stringify(alturasVias));
     await browser.close();
   }
 
