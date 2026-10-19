@@ -2167,8 +2167,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   const FIT_SCALE_MAX = 1;
   const FIT_SCALE_MIN = 0.62;
   const FIT_SCALE_STEP = 0.04;
-  const FIT_COLUMN_WIDTH = 480; // px — largura aproximada de cada via lado a lado em A4 paisagem
-  const FIT_MAX_HEIGHT = 620;   // px — altura aproximada disponível por folha (A4 paisagem, margens 12mm)
+  // A4 paisagem (1123 x 794 px a 96 dpi) com margem de 12 mm: ~1032 x 703 px úteis. O corpo da
+  // janela de impressão tem max-width 1000px e as duas vias têm 16px entre si: (1000-16)/2 = 492px.
+  const FIT_COLUMN_WIDTH = 492; // px — largura de cada via lado a lado na impressão
+  const FIT_MAX_HEIGHT = 680;   // px — altura útil da folha (703px) com folga para diferença de fonte
 
   function fitChromeCss(){
     return `
@@ -2244,7 +2246,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!probe){
       probe = document.createElement('div');
       probe.id = 'fitProbe';
-      probe.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;width:' + FIT_COLUMN_WIDTH + 'px;';
+      probe.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;width:' + FIT_COLUMN_WIDTH + 'px;'
+        + "font-size:16px;line-height:normal;font-family:'Inter',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#16241F;";
       document.body.appendChild(probe);
       const style = document.createElement('style');
       style.id = 'fitProbeStyle';
@@ -2339,24 +2342,41 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         }
       }
 
-      // 2) não coube nem no tamanho mínimo — divide em duas folhas
-      const scale = FIT_SCALE_MIN;
-      let corte = 1;
-      for(let n = entradas.length - 1; n >= 1; n--){
-        const html = renderEntradasHtml(entradas.slice(0, n), peso);
-        const altura = medirAlturaVia(buildVia(html), scale);
-        if(altura <= FIT_MAX_HEIGHT){ corte = n; break; }
+      // 2) não coube nem no tamanho mínimo — divide em quantas folhas forem precisas,
+      // cada uma medida (antes só havia 2 e o resto transbordava sem cabeçalho)
+      const notaDe = e => !e ? null
+        : e.tipo === 'item' ? 'Continuação da prescrição — Uso ' + e.it.via
+        : e.tipo === 'orientItem' ? 'Continuação — Orientações'
+        : null;
+      const paginar = (scale, limiteFolhas) => {
+        const cabe = (ini, fim) => {
+          const nota = ini > 0 ? notaDe(entradas[ini]) : null;
+          return medirAlturaVia(buildVia(renderEntradasHtml(entradas.slice(ini, fim), peso, nota)), scale) <= FIT_MAX_HEIGHT;
+        };
+        const paginas = [];
+        let ini = 0;
+        while(ini < entradas.length){
+          if(limiteFolhas && paginas.length >= limiteFolhas) return null; // já passou do mínimo
+          // maior fim que cabe (a altura cresce com o nº de entradas: busca binária)
+          let lo = ini + 1, hi = entradas.length, melhor = ini + 1;
+          while(lo <= hi){
+            const meio = (lo + hi) >> 1;
+            if(cabe(ini, meio)){ melhor = meio; lo = meio + 1; } else { hi = meio - 1; }
+          }
+          // não termina a folha num título ("Uso oral", "Orientações") sem nada embaixo
+          while(melhor - 1 > ini && melhor < entradas.length && /titulo|orientTitulo/.test(entradas[melhor - 1].tipo)) melhor--;
+          paginas.push(renderEntradasHtml(entradas.slice(ini, melhor), peso, ini > 0 ? notaDe(entradas[ini]) : null));
+          ini = melhor;
+        }
+        return paginas;
+      };
+      // menor nº de folhas possível (fonte mínima) e, com esse nº, a maior fonte que ainda cabe
+      const minimo = paginar(FIT_SCALE_MIN);
+      for(let scale = FIT_SCALE_MAX; scale > FIT_SCALE_MIN + 1e-6; scale -= FIT_SCALE_STEP){
+        const paginas = paginar(scale, minimo.length);
+        if(paginas && paginas.length <= minimo.length) return { scale: Math.round(scale * 100) / 100, paginas };
       }
-      const pagina1 = renderEntradasHtml(entradas.slice(0, corte), peso);
-      const restante = entradas.slice(corte);
-      let nota = null;
-      if(restante.length && restante[0].tipo === 'item'){
-        nota = 'Continuação da prescrição — Uso ' + restante[0].it.via;
-      } else if(restante.length && restante[0].tipo === 'orientItem'){
-        nota = 'Continuação — Orientações';
-      }
-      const pagina2 = restante.length ? renderEntradasHtml(restante, peso, nota) : null;
-      return { scale: Math.round(scale * 100) / 100, paginas: pagina2 ? [ pagina1, pagina2 ] : [ pagina1 ] };
+      return { scale: FIT_SCALE_MIN, paginas: minimo };
     } finally {
       // Sempre limpa a div/estilo de medição, mesmo que a função retorne mais
       // cedo — sem isso o vazamento de CSS pra página real persistia até o

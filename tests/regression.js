@@ -573,6 +573,34 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
+  {
+    const browser = await chromium.launch();
+    const { page } = await newPage(browser);
+    await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    await page.evaluate(() => { const r = document.querySelector('input[name=tipoReceita][value="controle"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); });
+    const resultados = [];
+    for (const conds of [['Dor Muscular'], ['Enxaqueca', 'Dor Muscular', 'GECA'], ['Dengue', 'ITU', 'Sinusite bomba', 'Vertigem', 'Gripe']]) {
+      await page.click('#btnLimpar');
+      for (const n of conds) await selectCondicao(page, n);
+      await page.click('#btnImprimir');
+      await page.waitForTimeout(500);
+      const html = (await page.evaluate(() => window.__prints)).pop();
+      const p2 = await browser.newPage();
+      await p2.setContent(html, { waitUntil: 'load' });
+      const folhas = await p2.evaluate(() => document.querySelectorAll('.vias-lado-a-lado').length);
+      const pdf = await p2.pdf({ preferCSSPageSize: true });
+      const paginas = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+      resultados.push({ conds: conds.length, folhas, paginas });
+      await p2.close();
+    }
+    const ok = resultados.every((r) => r.folhas === r.paginas) && resultados[0].folhas === 1;
+    record('controle especial: folhas montadas = paginas do PDF', ok, JSON.stringify(resultados));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;
