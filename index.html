@@ -338,9 +338,10 @@
       <div class="field">
         <label for="encTexto">Texto do encaminhamento</label>
         <textarea id="encTexto" class="enc-texto"></textarea>
-        <div class="mini-note">Você pode editar este texto livremente antes de copiar ou imprimir.</div>
+        <div class="mini-note">Você pode editar este texto livremente antes de copiar ou imprimir. Fechar a janela não apaga o que você escreveu: ao reabrir para o mesmo paciente, o texto está como você deixou.</div>
       </div>
       <div class="modal-actions">
+        <button id="btnRecomecarEncaminhamento" class="btn btn-outline btn-recomecar" type="button" hidden title="Gera o texto de novo a partir dos campos acima (descarta a edição à mão)">Recomeçar texto</button>
         <button id="btnCopiarEncaminhamento" class="btn btn-outline" type="button">Copiar texto</button>
         <button id="btnImprimirEncaminhamento" class="btn btn-primary" type="button">Imprimir</button>
       </div>
@@ -416,6 +417,7 @@
         <div class="mini-note">O texto se atualiza conforme os campos acima; você pode editá-lo antes de copiar ou imprimir. O CID só entra com a autorização do paciente (Resolução CFM 1.658/2002).</div>
       </div>
       <div class="modal-actions">
+        <button id="btnRecomecarAtestado" class="btn btn-outline btn-recomecar" type="button" hidden title="Gera o texto de novo a partir dos campos acima (descarta a edição à mão)">Recomeçar texto</button>
         <button id="btnCopiarAtestado" class="btn btn-outline" type="button">Copiar texto</button>
         <button id="btnImprimirAtestado" class="btn btn-primary" type="button">Imprimir</button>
       </div>

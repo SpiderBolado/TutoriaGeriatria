@@ -273,7 +273,43 @@
   }
 
   // ---------- Renderização da lista (esquerda) ----------
+  // A lista é refeita inteira a cada mudança (marcar outro item, peso, busca);
+  // sem isto, o formulário de edição aberto voltava aos valores salvos e o que
+  // estava digitado se perdia. O rascunho vale até Salvar ou Cancelar.
+  let rascunhoEdicao = null;
+  let linhaEditadaNoDom = null;   // linha cujo formulário está na tela agora
+  const campoEdicao = c => [...c.classList].find(k => k.startsWith('ef-'));
+  function capturarRascunhoEdicao(cont){
+    if(!editingRow || (rascunhoEdicao && rascunhoEdicao.row !== editingRow)) rascunhoEdicao = null;
+    if(!editingRow) return;
+    const form = cont.querySelector('.edit-form');
+    // linha fora do filtro, ou a edição acabou de passar para outra linha: não captura
+    if(!form || linhaEditadaNoDom !== editingRow) return;
+    const campos = {};
+    form.querySelectorAll('input, textarea, select').forEach(c => { const k = campoEdicao(c); if(k) campos[k] = c.value; });
+    const ativo = document.activeElement;
+    const foco = ativo && form.contains(ativo) ? { k: campoEdicao(ativo), ini: ativo.selectionStart, fim: ativo.selectionEnd } : null;
+    rascunhoEdicao = { row: editingRow, campos, foco };
+  }
+  function restaurarRascunhoEdicao(cont){
+    if(!editingRow || !rascunhoEdicao || rascunhoEdicao.row !== editingRow) return;
+    const form = cont.querySelector('.edit-form');
+    if(!form) return;
+    Object.entries(rascunhoEdicao.campos).forEach(([k, v]) => { const c = form.querySelector('.' + k); if(c) c.value = v; });
+    const f = rascunhoEdicao.foco;
+    const c = f && f.k && form.querySelector('.' + f.k);
+    if(c){ c.focus(); try{ if(f.ini !== null && f.ini !== undefined) c.setSelectionRange(f.ini, f.fim); }catch(_){ /* select não tem seleção */ } }
+  }
+
   function renderLista(filtro){
+    const cont = el('listaContainer');
+    capturarRascunhoEdicao(cont);
+    renderListaConteudo(filtro);
+    linhaEditadaNoDom = cont.querySelector('.edit-form') ? editingRow : null;
+    restaurarRascunhoEdicao(cont);
+  }
+
+  function renderListaConteudo(filtro){
     const cont = el('listaContainer');
     const f = norm(filtro);
     cont.innerHTML = '';
@@ -844,7 +880,18 @@
     return html;
   }
 
+  // Retrato dos campos de uma janela, para saber se algo foi alterado antes de fechar
+  function valoresDoFormulario(raiz){
+    return JSON.stringify([...raiz.querySelectorAll('input, textarea, select')].map(c => (c.type === 'checkbox' || c.type === 'radio') ? c.checked : c.value));
+  }
+
   // ---------- Encaminhamento ----------
+  // Rascunho: fechar a janela não descarta o que foi escrito. Reabrir para o
+  // mesmo paciente mostra tudo como estava; outro paciente ou "Nova receita"
+  // recomeça. Depois de editar o texto à mão, mudar os campos não o sobrescreve
+  // (o botão "Recomeçar texto" gera de novo a partir dos campos).
+  let encRascunhoPaciente = null;
+  let encTextoEditado = false;
   function condicoesNaReceita(){
     const nomes = Object.values(selected).map(it => it.origemCondicao).filter(Boolean);
     return [...new Set(nomes)];
@@ -900,12 +947,25 @@ ${dataStr}`;
   }
 
   function atualizarPreviaEncaminhamento(){
+    el('btnRecomecarEncaminhamento').hidden = !encTextoEditado;
+    if(encTextoEditado) return;
     el('encTexto').value = montarTextoEncaminhamento();
   }
 
   function abrirEncaminhamento(){
-    el('encNomePaciente').value = el('nomePaciente').value.trim();
-    popularEncaminhamentoCondicoes();
+    const paciente = el('nomePaciente').value.trim();
+    if(encRascunhoPaciente === null || encRascunhoPaciente !== paciente){
+      encTextoEditado = false;
+      el('encNomePaciente').value = paciente;
+      el('encCondicaoOutra').value = '';
+      popularEncaminhamentoCondicoes();
+    } else {
+      // mesmo paciente: mantém o que foi escrito; a lista de condições acompanha a receita
+      const escolhida = el('encCondicao').value;
+      popularEncaminhamentoCondicoes();
+      if([...el('encCondicao').options].some(o => o.value === escolhida)) el('encCondicao').value = escolhida;
+      el('encCondicaoOutraField').style.display = el('encCondicao').value === '__outra__' ? '' : 'none';
+    }
     atualizarPreviaEncaminhamento();
     el('encaminhamentoOverlay').classList.add('show');
   }
@@ -1056,18 +1116,31 @@ _________________________________
 ${assinatura}`;
   }
 
+  // Mesmo esquema de rascunho do encaminhamento
+  let atRascunhoPaciente = null;
+  let atTextoEditado = false;
+
   function atualizarPreviaAtestado(){
     const tipo = tipoAtestado();
     el('atestadoOverlay').dataset.tipo = tipo;
     el('atTitulo').textContent = TITULOS_ATESTADO[tipo];
     const dias = el('atDias').value;
     document.querySelectorAll('.at-dias-rapidos button').forEach(b => b.setAttribute('aria-pressed', b.dataset.dias === dias ? 'true' : 'false'));
+    el('btnRecomecarAtestado').hidden = !atTextoEditado;
+    if(atTextoEditado) return;
     el('atTexto').value = montarTextoAtestado();
   }
 
-  // Cada abertura começa do zero para o paciente atual: CID, documento e
-  // acompanhante não passam de um paciente para o outro.
+  // Outro paciente (ou Nova receita) começa do zero: CID, documento e
+  // acompanhante não passam de um paciente para o outro. O mesmo paciente
+  // reencontra o rascunho como deixou.
   function abrirAtestado(){
+    if(atRascunhoPaciente !== null && atRascunhoPaciente === el('nomePaciente').value.trim()){
+      atualizarPreviaAtestado();
+      el('atestadoOverlay').classList.add('show');
+      return;
+    }
+    atTextoEditado = false;
     const hoje = isoDia(new Date()), agora = horaAgora();
     el('atNomePaciente').value = el('nomePaciente').value.trim();
     ['atDocumento', 'atAcompanhante', 'atCid', 'atHoraInicio'].forEach(id => { el(id).value = ''; });
@@ -2166,18 +2239,19 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     
     overlay.classList.add('show');
+    overlay.dataset.valoresIniciais = valoresDoFormulario(overlay);
   });
 
   // Modal de Edição de Itens da Prescrição
   const closeEditModal = () => el('editItemOverlay').classList.remove('show');
   el('btnFecharEditItem').addEventListener('click', closeEditModal);
   el('btnCancelEditItem').addEventListener('click', closeEditModal);
-  el('editItemOverlay').addEventListener('click', (e) => {
-    if(e.target.id === 'editItemOverlay') closeEditModal();
-  });
+  // Clicar fora não fecha (perdia a edição); Esc só fecha direto se nada mudou
   document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && el('editItemOverlay').classList.contains('show')){
-      closeEditModal();
+    const ov = el('editItemOverlay');
+    if(e.key === 'Escape' && ov.classList.contains('show')){
+      const mudou = valoresDoFormulario(ov) !== ov.dataset.valoresIniciais;
+      if(!mudou || window.confirm('Fechar sem salvar? A edição deste item será perdida.')) closeEditModal();
     }
   });
 
@@ -2292,11 +2366,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
   // Encaminhamento
   el('btnEncaminhamento').addEventListener('click', abrirEncaminhamento);
-  const closeEncaminhamentoModal = () => el('encaminhamentoOverlay').classList.remove('show');
+  // Clicar fora da janela não fecha (fechava sem querer e perdia o texto); fechar guarda o rascunho
+  const closeEncaminhamentoModal = () => {
+    encRascunhoPaciente = el('nomePaciente').value.trim();
+    el('encaminhamentoOverlay').classList.remove('show');
+  };
   el('btnFecharEncaminhamento').addEventListener('click', closeEncaminhamentoModal);
-  el('encaminhamentoOverlay').addEventListener('click', (e) => {
-    if(e.target.id === 'encaminhamentoOverlay') closeEncaminhamentoModal();
-  });
+  el('encTexto').addEventListener('input', () => { encTextoEditado = true; el('btnRecomecarEncaminhamento').hidden = false; });
+  el('btnRecomecarEncaminhamento').addEventListener('click', () => { encTextoEditado = false; atualizarPreviaEncaminhamento(); });
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape' && el('encaminhamentoOverlay').classList.contains('show')){
       closeEncaminhamentoModal();
@@ -2313,11 +2390,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
   // Atestado
   el('btnAtestado').addEventListener('click', abrirAtestado);
-  const closeAtestadoModal = () => el('atestadoOverlay').classList.remove('show');
+  const closeAtestadoModal = () => {
+    atRascunhoPaciente = el('nomePaciente').value.trim();
+    el('atestadoOverlay').classList.remove('show');
+  };
   el('btnFecharAtestado').addEventListener('click', closeAtestadoModal);
-  el('atestadoOverlay').addEventListener('click', (e) => {
-    if(e.target.id === 'atestadoOverlay') closeAtestadoModal();
-  });
+  el('atTexto').addEventListener('input', () => { atTextoEditado = true; el('btnRecomecarAtestado').hidden = false; });
+  el('btnRecomecarAtestado').addEventListener('click', () => { atTextoEditado = false; atualizarPreviaAtestado(); });
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape' && el('atestadoOverlay').classList.contains('show')) closeAtestadoModal();
   });
@@ -2701,6 +2780,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   });
   el('btnLimpar').addEventListener('click', () => {
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false;
+    encRascunhoPaciente = null; atRascunhoPaciente = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
   });
