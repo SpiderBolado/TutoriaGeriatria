@@ -220,7 +220,7 @@
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
           Atestado
         </button>
-        <button id="btnEncaminhamento" class="btn" type="button" title="Monta um texto de encaminhamento à atenção básica">
+        <button id="btnEncaminhamento" class="btn" type="button" title="Monta um texto de encaminhamento (atenção básica, especialidade ou hospital)">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
           Encaminhar
         </button>
@@ -334,6 +334,11 @@
       <div class="field">
         <label for="encCondicao">Diagnóstico / condição</label>
         <select id="encCondicao"></select>
+      </div>
+      <div class="field">
+        <label for="encDestino">Encaminhar para</label>
+        <input type="text" id="encDestino" list="encDestinos" value="atenção básica" placeholder="ex: atenção básica, ortopedia, hospital de referência">
+        <datalist id="encDestinos"><option value="atenção básica"><option value="ambulatório de ortopedia"><option value="ambulatório de cardiologia"><option value="oftalmologia"><option value="otorrinolaringologia"><option value="hospital de referência"></datalist>
       </div>
       <div class="field" id="encCondicaoOutraField" style="display:none">
         <label for="encCondicaoOutra">Descreva o diagnóstico</label>
