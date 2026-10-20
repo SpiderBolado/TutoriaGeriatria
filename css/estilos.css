@@ -1177,3 +1177,16 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 .ajuda-modal-body > .modal-actions, .ajuda-modal > .modal-actions{position:sticky;bottom:-20px;background:var(--surface);z-index:1;padding-bottom:4px;}
 .falta-peso{color:var(--amber-ink);font-weight:600;}
 .cid-sem-autorizacao{color:var(--amber-ink);margin-top:4px;}
+
+/* Alergia do Quadro marcada no próprio item (só na tela) */
+.selo-alergia{flex:none;font-size:11px;font-weight:700;color:#fff;background:var(--danger);border-radius:999px;padding:1px 8px;white-space:nowrap;}
+/* Receita separada: o que foi para as 2 vias, no topo da prévia */
+.resumo-separada{font-size:12.5px;background:var(--teal-wash);color:var(--teal-dark);border:1px solid var(--teal);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:12px;}
+.resumo-separada a{color:inherit;font-weight:700;margin-left:6px;}
+/* Celular: botão flutuante até a receita */
+.ver-receita{display:none;}
+@media (max-width:880px){
+  .ver-receita{display:block;position:fixed;right:16px;bottom:16px;z-index:900;background:var(--primary);color:var(--on-primary);border:0;border-radius:999px;padding:12px 18px;font:600 14px var(--font-ui);box-shadow:var(--shadow-lg);min-height:44px;}
+  .ver-receita[hidden]{display:none;}
+}
+@media print{ .ver-receita, .selo-alergia, .resumo-separada{display:none !important;} }

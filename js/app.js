@@ -948,6 +948,7 @@
           <div class="item-linha">
             <span class="num mono">${String(idx+1).padStart(2,'0')}.</span>
             <span class="nome-med">${escapeHtml(it.nome)}</span>
+            ${(() => { const q = quadroAtual(); const a = q && window.PONTE.conflitoAlergia(it.nome, q.alergias || []); return a ? `<span class="selo-alergia" title="Alergia registrada no Quadro">⚠ alergia: ${escapeHtml(a)}</span>` : ''; })()}
             ${tipoReceitaAtual() === 'auto' ? (() => { const d = precisaDuasVias(it); return `<button class="vias-item${d ? ' em-duas' : ''}" data-sel="${escapeHtml(id)}" title="${d ? 'Vai no receituário de 2 vias — clique para passar para a receita comum' : 'Vai na receita comum — clique para passar para as 2 vias'}">${d ? '2 vias' : 'comum'}</button>`; })() : ''}
             <span class="dots"></span>
             <span class="qtde">${escapeHtml(it.qtde||'')}</span>
@@ -1007,7 +1008,10 @@
     const medicoCrm = (el('medicoCrm') && el('medicoCrm').value.trim()) || '';
     const assinatura = [medicoNome, medicoCrm].filter(Boolean).join(' — ');
 
-    return `Encaminho ${nomePaciente} à atenção básica, pois esteve nesta unidade no dia ${dataStr} apresentando sinais e sintomas compatíveis com ${condicao}, tendo sido prescrito ${medicamentos}, e necessita de acompanhamento ao curso de sua doença e na convalescença, além de manejo de suas condições de base.
+    const destino = (el('encDestino') && el('encDestino').value.trim()) || 'atenção básica';
+    const aoDestino = /^(atenção|atencao|unidade|ubs|equipe|clínica|clinica|policlínica|emergência|emergencia)\b/i.test(destino) ? 'à ' + destino
+      : /^(ambulatório|ambulatorio|hospital|serviço|servico|setor|pronto|caps|centro|posto)\b/i.test(destino) ? 'ao ' + destino : 'a ' + destino;
+    return `Encaminho ${nomePaciente} ${aoDestino}, pois esteve nesta unidade no dia ${dataStr} apresentando sinais e sintomas compatíveis com ${condicao}, tendo sido prescrito ${medicamentos}, e necessita de acompanhamento ao curso de sua doença e na convalescença, além de manejo de suas condições de base.
 
 Agradeço,
 
@@ -1431,8 +1435,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const paper = el('receitaPaper');
     const sep = separacaoAtiva();
     paper.classList.toggle('separada', !!sep);
+    const nomes = o => Object.values(o).map(it => it.nome);
     paper.innerHTML = sep
-      ? `<div class="parte-comum">${comSelecao(sep.comum, sep.orientComum, () => htmlPrevia('comum'))}</div>`
+      ? `<div class="resumo-separada"><b>Comum (${Object.keys(sep.comum).length})</b> · <b>2 vias (${Object.keys(sep.duas).length}):</b> ${escapeHtml(nomes(sep.duas).join(', '))} <a href="#" data-ir="parte-duas">ver ↓</a></div>`
+        + `<div class="parte-comum">${comSelecao(sep.comum, sep.orientComum, () => htmlPrevia('comum'))}</div>`
         + `<div class="separador-vias"><span>Receituário de controle especial — 2 vias</span></div>`
         + `<div class="parte-duas">${comSelecao(sep.duas, sep.orientDuas, () => htmlPrevia('controle'))}</div>`
       : htmlPrevia(tipoEfetivo());
@@ -2125,6 +2131,20 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     renderAvisos();
     renderCount();
     atualizarDestaquePeso();
+    atualizarVerReceita();
+  }
+  // Celular: botão flutuante que leva até a receita (ela fica abaixo da lista)
+  function atualizarVerReceita(){
+    let b = el('btnVerReceita');
+    if(!b){
+      b = document.createElement('button');
+      b.id = 'btnVerReceita'; b.type = 'button'; b.className = 'ver-receita';
+      b.addEventListener('click', () => el('receitaPaper').closest('.receita-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      document.body.appendChild(b);
+    }
+    const n = Object.keys(selected).length + Object.keys(selectedOrient).length;
+    b.textContent = 'Ver receita (' + Object.keys(selected).length + ')';
+    b.hidden = !n;
   }
 
   // ---------- Texto puro para copiar ----------
@@ -2770,6 +2790,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
   });
 
+  el('receitaPaper').addEventListener('click', (e) => {
+    const ir = e.target.closest('[data-ir]');
+    if(!ir) return;
+    e.preventDefault();
+    const alvo = el('receitaPaper').querySelector('.' + ir.dataset.ir);
+    if(alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   // Trocar o item de lado (2 vias × comum) em "Separar sozinho"
   el('receitaPaper').addEventListener('click', (e) => {
     const btn = e.target.closest('.vias-item');
@@ -3001,6 +3028,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     atualizarPreviaEncaminhamento();
   });
   el('encCondicaoOutra').addEventListener('input', atualizarPreviaEncaminhamento);
+  el('encDestino').addEventListener('input', atualizarPreviaEncaminhamento);
   el('btnCopiarEncaminhamento').addEventListener('click', copiarEncaminhamento);
   el('btnImprimirEncaminhamento').addEventListener('click', imprimirEncaminhamento);
 
@@ -3079,7 +3107,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;}
       .via-box-patos-assinatura{margin-top:8px;padding:14px 16px 18px 16px;border-top:1px dashed #D7DEDA;font-size:11px;}
       .receita-vazia-mini{padding:20px 6px;color:#4B5A55;font-size:12.5px;text-align:center;}
-      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia, .selo-alergia, .resumo-separada{ display:none !important; }
     `;
   }
 
@@ -3317,7 +3345,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       .via-box-footer > div{flex:1;padding:9px 12px;font-size:10.5px;color:#4B5A55;line-height:1.7;}
       .via-box-footer > div:first-child{border-right:1.5px solid #16241F;}
       .via-box-footer b{color:#16241F;}
-      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia{ display:none !important; }
+      .rm-item, .edit-item-btn, .par-item, .vias-item, .pos-vazia, .selo-alergia, .resumo-separada{ display:none !important; }
       .assinatura-bloco{margin-top:50px;padding-top:16px;border-top:1px dashed #D7DEDA;display:flex;align-items:flex-end;justify-content:center;gap:28px;}
       .carimbo-box{width:190px;height:88px;flex:none;border:1.5px dashed #D7DEDA;border-radius:6px;display:flex;align-items:center;justify-content:center;}
       .carimbo-box span{font-size:10.5px;color:#D7DEDA;text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
