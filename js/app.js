@@ -396,8 +396,11 @@
     const toks = tokensBusca(filtro);
     const todos = allMedicamentos();
     if(!toks.length) return todos;
+    // fora da pediatria, a apresentação de adulto vem antes da suspensão por kg
+    const crianca = pacientePediatrico();
     return todos.map(m => [m, pontuaTexto([m.nome, m.concentracao, m.forma].filter(Boolean).join(' '), toks)])
-      .filter(x => x[1]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+      .filter(x => x[1]).map(x => [x[0], x[1] + (x[0].fator != null || x[0].faixas ? (crianca ? 0.5 : -0.5) : 0)])
+      .sort((a, b) => b[1] - a[1]).map(x => x[0]);
   }
 
   function renderListaConteudo(filtro){
@@ -951,7 +954,7 @@
             <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item" aria-label="Editar ${escapeHtml(it.nome)}">&#x270E;</button>
             <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita" aria-label="Remover ${escapeHtml(it.nome)} da receita">&times;</button>
           </div>
-          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
+          <div class="item-pos">${precisaPeso ? '<span class="falta-peso">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
         `;
       });
     });
@@ -1053,10 +1056,11 @@ ${dataStr}`;
       el('encCondicaoOutraField').style.display = el('encCondicao').value === '__outra__' ? '' : 'none';
     }
     atualizarPreviaEncaminhamento();
-    el('encaminhamentoOverlay').classList.add('show');
+    mostrarJanela('encaminhamentoOverlay', 'btnImprimirEncaminhamento');
   }
 
-  function imprimirEncaminhamento(){
+  async function imprimirEncaminhamento(){
+    if(!await conferirDocumento(el('encTexto').value, el('encNomePaciente'))) return;
     imprimirDocumentoSimples('Encaminhamento', el('encTexto').value, el('encNomePaciente').value.trim());
   }
 
@@ -1202,6 +1206,7 @@ ${assinatura}`;
     const dias = el('atDias').value;
     document.querySelectorAll('.at-dias-rapidos button').forEach(b => b.setAttribute('aria-pressed', b.dataset.dias === dias ? 'true' : 'false'));
     el('btnRecomecarAtestado').hidden = !atTextoEditado;
+    el('atCidAviso').hidden = !(el('atCid').value.trim() && !el('atCidAutorizado').checked);
     if(atTextoEditado) return;
     el('atTexto').value = montarTextoAtestado();
   }
@@ -1212,7 +1217,7 @@ ${assinatura}`;
   function abrirAtestado(){
     if(atRascunhoPaciente !== null && atRascunhoPaciente === el('nomePaciente').value.trim()){
       atualizarPreviaAtestado();
-      el('atestadoOverlay').classList.add('show');
+      mostrarJanela('atestadoOverlay', 'atDias');
       return;
     }
     atTextoEditado = false;
@@ -1226,10 +1231,11 @@ ${assinatura}`;
     el('atHoraFim').value = agora;
     el('atDias').value = '1';
     atualizarPreviaAtestado();
-    el('atestadoOverlay').classList.add('show');
+    mostrarJanela('atestadoOverlay', 'atDias');
   }
 
-  function imprimirAtestado(){
+  async function imprimirAtestado(){
+    if(!await conferirDocumento(el('atTexto').value, el('atNomePaciente'))) return;
     imprimirDocumentoSimples(TITULOS_ATESTADO[tipoAtestado()], el('atTexto').value, el('atNomePaciente').value.trim());
   }
 
@@ -1475,7 +1481,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return kg !== null && kg < window.PEDIATRIA.PESO_MAX_KG;
   }
   function autoPediatriaAtiva(){
-    try{ return localStorage.getItem(AUTO_PED_KEY) === '1'; }catch(e){ return false; }
+    // no Quadro (idade e peso chegam do cartão) já vem ligado; fora dele, só se marcado
+    try{ const v = localStorage.getItem(AUTO_PED_KEY); return v === null ? !!PONTE : v === '1'; }catch(e){ return false; }
   }
 
   function executarConversao(automatica){
@@ -1492,6 +1499,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const acum = conversaoPed || { motivos: [], fixos: [] };
     r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
     r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
+    acum.automatica = !!automatica;
     conversaoPed = acum;
     renderTudo();
     if(automatica) showToast('Receita convertida para pediátrica — confira os avisos');
@@ -1527,7 +1535,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(pacienteQuadro.nome && tela && primeiroNome(tela) !== primeiroNome(pacienteQuadro.nome)) return null;
     return pacienteQuadro;
   }
-  function aplicarPacienteDoQuadro(p){
+  async function aplicarPacienteDoQuadro(p){
     if(!p){ return; }
     const tela = el('nomePaciente').value.trim();
     const temItens = Object.keys(selected).length || Object.keys(selectedOrient).length;
@@ -1537,7 +1545,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     // outro paciente: receita nova se a anterior já saiu; receita ainda não impressa
     // sem nome fica para este paciente; com outro nome, pergunta antes de apagar
     if(!mesmo && (tela || temItens)){
-      const limpar = jaSaiu || !temItens || (tela && window.confirm('Trocar para ' + p.nome + '? A receita de ' + tela + ' ainda não foi impressa e será apagada.'));
+      const limpar = jaSaiu || !temItens || (tela && await perguntar('Trocar para <b>' + escapeHtml(p.nome) + '</b>? A receita de ' + escapeHtml(tela) + ' ainda não foi impressa e será apagada.',
+        [{ rotulo: 'Manter ' + tela, valor: false }, { rotulo: 'Trocar de paciente', valor: true, primario: true }]));
       if(limpar){ limpezaSilenciosa = true; try{ el('btnLimpar').click(); } finally { limpezaSilenciosa = false; } }
       else if(tela) return;   // ficou com o paciente anterior
     }
@@ -1546,6 +1555,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(p.idade && !el('idade').value.trim()) el('idade').value = window.PONTE.idadeParaCampo(p.idade);
     if(p.peso && !el('peso').value) el('peso').value = String(p.peso);
     renderReceita(); atualizarDestaquePeso(); renderTudo();
+    // receita vazia: o foco vai para a 1ª sugestão pela queixa (Enter adiciona) ou para a busca
+    if(!Object.keys(selected).length){
+      const sug = document.querySelector('#avisoBar button[data-acao="cond-queixa"]');
+      (sug || el('search')).focus({ preventScroll: true });
+    }
   }
   // condição montada para criança: a maioria dos itens com dose por peso (ex.: Faringoamigdalite, em suspensão)
   function condicaoPorPeso(nome){
@@ -1562,10 +1576,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!q) return;
     const alergias = q.alergias || [];
     if(alergias.length){
-      const conflitos = entradas.map(([, it]) => [it.nome, window.PONTE.conflitoAlergia(it.nome, alergias)]).filter(x => x[1]);
+      const conflitos = entradas.map(([id, it]) => [id, it.nome, window.PONTE.conflitoAlergia(it.nome, alergias)]).filter(x => x[2]);
       bar.appendChild(avisoHtml('perigo', '&#9888;', conflitos.length
-        ? '<b>ALERGIA — confira antes de imprimir:</b>' + listaHtml(conflitos.map(([n, a]) => n + ' (alergia a ' + a + ' registrada no Quadro)'))
-        : 'Alergia registrada no Quadro: <b>' + escapeHtml(alergias.join(', ')) + '</b>'));
+        ? '<b>ALERGIA — confira antes de imprimir:</b>' + listaHtml(conflitos.map(([, n, a]) => n + ' (alergia a ' + a + ' registrada no Quadro)'))
+        : 'Alergia registrada no Quadro: <b>' + escapeHtml(alergias.join(', ')) + '</b>',
+        conflitos.length ? `<button type="button" data-acao="tirar-alergico" data-ids="${escapeHtml(conflitos.map(c => c[0]).join('|'))}">Tirar da receita</button>` : ''));
     }
     // receita ainda vazia: a queixa do cartão sugere por onde começar
     if(!entradas.length && q.queixa){
@@ -1597,6 +1612,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
     renderAvisosQuadro(bar, entradas);
+    if(entradas.length && !el('medicoNome').value.trim() && !semMedicoAceito)
+      bar.appendChild(avisoHtml('teal', '&#9998;', 'Seu <b>nome e CRM</b> ainda não aparecem na receita (preenche uma vez neste aparelho).',
+        '<button type="button" data-acao="preencher-medico">Preencher</button>'));
 
     // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
     const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas, idade) : 0;
@@ -1617,7 +1635,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(alto) itens.push(alto);
       itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
       convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
-      const titulo = 'Receita convertida automaticamente para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
+      const titulo = 'Receita convertida ' + (conversaoPed.automatica ? 'automaticamente ' : '') + 'para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
       bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
         + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
         desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
@@ -2157,6 +2175,89 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), acao ? 8000 : 1800);
   }
+  // Abre uma janela no topo, com o foco dentro dela (campo principal ou o botão de imprimir);
+  // ao fechar, o foco volta para o botão que a abriu
+  const quemAbriu = {};
+  function mostrarJanela(id, focoId){
+    const ov = el(id);
+    quemAbriu[id] = document.activeElement;
+    ov.classList.add('show');
+    const modal = ov.querySelector('.ajuda-modal');
+    if(modal) modal.scrollTop = 0;
+    const f = focoId && el(focoId);
+    if(f){
+      f.focus({ preventScroll: true });
+      if(f.tagName === 'TEXTAREA'){ try{ f.setSelectionRange(f.value.length, f.value.length); }catch(_){ /* nada */ } }
+    }
+  }
+  document.querySelectorAll('.ajuda-overlay').forEach(ov => new MutationObserver(() => {
+    if(!ov.classList.contains('show') && quemAbriu[ov.id]){
+      const b = quemAbriu[ov.id]; quemAbriu[ov.id] = null;
+      if(b && document.contains(b) && !document.querySelector('.ajuda-overlay.show')) b.focus({ preventScroll: true });
+    }
+  }).observe(ov, { attributes: true, attributeFilter: ['class'] }));
+
+  // Pergunta dentro do app (o confirm() do navegador pode ser bloqueado dentro do Claude).
+  // htmlTexto já vem escapado; botoes: [{ rotulo, valor, primario }]. Esc devolve null.
+  function perguntar(htmlTexto, botoes){
+    return new Promise(resolve => {
+      const ov = document.createElement('div');
+      ov.className = 'ajuda-overlay show pergunta-overlay';
+      ov.innerHTML = '<div class="ajuda-modal modal-sm" role="alertdialog" aria-modal="true"><div class="ajuda-modal-body"><div class="pergunta-texto"></div><div class="modal-actions"></div></div></div>';
+      ov.querySelector('.pergunta-texto').innerHTML = htmlTexto;
+      const fim = v => { document.removeEventListener('keydown', tecla, true); ov.remove(); resolve(v); };
+      const tecla = e => { if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); fim(null); } };
+      document.addEventListener('keydown', tecla, true);
+      const acoes = ov.querySelector('.modal-actions');
+      botoes.forEach(b => {
+        const bt = document.createElement('button');
+        bt.type = 'button'; bt.className = 'btn ' + (b.primario ? 'btn-primary' : 'btn-outline'); bt.textContent = b.rotulo;
+        bt.addEventListener('click', () => fim(b.valor));
+        acoes.appendChild(bt);
+      });
+      document.body.appendChild(ov);
+      const prim = acoes.querySelector('.btn-primary') || acoes.querySelector('button');
+      if(prim) prim.focus();
+    });
+  }
+  // Antes de imprimir ou baixar: o que sairia errado no papel. "Preencher" leva ao campo;
+  // "Imprimir assim mesmo" segue (para o médico em branco, não pergunta de novo nesta visita).
+  let semMedicoAceito = false;
+  async function conferirAntesDeEmitir(){
+    if(!Object.keys(selected).length && !Object.keys(selectedOrient).length){ showToast('A receita está vazia'); return false; }
+    if(window.__semConferir) return true;   // testes automáticos que não tratam da checagem
+    const falta = [];
+    const porPeso = Object.values(selected).filter(it => itemPorPeso(it)).length;
+    if(porPeso && !pesoAtualKg()) falta.push({ txt: `o <b>peso</b> (${porPeso} ${porPeso === 1 ? 'item' : 'itens'} com dose por kg)`, campo: 'peso' });
+    else if(/\bDOSE\b/.test(el('receitaPaper').innerText)) falta.push({ txt: 'a <b>dose</b> de um item (a palavra DOSE sairia no papel)', campo: null });
+    if(!el('nomePaciente').value.trim()) falta.push({ txt: 'o <b>nome do paciente</b>', campo: 'nomePaciente' });
+    if(!semMedicoAceito && !el('medicoNome').value.trim()) falta.push({ txt: 'o <b>seu nome e CRM</b> (Dados do médico)', campo: 'medicoNome', medico: true });
+    if(!falta.length) return true;
+    const r = await perguntar('<b>Antes de imprimir, falta:</b><ul>' + falta.map(f => '<li>' + f.txt + '</li>').join('') + '</ul>',
+      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: 'Preencher', valor: 'preencher', primario: true }]);
+    if(r === 'segue'){ if(falta.some(f => f.medico)) semMedicoAceito = true; return true; }
+    if(r === 'preencher'){
+      const f = falta.find(x => x.campo);
+      if(f){
+        if(f.campo === 'medicoNome') el('medicoDetails').open = true;
+        el(f.campo).scrollIntoView({ block: 'center' }); el(f.campo).focus();
+      }
+    }
+    return false;
+  }
+  // Atestado e encaminhamento: marcadores "(nome do …)" que ficaram no texto
+  async function conferirDocumento(texto, campoNome){
+    if(window.__semConferir) return true;
+    const marcas = [...new Set((String(texto).match(/\((?:nome do (?:m[eé]dico|paciente)|diagn[oó]stico|nenhum medicamento[^)]*)\)/gi) || []))];
+    if(!marcas.length) return true;
+    const r = await perguntar('<b>O texto ainda tem marcadores para preencher:</b><ul>' + marcas.map(m => '<li>' + escapeHtml(m) + '</li>').join('') + '</ul>',
+      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: 'Voltar e editar', valor: 'editar', primario: true }]);
+    if(r === 'segue') return true;
+    if(/nome do paciente/i.test(marcas.join(' ')) && campoNome && !campoNome.value.trim()) campoNome.focus();
+    else if(/nome do m/i.test(marcas.join(' '))){ el('medicoDetails').open = true; }
+    return false;
+  }
+
   // Retrato da receita na tela, para desfazer "Nova receita", "Mesmo paciente" e o ×
   function retratoReceita(){
     return { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)),
@@ -2749,7 +2850,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       inputId.value = id;
     }
     
-    overlay.classList.add('show');
+    mostrarJanela('editItemOverlay', 'editItemPosologia');
     overlay.dataset.valoresIniciais = valoresDoFormulario(overlay);
   });
 
@@ -3270,6 +3371,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   el('btnImprimir').addEventListener('click', async () => {
+    if(!await conferirAntesDeEmitir()) return;
     const sep = separacaoAtiva();
     let paperHtml, printStyles;
     if(sep){
@@ -3293,7 +3395,15 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!await abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
     registrarHistorico('impresso');
   });
-  el('btnPediatrica').addEventListener('click', () => executarConversao(false));
+  el('btnPediatrica').addEventListener('click', async () => {
+    const meses = idadeAtualMeses();
+    if(meses !== null && meses >= 144){
+      const r = await perguntar('O paciente tem <b>' + escapeHtml(window.PEDIATRIA.formatarIdade(meses)) + '</b>. A versão pediátrica troca os remédios por gotas e doses por kg. Converter assim mesmo?',
+        [{ rotulo: 'Cancelar', valor: false }, { rotulo: 'Converter', valor: true, primario: true }]);
+      if(!r) return;
+    }
+    executarConversao(false);
+  });
   el('avisoBar').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-acao]');
     if(!b) return;
@@ -3306,6 +3416,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
     if(b.dataset.acao === 'cond-queixa') toggleCondicaoInteira(b.dataset.nome, true);
+    if(b.dataset.acao === 'preencher-medico'){ el('medicoDetails').open = true; el('medicoNome').scrollIntoView({ block: 'center' }); el('medicoNome').focus(); }
+    if(b.dataset.acao === 'tirar-alergico'){
+      const antes = retratoReceita();
+      b.dataset.ids.split('|').forEach(id => { delete selected[id]; });
+      renderTudo();
+      showToast('Removido da receita', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    }
     if(b.dataset.acao === 'padrao-adiar'){ padroes.adiadas[b.dataset.chave] = (padroes.n[b.dataset.chave] || 0) + PADROES_MIN; savePadroes(); renderTudo(); }
     if(b.dataset.acao === 'padrao-dispensar'){ padroes.dispensadas[b.dataset.chave] = true; savePadroes(); renderTudo(); }
   });

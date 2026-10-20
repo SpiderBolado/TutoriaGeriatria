@@ -212,10 +212,27 @@
     <div class="toolbar" role="toolbar" aria-label="Ações da receita">
       <span class="count-chip" id="countChip" aria-live="polite"></span>
       <div class="toolbar-actions">
-        <button id="btnLimpar" class="btn btn-ghost-danger" type="button" title="Limpa a receita para o próximo paciente (Ctrl+Enter)">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg>
-          Nova receita
+        <button id="btnImprimir" class="btn btn-primary" type="button" title="Imprimir (Ctrl+P)">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+          Imprimir / PDF
         </button>
+        <button id="btnAtestado" class="btn" type="button" title="Atestado de afastamento ou declaração de comparecimento / acompanhante">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+          Atestado
+        </button>
+        <button id="btnEncaminhamento" class="btn" type="button" title="Monta um texto de encaminhamento à atenção básica">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+          Encaminhar
+        </button>
+        <button id="btnCopiar" class="btn" type="button" title="Copia a receita como texto">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+          Copiar
+        </button>
+        <button id="btnDocx" class="btn" type="button">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Baixar .docx
+        </button>
+        <span class="toolbar-sep" aria-hidden="true"></span>
         <button id="btnMesmoPaciente" class="btn" type="button" title="Limpa remédios e orientações e mantém nome, idade e peso — para outra receita do mesmo paciente (ex.: antibiótico em 2 vias e sintomáticos na comum). Ctrl+Shift+Enter">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 8h5M19.5 5.5v5"/></svg>
           Mesmo paciente
@@ -224,27 +241,9 @@
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="2.5"/><path d="M7 10.5 12 9l5 1.5M12 9v6M9 21l3-6 3 6"/></svg>
           Versão pediátrica
         </button>
-        <span class="toolbar-sep" aria-hidden="true"></span>
-        <button id="btnCopiar" class="btn" type="button" title="Copia a receita como texto">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
-          Copiar
-        </button>
-        <button id="btnEncaminhamento" class="btn" type="button" title="Monta um texto de encaminhamento à atenção básica">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
-          Encaminhar
-        </button>
-        <button id="btnAtestado" class="btn" type="button" title="Atestado de afastamento ou declaração de comparecimento / acompanhante">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
-          Atestado
-        </button>
-        <span class="toolbar-sep" aria-hidden="true"></span>
-        <button id="btnImprimir" class="btn" type="button">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
-          Imprimir / PDF
-        </button>
-        <button id="btnDocx" class="btn btn-primary" type="button">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
-          Baixar .docx
+        <button id="btnLimpar" class="btn btn-proximo" type="button" title="Limpa tudo para o próximo paciente (Ctrl+Enter); dá para desfazer">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg>
+          Nova receita
         </button>
       </div>
     </div>
@@ -414,6 +413,7 @@
           <label for="atCid">CID-10 <small>(opcional)</small></label>
           <input type="text" id="atCid" placeholder="ex: J06.9">
           <label class="check-inline"><input type="checkbox" id="atCidAutorizado"> O paciente autorizou incluir o CID no atestado</label>
+          <div class="mini-note cid-sem-autorizacao" id="atCidAviso" hidden>Sem a autorização do paciente, o CID não entra no atestado.</div>
         </div>
       </div>
       <div class="field">
