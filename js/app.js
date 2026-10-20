@@ -26,8 +26,46 @@
     },
     async set(key, value){
       localStorage.setItem(key, value);
+      if(PONTE) PONTE.salvar(key, value);
     }
   };
+  // Dentro do Quadro do Plantão (ver js/ponte.js): configurações pelo banco do
+  // Quadro, impressão e downloads pelo Quadro, paciente vindo do cartão.
+  const PONTE = window.PONTE && window.PONTE.embutido ? window.PONTE : null;
+  function guardarPreferencia(key, valor){
+    try{ localStorage.setItem(key, valor); }catch(_){ /* sem armazenamento */ }
+    if(PONTE) PONTE.salvar(key, valor);
+  }
+
+  // Abre a impressão de um documento pronto. Fora do Quadro: janela nova, como sempre.
+  function abrirImpressao(titulo, printStyles, paperHtml, paciente){
+    const doc = '<html><head><title>' + escapeHtml(titulo) + '</title><meta charset="UTF-8">' +
+      '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>';
+    if(PONTE){ PONTE.imprimir(titulo, doc, paciente, showToast); return true; }
+    const printWindow = window.open('', '_blank');
+    if(!printWindow){
+      showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
+      return false;
+    }
+    printWindow.document.write(doc);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); }, 250);
+    return true;
+  }
+  // Salva um arquivo gerado aqui. Dentro do Quadro, o download passa por ele.
+  async function salvarArquivo(nome, blob){
+    if(PONTE) return PONTE.baixar(nome, blob);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  }
 
   async function loadCustomMeds(){
     try{
@@ -1014,18 +1052,7 @@ ${dataStr}`;
       ${corpoHtml}
     `;
 
-    const printWindow = window.open('', '_blank');
-    if(!printWindow){
-      showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
-      return;
-    }
-    printWindow.document.write(
-      '<html><head><title>' + escapeHtml(titulo) + '</title><meta charset="UTF-8">' +
-      '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>'
-    );
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => { printWindow.print(); }, 250);
+    abrirImpressao(titulo, printStyles, paperHtml, nomePaciente);
   }
 
   function copiarEncaminhamento(){ return copiarTextoSimples(el('encTexto').value); }
@@ -1441,6 +1468,65 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
   const listaHtml = itens => itens.length ? '<ul>' + itens.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '';
 
+  // ---------- Paciente vindo do Quadro do Plantão ----------
+  // {nome, idade, peso, sexo, alergias:[], queixa, ficha} do cartão; vale enquanto o
+  // nome na tela for o do cartão (trocou o nome à mão: as alergias não são deste).
+  let pacienteQuadro = null;
+  const primeiroNome = n => norm(n).split(/\s+/)[0] || '';
+  function quadroAtual(){
+    if(!pacienteQuadro) return null;
+    const tela = el('nomePaciente').value.trim();
+    if(pacienteQuadro.nome && tela && primeiroNome(tela) !== primeiroNome(pacienteQuadro.nome)) return null;
+    return pacienteQuadro;
+  }
+  function aplicarPacienteDoQuadro(p){
+    if(!p){ return; }
+    const tela = el('nomePaciente').value.trim();
+    const outro = !tela || !p.nome || norm(tela) !== norm(p.nome);
+    // outro paciente: receita nova (a anterior já saiu); o mesmo: só completa o que falta
+    if(outro && (tela || Object.keys(selected).length || Object.keys(selectedOrient).length)) el('btnLimpar').click();
+    pacienteQuadro = p;
+    if(p.nome) el('nomePaciente').value = p.nome;
+    if(p.idade && !el('idade').value.trim()) el('idade').value = window.PONTE.idadeParaCampo(p.idade);
+    if(p.peso && !el('peso').value) el('peso').value = String(p.peso);
+    renderReceita(); atualizarDestaquePeso(); renderTudo();
+  }
+  // condição montada para criança: a maioria dos itens com dose por peso (ex.: Faringoamigdalite, em suspensão)
+  function condicaoPorPeso(nome){
+    const meds = getCondEffective(nome).meds;
+    return meds.length > 0 && meds.filter(m => m.fator != null || m.faixas).length * 2 > meds.length;
+  }
+  // adulto não recebe sugestão de condição pediátrica
+  function condicaoParaSugerir(nome){
+    if(!(DATA.condicoes[nome] || customCondicoes[nome])) return false;
+    return pacientePediatrico() || !condicaoPorPeso(nome);
+  }
+  function renderAvisosQuadro(bar, entradas){
+    const q = quadroAtual();
+    if(!q) return;
+    const alergias = q.alergias || [];
+    if(alergias.length){
+      const conflitos = entradas.map(([, it]) => [it.nome, window.PONTE.conflitoAlergia(it.nome, alergias)]).filter(x => x[1]);
+      bar.appendChild(avisoHtml('perigo', '&#9888;', conflitos.length
+        ? '<b>ALERGIA — confira antes de imprimir:</b>' + listaHtml(conflitos.map(([n, a]) => n + ' (alergia a ' + a + ' registrada no Quadro)'))
+        : 'Alergia registrada no Quadro: <b>' + escapeHtml(alergias.join(', ')) + '</b>'));
+    }
+    // receita ainda vazia: a queixa do cartão sugere por onde começar
+    if(!entradas.length && q.queixa){
+      const anos = idadeAtualMeses() !== null ? idadeAtualMeses() / 12 : null;
+      const sug = window.PONTE.sugerirCondicoes(q.queixa, condicaoParaSugerir, anos);
+      if(sug.length) bar.appendChild(avisoHtml('teal', '&#10022;',
+        'Pela queixa do Quadro: <b>' + escapeHtml(q.queixa.length > 90 ? q.queixa.slice(0, 89) + '…' : q.queixa) + '</b>',
+        '<div class="aviso-acoes">' + sug.map(n => `<button type="button" data-acao="cond-queixa" data-nome="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join('') + '</div>'));
+    }
+  }
+  // Textos que mudam dentro do Quadro (as configurações deixam de ser só deste aparelho)
+  function modoQuadro(){
+    document.documentElement.classList.add('no-quadro');
+    const tag = document.querySelector('.header-titles .tag');
+    if(tag && PONTE.comBanco()) tag.lastChild.textContent = ' No Quadro · configurações valem em qualquer computador';
+  }
+
   // ---------- Avisos (pediatria, teto de dose, duplicidade de princípio ativo) ----------
   function renderAvisos(){
     const bar = el('avisoBar');
@@ -1454,6 +1540,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     });
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
+    renderAvisosQuadro(bar, entradas);
 
     // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
     const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas, idade) : 0;
@@ -1787,6 +1874,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     saveHistorico();
     renderHistorico();
     registrarAtendimento();
+    // a receita volta para a linha do tempo do cartão no Quadro
+    if(PONTE){
+      const sep = separacaoAtiva();
+      PONTE.emitida({ como: tipo, paciente: el('nomePaciente').value.trim(), itens: Object.values(selected).map(it => it.nome),
+        duasVias: sep ? Object.values(sep.duas).map(it => it.nome) : (tipoEfetivo() === 'controle' ? Object.values(selected).map(it => it.nome) : []),
+        orientacoes: Object.keys(selectedOrient).length });
+    }
   }
 
   function renderHistorico(filtroPaciente){
@@ -1848,14 +1942,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       medico: { nome: el('medicoNome').value.trim(), crm: el('medicoCrm').value.trim() }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'gerador-receitas-backup-' + new Date().toISOString().slice(0,10) + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    if(!await salvarArquivo('gerador-receitas-backup-' + new Date().toISOString().slice(0,10) + '.json', blob)) return;
     await storage.set('ultimo-backup', payload.exportadoEm, false);
     atualizarAvisoBackup();
     showToast('Backup exportado');
@@ -1867,7 +1954,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // perdia tudo o que só ficava salvo no localStorage daquele navegador.
   async function atualizarAvisoBackup(){
     const nota = el('storageNote');
-    const base = 'Suas edições, catálogo pessoal, histórico e dados do médico ficam salvos no armazenamento deste app, neste dispositivo. Exporte um backup antes de trocar de computador.';
+    const base = PONTE && PONTE.comBanco()
+      ? 'Dentro do Quadro, suas edições, catálogo pessoal, padrões e dados do médico ficam salvos na sua conta do Claude e valem em qualquer computador. O histórico de receitas (tem nomes de pacientes) fica só neste aparelho.'
+      : 'Suas edições, catálogo pessoal, histórico e dados do médico ficam salvos no armazenamento deste app, neste dispositivo. Exporte um backup antes de trocar de computador.';
+    if(PONTE && PONTE.comBanco()){ nota.textContent = base; return; }
     const temAlgoParaPerder = customMeds.length || Object.keys(customCondicoes).length || historico.length || Object.keys(overridesMedicamentos).length;
     if(!temAlgoParaPerder){ nota.textContent = base; return; }
     const r = await storage.get('ultimo-backup', false);
@@ -2402,16 +2492,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
           ] })
         : tipo === 'controle' ? docControle(dados) : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
       const nomeArquivo = 'Receita - ' + (dados.paciente !== '—' ? dados.paciente : 'paciente') + ' - ' + dados.data.replace(/\//g,'-') + '.docx';
-      a.href = url;
-      a.download = nomeArquivo;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-      showToast('Arquivo .docx gerado');
+      if(await salvarArquivo(nomeArquivo, blob)) showToast('Arquivo .docx gerado');
     }catch(e){
       console.error(e);
       showToast('Erro ao gerar o .docx — veja o console para detalhes');
@@ -3094,18 +3176,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       else paperHtml = el('receitaPaper').innerHTML;
       printStyles = estilosImpressao(ehControle, fitScale);
     }
-    const printWindow = window.open('', '_blank');
-    if(!printWindow){
-      showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
-      return;
-    }
-    printWindow.document.write(
-      '<html><head><title>Receita</title><meta charset="UTF-8">' +
-      '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>'
-    );
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => { printWindow.print(); }, 250);
+    if(!abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
     registrarHistorico('impresso');
   });
   el('btnPediatrica').addEventListener('click', () => executarConversao(false));
@@ -3120,24 +3191,25 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       renderTudo();
     }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
+    if(b.dataset.acao === 'cond-queixa') toggleCondicaoInteira(b.dataset.nome, true);
     if(b.dataset.acao === 'padrao-adiar'){ padroes.adiadas[b.dataset.chave] = (padroes.n[b.dataset.chave] || 0) + PADROES_MIN; savePadroes(); renderTudo(); }
     if(b.dataset.acao === 'padrao-dispensar'){ padroes.dispensadas[b.dataset.chave] = true; savePadroes(); renderTudo(); }
   });
   el('avisoBar').addEventListener('change', (e) => {
     if(e.target.matches('input[data-acao="separar-sempre"]')){
-      try{ localStorage.setItem(SEPARAR_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
+      guardarPreferencia(SEPARAR_KEY, e.target.checked ? '1' : '0');
       if(e.target.checked){ separarSuspenso = false; renderTudo(); }
       return;
     }
     if(!e.target.matches('input[data-acao="auto-ped"]')) return;
-    try{ localStorage.setItem(AUTO_PED_KEY, e.target.checked ? '1' : '0'); }catch(_){ /* sem armazenamento */ }
+    guardarPreferencia(AUTO_PED_KEY, e.target.checked ? '1' : '0');
     if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
   });
   // Nova receita: próximo paciente (limpa tudo)
   el('btnLimpar').addEventListener('click', () => {
     finalizarAtendimento();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
-    encRascunhoPaciente = null; atRascunhoPaciente = null;
+    encRascunhoPaciente = null; atRascunhoPaciente = null; pacienteQuadro = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
     renderTudo();
   });
@@ -3473,6 +3545,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
   // ---------- Init ----------
   (async function init(){
+    if(PONTE){ await PONTE.sincronizar(); modoQuadro(); }
     await loadCustomMeds();
     await loadCustomCondicoes();
     await loadOverrides();
@@ -3487,5 +3560,6 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     renderHistorico();
     renderTudo();
     initEditorCondicoes();
+    if(PONTE) PONTE.onPaciente(aplicarPacienteDoQuadro);
   })();
 })();

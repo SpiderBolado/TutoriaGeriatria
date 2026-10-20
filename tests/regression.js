@@ -1018,6 +1018,46 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Dentro do Quadro do Plantao: configuracoes pelo banco, paciente do cartao, receita volta, downloads pelo Quadro ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url + 'tests/fixtures/quadro-falso.html');
+    let f = null;
+    for(let k = 0; k < 40; k++){
+      f = page.frame({ url: /index\.html#quadro/ });
+      if(f && await f.evaluate(() => document.getElementById('nomePaciente') && document.getElementById('nomePaciente').value).catch(() => '')) break;
+      await page.waitForTimeout(250);
+    }
+    const inicio = await f.evaluate(() => ({ nome: nomePaciente.value, idade: idade.value, peso: peso.value, medico: medicoNome.value, avisos: avisoBar.innerText }));
+    await f.click('button[data-acao="cond-queixa"][data-nome="Dor Muscular"]');
+    await page.waitForTimeout(400);
+    const conflito = await f.evaluate(() => avisoBar.innerText);
+    // configuracao editada sobe; historico (tem nome) nao
+    await f.evaluate(() => { medicoCrm.value = '9999'; medicoCrm.dispatchEvent(new Event('input', { bubbles: true })); medicoCrm.dispatchEvent(new Event('change', { bubbles: true })); });
+    const [popup] = await Promise.all([page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null), f.click('#btnImprimir')]);
+    if(popup) await popup.close();
+    await f.click('#btnDocx');
+    await page.waitForTimeout(2500);
+    const log = await page.evaluate(() => window.__log);
+    const banco = await page.evaluate(() => window.__banco);
+    // outro cartao: outro paciente comeca receita nova, sem as alergias do anterior
+    await page.evaluate(() => window.__mandarPaciente({ nome: 'Bruno Outro', idade: '8 meses', peso: 9, alergias: [], queixa: '' }));
+    await page.waitForTimeout(500);
+    const outro = await f.evaluate(() => ({ nome: nomePaciente.value, idade: idade.value, peso: peso.value, itens: document.querySelectorAll('#receitaPaper .item, #receitaPaper .rx-item').length, avisos: avisoBar.innerText }));
+    const emitidas = log.filter(x => x.tipo === 'emitida');
+    const ok = inicio.nome === 'Ana Teste' && inicio.idade === '30 anos' && inicio.peso === '58' && inicio.medico === 'Dra. Do Banco'
+      && /Alergia registrada no Quadro: dipirona/.test(inicio.avisos) && /ALERGIA/.test(conflito)
+      && /9999/.test(banco['medico-info'] || '') && !log.some(x => x.tipo === 'salvar' && /historico|atendimento/.test(x.chave))
+      && !!popup && emitidas.length === 2 && emitidas[0].como === 'impresso' && emitidas[0].itens.length >= 1
+      && log.some(x => x.tipo === 'baixar' && /\.docx$/.test(x.nome) && x.tamanho > 1000)
+      && outro.nome === 'Bruno Outro' && outro.idade === '8 meses' && !/dipirona/.test(outro.avisos)
+      && consoleErrors.length === 0;
+    record('dentro do Quadro: banco, paciente do cartao, alergia, receita emitida e downloads pela ponte', ok,
+      JSON.stringify({ inicio: { ...inicio, avisos: inicio.avisos.slice(0, 120) }, conflito: conflito.slice(0, 120), crm: banco['medico-info'], popup: !!popup, log: log.map(x => x.tipo + (x.chave ? ':' + x.chave : '') + (x.nome ? ':' + x.nome : '')), outro, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

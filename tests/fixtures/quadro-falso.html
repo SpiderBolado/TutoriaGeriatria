@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Quadro falso (teste)</title>
+<style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%}</style></head>
+<body>
+<!-- Faz o papel do Quadro do Plantão nos testes: responde à ponte do receituário (js/ponte.js) -->
+<iframe id="rx" src="/index.html#quadro"></iframe>
+<script>
+  window.__log = [];
+  window.__banco = { 'medico-info': JSON.stringify({ nome: 'Dra. Do Banco', crm: '1234' }) };
+  window.__paciente = { nome: 'Ana Teste', idade: '30 anos', peso: 58, alergias: ['dipirona'], queixa: 'dor lombar' };
+  const fr = document.getElementById('rx');
+  const manda = m => fr.contentWindow.postMessage(Object.assign({ rx: 1 }, m), location.origin);
+  window.__mandarPaciente = p => manda({ tipo: 'paciente', paciente: p });
+  addEventListener('message', async e => {
+    if(e.source !== fr.contentWindow || !e.data || e.data.rx !== 1) return;
+    const d = e.data;
+    window.__log.push({ tipo: d.tipo, chave: d.chave, nome: d.nome, itens: d.itens, como: d.como, tamanho: d.blob ? d.blob.size : undefined });
+    if(d.tipo === 'inicio') manda({ resp: d.id, dados: window.__banco, paciente: window.__paciente });
+    if(d.tipo === 'salvar') window.__banco[d.chave] = d.valor;
+    if(d.tipo === 'baixar') manda({ resp: d.id, ok: true });
+  });
+</script>
+</body></html>
