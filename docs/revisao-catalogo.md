@@ -1077,3 +1077,17 @@ Fontes: bulas ANVISA, MS (dengue, PCDT-IST, Guia de Vigilância), Beers 2023, NI
 - REGRAS: novo aviso oseltamivir (inserir antes da sulfadiazina) — _O avulso Oseltamivir 75mg (cápsula de adulto) não tinha regra; em criança, a dose é por faixa de peso._ (fonte: MS, Guia de Manejo e Tratamento de Influenza 2023 (tabela reproduzida nas notas da SES-RJ 04/2026 e da SMS-SP))
 - REGRAS: aviso diclofenaco — _A regra também pega o avulso 'Diclofenaco 50mg' (comprimido oral), mas o aviso falava só do gel._ (fonte: Bula Cataflam drágeas 50 mg (Novartis): contraindicado abaixo de 14 anos; diclofenaco gel: não recomendado abaixo de 14 anos)
 - REGRAS: aviso aciclovir (excluir tópico) — _'Aciclovir 5% - Pomada' (Herpes Simples Labial) e o avulso 'Aciclovir 0.05' (tópico) recebiam o aviso de dose oral por kg da varicela, que não se aplica ao creme._ (fonte: objetivo (teste: regraPara em todos os nomes do catálogo))
+
+## Terceira revisão (20/10/2026) — itens de segurança aplicados
+
+Cada linha pode ser revertida trocando o texto "Agora" pelo "Antes" em `js/dados.js`.
+
+| Item | Antes | Agora | Motivo | Fonte |
+|---|---|---|---|---|
+| Ibuprofeno Gotas 200mg/mL (avulso) | "Dar DOSE gotas, de 08/08 horas, por 05 dias." | "… de 08/08 horas, se dor ou febre, por no máximo 05 dias." | AINE em horário fixo sem sintoma expõe a risco renal/GI; contraindicado na dengue não diagnosticada. Igual ao item da Pneumonia (Criança). | Bula do ibuprofeno gotas (uso sintomático); MS, Dengue: diagnóstico e manejo clínico (2024) |
+| SUA — Tropinal | "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias." | "… até de 08/08 horas … por no máximo 05 dias. Não usar se estiver grávida, amamentando ou se tiver glaucoma." | No sangramento uterino a gestação pode não ter sido descartada; o mesmo aviso já existe em Dor Abdominal. | Bula Tropinal (EMS): contraindicado na gestação, lactação e glaucoma |
+| Enxaqueca — Sumatriptano 25mg | sem advertência | + "Não use se você tem doença do coração, já teve infarto ou AVC, ou tem pressão alta sem controle. Se sentir dor ou aperto forte no peito depois de tomar, procure atendimento." | Contraindicação cardiovascular e alerta de dor torácica. | Bula de succinato de sumatriptana (contraindicações e advertências) |
+| Cerumin (avulso) | 03 gotas | 05 gotas | Igualar à condição Cerume, já corrigida pela bula. | Bula Cerumin |
+| Hordéolo — Tobramicina 0,3% Pomada | de 06/06 horas | de 08/08 horas | Bula: 2 a 3 vezes ao dia nos casos leves e moderados. | Bula Tobrex pomada (Novartis) |
+
+Os demais achados da 3ª revisão (omeprazol na DRGE, duração do ATB na sinusite, idade mínima da ondansetrona, cálcio elementar, quantidade de nistatina, hidrocortisona, simeticona, azitromicina, clonazepam SL e 12 pontos clínicos) ficaram para decisão do médico.
