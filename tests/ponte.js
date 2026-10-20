@@ -15,6 +15,12 @@ assert.strictEqual(P.conflitoAlergia('Sulfametoxazol + Trimetoprima', ['sulfa'])
 assert.strictEqual(P.conflitoAlergia('Azitromicina 500mg', ['penicilina']), null);
 assert.strictEqual(P.conflitoAlergia('Paracetamol 750mg', ['dipirona']), null);
 assert.strictEqual(P.conflitoAlergia('Dipirona 500mg', []), null);
+assert.strictEqual(P.conflitoAlergia('AAS 100mg', ['Dipirona e AAS']), 'Dipirona e AAS');
+assert.strictEqual(P.conflitoAlergia('Ibuprofeno 600 mg', ['Dipirona, AINEs']), 'Dipirona, AINEs');
+assert.strictEqual(P.conflitoAlergia('Amoxicilina 500mg', ['Alergia a penicilina']), 'Alergia a penicilina');
+assert.strictEqual(P.conflitoAlergia('Dipirona 500mg', ['Alérgico a dipirona']), 'Alérgico a dipirona');
+assert.strictEqual(P.conflitoAlergia('Cefalexina 500mg', ['Sulfa / cefalosporinas']), 'Sulfa / cefalosporinas');
+assert.strictEqual(P.conflitoAlergia('Paracetamol 750mg', ['Dipirona e AAS']), null);
 
 // queixa → condições que existem no catálogo (no máximo 3)
 const sug = q => P.sugerirCondicoes(q, existe);

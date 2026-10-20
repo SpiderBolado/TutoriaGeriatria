@@ -41,7 +41,7 @@
   function abrirImpressao(titulo, printStyles, paperHtml, paciente){
     const doc = '<html><head><title>' + escapeHtml(titulo) + '</title><meta charset="UTF-8">' +
       '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>';
-    if(PONTE){ PONTE.imprimir(titulo, doc, paciente, showToast); return true; }
+    if(PONTE) return PONTE.imprimir(titulo, doc, paciente, showToast);   // promessa: true quando a impressão abriu ou o arquivo foi salvo
     const printWindow = window.open('', '_blank');
     if(!printWindow){
       showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
@@ -238,6 +238,8 @@
     saveOverrides();
   }
 
+  const nomeIgual = (o, m) => o.nome === undefined || o.nome === m.nome;
+  const fatorIgual = (o, m) => o.fator === undefined || (o.fator ?? null) === (m.fator ?? null);
   // Retorna a versão "efetiva" de uma condição: base + edições - remoções
   function getCondEffective(nome){
     const base = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
@@ -252,11 +254,12 @@
         posologia: o.posologia !== undefined ? o.posologia : m.posologia,
         via: o.via !== undefined ? o.via : m.via,
         fator: o.fator !== undefined ? o.fator : m.fator,
-        // teto e idade mínima valem para o item original; editar nome ou fator os descarta
-        max: (o.nome === undefined && o.fator === undefined) ? m.max : undefined,
-        faixas: (o.nome === undefined && o.fator === undefined) ? m.faixas : undefined,
-        idadeMinMeses: o.nome === undefined ? m.idadeMinMeses : undefined,
-        pesoMinKg: o.nome === undefined ? m.pesoMinKg : undefined,
+        // teto e idade mínima valem para o item original; trocar o nome ou o fator os descarta
+        // (salvar o mesmo nome/fator, só mudando a quantidade, não descarta)
+        max: (nomeIgual(o, m) && fatorIgual(o, m)) ? m.max : undefined,
+        faixas: (nomeIgual(o, m) && fatorIgual(o, m)) ? m.faixas : undefined,
+        idadeMinMeses: nomeIgual(o, m) ? m.idadeMinMeses : undefined,
+        pesoMinKg: nomeIgual(o, m) ? m.pesoMinKg : undefined,
         editado: o.nome!==undefined || o.qtde!==undefined || o.posologia!==undefined || o.via!==undefined || o.fator!==undefined
       };
     }).filter(Boolean);
@@ -348,21 +351,64 @@
     restaurarRascunhoEdicao(cont);
   }
 
+  // ---------- Busca ----------
+  // Todas as palavras do termo precisam aparecer (sem acento; "500 mg" = "500mg"), quem
+  // começa com o termo vem antes, e sintomas ("garganta", "febre") trazem as condições
+  // que a queixa sugere. A ordem por uso é a do início do atendimento: não pula
+  // enquanto se clica (recalcula em "Nova receita").
+  const compacto = s => norm(s).replace(/(\d)\s+(mg|ml|g|mcg|ui|%)(?![a-z])/g, '$1$2');
+  const tokensBusca = f => compacto(f).split(/\s+/).filter(Boolean);
+  let usoNaAbertura = null;
+  const usoOrdem = nome => (usoNaAbertura || usoCondicoes)[nome] || 0;
+  function pontuaTexto(texto, toks){
+    const t = compacto(texto);
+    if(!toks.every(k => t.includes(k))) return 0;
+    return toks.every(k => new RegExp('(^|[^a-z0-9])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t)) ? 2 : 1;
+  }
+  // adulto: condição montada para criança vai para o fim; criança: vem antes
+  function ajusteIdade(nome){
+    if(!condicaoPorPeso(nome)) return 0;
+    const meses = idadeAtualMeses(), kg = pesoAtualKg();
+    if(meses === null && kg === null) return 0;
+    return pacientePediatrico() ? 0.5 : -3;
+  }
+  function buscarCondicoes(filtro){
+    const toks = tokensBusca(filtro);
+    const todas = getOrdemCondicoes();
+    if(!toks.length) return todas.slice().sort((a, b) => usoOrdem(b) - usoOrdem(a));
+    const sinon = window.PONTE ? window.PONTE.sugerirCondicoes(filtro, n => todas.includes(n), null) : [];
+    const pont = {};
+    todas.forEach(nome => {
+      const pn = pontuaTexto(nome, toks);
+      let p = pn ? 3 + pn : sinon.includes(nome) ? 3 : getCondEffective(nome).meds.some(m => pontuaTexto(m.nome, toks)) ? 1 : 0;
+      if(p) pont[nome] = p + ajusteIdade(nome);
+    });
+    return Object.keys(pont).sort((a, b) => pont[b] - pont[a] || usoOrdem(b) - usoOrdem(a));
+  }
+  function pontoCondicao(nome, filtro){
+    const toks = tokensBusca(filtro);
+    const pn = pontuaTexto(nome, toks);
+    if(pn) return 3 + pn;
+    const sinon = window.PONTE ? window.PONTE.sugerirCondicoes(filtro, n => n === nome, null) : [];
+    return sinon.length ? 3 : 1;
+  }
+  function buscarAvulsos(filtro){
+    const toks = tokensBusca(filtro);
+    const todos = allMedicamentos();
+    if(!toks.length) return todos;
+    // fora da pediatria, a apresentação de adulto vem antes da suspensão por kg
+    const crianca = pacientePediatrico();
+    return todos.map(m => [m, pontuaTexto([m.nome, m.concentracao, m.forma].filter(Boolean).join(' '), toks)])
+      .filter(x => x[1]).map(x => [x[0], x[1] + (x[0].fator != null || x[0].faixas ? (crianca ? 0.5 : -0.5) : 0)])
+      .sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  }
+
   function renderListaConteudo(filtro){
     const cont = el('listaContainer');
-    const f = norm(filtro);
     cont.innerHTML = '';
 
-    // Condições
-    const condMatches = getOrdemCondicoes().filter(nome => {
-      if(!f) return true;
-      if(norm(nome).includes(f)) return true;
-      return getCondEffective(nome).meds.some(m => norm(m.nome).includes(f));
-    });
-    // Mais usadas primeiro (sort estável: empates mantêm a ordem original)
-    condMatches.sort((a,b) => (usoCondicoes[b]||0) - (usoCondicoes[a]||0));
-
-    const medsMatches = allMedicamentos().filter(m => !f || norm(m.nome).includes(f));
+    const condMatches = buscarCondicoes(filtro);
+    const medsMatches = buscarAvulsos(filtro);
 
     if(condMatches.length === 0 && medsMatches.length === 0){
       const wrap = document.createElement('div');
@@ -426,7 +472,8 @@
     head.innerHTML = `
       <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check" aria-label="Adicionar todos os itens de ${escapeHtml(nome)}">
       <span class="nome">${escapeHtml(nome)}</span>
-      <span class="count">${eff.meds.length} item${eff.meds.length!==1?'s':''}</span>
+      ${condicaoPorPeso(nome) ? '<span class="selo-crianca" title="Montada para criança: doses por kg (pede o peso)">criança · dose/kg</span>' : ''}
+      <span class="count">${eff.meds.length} ${eff.meds.length!==1?'itens':'item'}</span>
       <span class="chev" aria-hidden="true">&#9656;</span>
     `;
     const chk = head.querySelector('input');
@@ -472,7 +519,7 @@
           <div class="edit-grid">
             <input type="text" class="ef-qtde" value="${escapeHtml(m.qtde)}" placeholder="Quantidade">
             <select class="ef-via">${renderViaOptions(m.via)}</select>
-            <input type="text" class="ef-fator" value="${m.fator!==null && m.fator!==undefined ? m.fator : ''}" placeholder="Fator/kg (opcional)">
+            <input type="text" class="ef-fator" value="${m.fator!==null && m.fator!==undefined ? escapeHtml(m.fator) : ''}" placeholder="Fator/kg (opcional)">
           </div>
           <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(m.posologia)}</textarea>
           <div class="edit-actions">
@@ -609,10 +656,12 @@
     if(!ov) return null;
     const map = tipo === 'meds' ? ov.meds : ov.orientacoes;
     if(!map) return null;
-    const hiddenIdxs = Object.keys(map).filter(i => map[i] && map[i].removido);
+    // a base é a mesma que a lista mostra (condição personalizada ou de fábrica)
+    const cond = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
+    const base = (tipo === 'meds' ? cond.meds : cond.orientacoes) || [];
+    const hiddenIdxs = Object.keys(map).filter(i => map[i] && map[i].removido && base[i] !== undefined);
     if(!hiddenIdxs.length) return null;
 
-    const base = tipo === 'meds' ? DATA.condicoes[nome].meds : DATA.condicoes[nome].orientacoes;
     const box = document.createElement('div');
     box.className = 'hidden-box';
     const title = document.createElement('div');
@@ -680,7 +729,7 @@
         <div class="edit-grid">
           <input type="text" class="ef-qtde" value="${escapeHtml(efetivo.qtde||'')}" placeholder="Quantidade">
           <select class="ef-via">${renderViaOptions(efetivo.via)}</select>
-          <input type="text" class="ef-fator" value="${efetivo.fator!==null && efetivo.fator!==undefined ? efetivo.fator : ''}" placeholder="Fator/kg (opcional)">
+          <input type="text" class="ef-fator" value="${efetivo.fator!==null && efetivo.fator!==undefined ? escapeHtml(efetivo.fator) : ''}" placeholder="Fator/kg (opcional)">
         </div>
         <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(efetivo.posologia||'')}</textarea>
         <div class="edit-actions">
@@ -786,7 +835,7 @@
       selected[id] = {
         nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
         via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null,
-        max: (efetivo.fator === m.fator) ? m.max : undefined, faixas: (efetivo.fator === m.fator) ? m.faixas : undefined,
+        max: ((efetivo.fator ?? null) === (m.fator ?? null)) ? m.max : undefined, faixas: ((efetivo.fator ?? null) === (m.fator ?? null)) ? m.faixas : undefined,
         idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: null
       };
     } else {
@@ -890,7 +939,7 @@
 
     let html = '';
     viaOrder.forEach(via => {
-      html += `<div class="via-titulo">Uso ${via}</div>`;
+      html += `<div class="via-titulo">Uso ${escapeHtml(via)}</div>`;
       grupos[via].forEach(([id, it], idx) => {
         const posologia = calcDoseItem(it, peso);
         const precisaPeso = itemPorPeso(it) && !peso;
@@ -905,7 +954,7 @@
             <button class="edit-item-btn" data-sel="${escapeHtml(id)}" title="Editar item" aria-label="Editar ${escapeHtml(it.nome)}">&#x270E;</button>
             <button class="rm-item" data-sel="${escapeHtml(id)}" title="Remover da receita" aria-label="Remover ${escapeHtml(it.nome)} da receita">&times;</button>
           </div>
-          <div class="item-pos">${precisaPeso ? '<span style="color:var(--amber);font-weight:600;">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
+          <div class="item-pos">${precisaPeso ? '<span class="falta-peso">Informe o peso para calcular a dose &rarr;</span> ' : ''}${posVazia ? '<span class="pos-vazia">sem posologia cadastrada — edite o item na lista ao lado</span>' : escapeHtml(posologia||'')}</div>
         `;
       });
     });
@@ -1007,10 +1056,11 @@ ${dataStr}`;
       el('encCondicaoOutraField').style.display = el('encCondicao').value === '__outra__' ? '' : 'none';
     }
     atualizarPreviaEncaminhamento();
-    el('encaminhamentoOverlay').classList.add('show');
+    mostrarJanela('encaminhamentoOverlay', 'btnImprimirEncaminhamento');
   }
 
-  function imprimirEncaminhamento(){
+  async function imprimirEncaminhamento(){
+    if(!await conferirDocumento(el('encTexto').value, el('encNomePaciente'))) return;
     imprimirDocumentoSimples('Encaminhamento', el('encTexto').value, el('encNomePaciente').value.trim());
   }
 
@@ -1156,6 +1206,7 @@ ${assinatura}`;
     const dias = el('atDias').value;
     document.querySelectorAll('.at-dias-rapidos button').forEach(b => b.setAttribute('aria-pressed', b.dataset.dias === dias ? 'true' : 'false'));
     el('btnRecomecarAtestado').hidden = !atTextoEditado;
+    el('atCidAviso').hidden = !(el('atCid').value.trim() && !el('atCidAutorizado').checked);
     if(atTextoEditado) return;
     el('atTexto').value = montarTextoAtestado();
   }
@@ -1166,7 +1217,7 @@ ${assinatura}`;
   function abrirAtestado(){
     if(atRascunhoPaciente !== null && atRascunhoPaciente === el('nomePaciente').value.trim()){
       atualizarPreviaAtestado();
-      el('atestadoOverlay').classList.add('show');
+      mostrarJanela('atestadoOverlay', 'atDias');
       return;
     }
     atTextoEditado = false;
@@ -1180,10 +1231,11 @@ ${assinatura}`;
     el('atHoraFim').value = agora;
     el('atDias').value = '1';
     atualizarPreviaAtestado();
-    el('atestadoOverlay').classList.add('show');
+    mostrarJanela('atestadoOverlay', 'atDias');
   }
 
-  function imprimirAtestado(){
+  async function imprimirAtestado(){
+    if(!await conferirDocumento(el('atTexto').value, el('atNomePaciente'))) return;
     imprimirDocumentoSimples(TITULOS_ATESTADO[tipoAtestado()], el('atTexto').value, el('atNomePaciente').value.trim());
   }
 
@@ -1413,7 +1465,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   const SEPARAR_KEY = 'separar-auto';
   let separarSuspenso = false;
   function separarSempreAtivo(){
-    try{ return localStorage.getItem(SEPARAR_KEY) === '1'; }catch(e){ return false; }
+    // ligado de fábrica: quem não quiser desmarca uma vez
+    try{ return localStorage.getItem(SEPARAR_KEY) !== '0'; }catch(e){ return true; }
   }
   function pesoAtualKg(){
     const v = parseFloat(String(el('peso').value).replace(',', '.'));
@@ -1428,7 +1481,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return kg !== null && kg < window.PEDIATRIA.PESO_MAX_KG;
   }
   function autoPediatriaAtiva(){
-    try{ return localStorage.getItem(AUTO_PED_KEY) === '1'; }catch(e){ return false; }
+    // no Quadro (idade e peso chegam do cartão) já vem ligado; fora dele, só se marcado
+    try{ const v = localStorage.getItem(AUTO_PED_KEY); return v === null ? !!PONTE : v === '1'; }catch(e){ return false; }
   }
 
   function executarConversao(automatica){
@@ -1445,6 +1499,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const acum = conversaoPed || { motivos: [], fixos: [] };
     r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
     r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
+    acum.automatica = !!automatica;
     conversaoPed = acum;
     renderTudo();
     if(automatica) showToast('Receita convertida para pediátrica — confira os avisos');
@@ -1472,6 +1527,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // {nome, idade, peso, sexo, alergias:[], queixa, ficha} do cartão; vale enquanto o
   // nome na tela for o do cartão (trocou o nome à mão: as alergias não são deste).
   let pacienteQuadro = null;
+  let limpezaSilenciosa = false;   // "Nova receita" disparada pelo Quadro: sem Desfazer nem foco
   const primeiroNome = n => norm(n).split(/\s+/)[0] || '';
   function quadroAtual(){
     if(!pacienteQuadro) return null;
@@ -1479,17 +1535,31 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(pacienteQuadro.nome && tela && primeiroNome(tela) !== primeiroNome(pacienteQuadro.nome)) return null;
     return pacienteQuadro;
   }
-  function aplicarPacienteDoQuadro(p){
+  async function aplicarPacienteDoQuadro(p){
     if(!p){ return; }
     const tela = el('nomePaciente').value.trim();
-    const outro = !tela || !p.nome || norm(tela) !== norm(p.nome);
-    // outro paciente: receita nova (a anterior já saiu); o mesmo: só completa o que falta
-    if(outro && (tela || Object.keys(selected).length || Object.keys(selectedOrient).length)) el('btnLimpar').click();
+    const temItens = Object.keys(selected).length || Object.keys(selectedOrient).length;
+    const idsAtuais = Object.keys(selected).sort().join('|') + '§' + Object.keys(selectedOrient).sort().join('|');
+    const jaSaiu = temItens && historico.length && historico[0].ids === idsAtuais && (historico[0].paciente || '') === tela;
+    const mesmo = tela && p.nome && (norm(tela) === norm(p.nome) || (primeiroNome(tela) === primeiroNome(p.nome) && norm(p.nome).startsWith(norm(tela))));
+    // outro paciente: receita nova se a anterior já saiu; receita ainda não impressa
+    // sem nome fica para este paciente; com outro nome, pergunta antes de apagar
+    if(!mesmo && (tela || temItens)){
+      const limpar = jaSaiu || !temItens || (tela && await perguntar('Trocar para <b>' + escapeHtml(p.nome) + '</b>? A receita de ' + escapeHtml(tela) + ' ainda não foi impressa e será apagada.',
+        [{ rotulo: 'Manter ' + tela, valor: false }, { rotulo: 'Trocar de paciente', valor: true, primario: true }]));
+      if(limpar){ limpezaSilenciosa = true; try{ el('btnLimpar').click(); } finally { limpezaSilenciosa = false; } }
+      else if(tela) return;   // ficou com o paciente anterior
+    }
     pacienteQuadro = p;
     if(p.nome) el('nomePaciente').value = p.nome;
     if(p.idade && !el('idade').value.trim()) el('idade').value = window.PONTE.idadeParaCampo(p.idade);
     if(p.peso && !el('peso').value) el('peso').value = String(p.peso);
     renderReceita(); atualizarDestaquePeso(); renderTudo();
+    // receita vazia: o foco vai para a 1ª sugestão pela queixa (Enter adiciona) ou para a busca
+    if(!Object.keys(selected).length){
+      const sug = document.querySelector('#avisoBar button[data-acao="cond-queixa"]');
+      (sug || el('search')).focus({ preventScroll: true });
+    }
   }
   // condição montada para criança: a maioria dos itens com dose por peso (ex.: Faringoamigdalite, em suspensão)
   function condicaoPorPeso(nome){
@@ -1506,10 +1576,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(!q) return;
     const alergias = q.alergias || [];
     if(alergias.length){
-      const conflitos = entradas.map(([, it]) => [it.nome, window.PONTE.conflitoAlergia(it.nome, alergias)]).filter(x => x[1]);
+      const conflitos = entradas.map(([id, it]) => [id, it.nome, window.PONTE.conflitoAlergia(it.nome, alergias)]).filter(x => x[2]);
       bar.appendChild(avisoHtml('perigo', '&#9888;', conflitos.length
-        ? '<b>ALERGIA — confira antes de imprimir:</b>' + listaHtml(conflitos.map(([n, a]) => n + ' (alergia a ' + a + ' registrada no Quadro)'))
-        : 'Alergia registrada no Quadro: <b>' + escapeHtml(alergias.join(', ')) + '</b>'));
+        ? '<b>ALERGIA — confira antes de imprimir:</b>' + listaHtml(conflitos.map(([, n, a]) => n + ' (alergia a ' + a + ' registrada no Quadro)'))
+        : 'Alergia registrada no Quadro: <b>' + escapeHtml(alergias.join(', ')) + '</b>',
+        conflitos.length ? `<button type="button" data-acao="tirar-alergico" data-ids="${escapeHtml(conflitos.map(c => c[0]).join('|'))}">Tirar da receita</button>` : ''));
     }
     // receita ainda vazia: a queixa do cartão sugere por onde começar
     if(!entradas.length && q.queixa){
@@ -1541,6 +1612,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
     renderAvisosQuadro(bar, entradas);
+    if(entradas.length && !el('medicoNome').value.trim() && !semMedicoAceito)
+      bar.appendChild(avisoHtml('teal', '&#9998;', 'Seu <b>nome e CRM</b> ainda não aparecem na receita (preenche uma vez neste aparelho).',
+        '<button type="button" data-acao="preencher-medico">Preencher</button>'));
 
     // 1) Sugestão: paciente pediátrico com itens de adulto que têm versão pediátrica
     const conversiveis = entradas.length ? window.PEDIATRIA.contarConversiveis(entradas, idade) : 0;
@@ -1561,7 +1635,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(alto) itens.push(alto);
       itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
       convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
-      const titulo = 'Receita convertida automaticamente para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
+      const titulo = 'Receita convertida ' + (conversaoPed.automatica ? 'automaticamente ' : '') + 'para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
       bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
         + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
         desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
@@ -1853,8 +1927,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function registrarHistorico(tipo){
     if(Object.keys(selected).length === 0 && Object.keys(selectedOrient).length === 0) return;
     const idsAtuais = Object.keys(selected).sort().join('|') + '§' + Object.keys(selectedOrient).sort().join('|');
-    // Dedup: se a última entrada tem os mesmos itens, só atualiza
-    if(historico.length && historico[0].ids === idsAtuais){
+    // Dedup: mesma receita do mesmo paciente (reimpressão) só atualiza; outro paciente
+    // com os mesmos itens, ou receita editada, vira entrada nova
+    const pacienteAtual = el('nomePaciente').value.trim();
+    const retrato = JSON.stringify([selected, selectedOrient]);
+    if(historico.length && historico[0].ids === idsAtuais && (historico[0].paciente || '') === pacienteAtual
+       && JSON.stringify([historico[0].selected, historico[0].selectedOrient]) === retrato){
       historico[0].quando = new Date().toISOString();
       historico[0].tipo = tipo;
       historico[0].paciente = el('nomePaciente').value.trim();
@@ -1903,7 +1981,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       const quando = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
       row.innerHTML = `
         <div class="hist-info">
-          <b>${escapeHtml(h.paciente || 'Sem nome')}</b> — ${quando}${h.peso ? ' · ' + h.peso + 'kg' : ''}
+          <b>${escapeHtml(h.paciente || 'Sem nome')}</b> — ${quando}${h.peso ? ' · ' + escapeHtml(h.peso) + 'kg' : ''}
           <span>${escapeHtml(h.resumo)}</span>
         </div>
       `;
@@ -2080,11 +2158,118 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return out;
   }
 
-  function showToast(msg){
+  // Aviso curto; com acao = { rotulo, fn }, mostra um botão (ex.: Desfazer) por mais tempo
+  let toastTimer = null;
+  function showToast(msg, acao){
     const t = el('toast');
     t.textContent = msg;
+    t.classList.toggle('com-acao', !!acao);
+    if(acao){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = acao.rotulo;
+      b.addEventListener('click', () => { t.classList.remove('show'); acao.fn(); });
+      t.appendChild(b);
+    }
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), acao ? 8000 : 1800);
+  }
+  // Abre uma janela no topo, com o foco dentro dela (campo principal ou o botão de imprimir);
+  // ao fechar, o foco volta para o botão que a abriu
+  const quemAbriu = {};
+  function mostrarJanela(id, focoId){
+    const ov = el(id);
+    quemAbriu[id] = document.activeElement;
+    ov.classList.add('show');
+    const modal = ov.querySelector('.ajuda-modal');
+    if(modal) modal.scrollTop = 0;
+    const f = focoId && el(focoId);
+    if(f){
+      f.focus({ preventScroll: true });
+      if(f.tagName === 'TEXTAREA'){ try{ f.setSelectionRange(f.value.length, f.value.length); }catch(_){ /* nada */ } }
+    }
+  }
+  document.querySelectorAll('.ajuda-overlay').forEach(ov => new MutationObserver(() => {
+    if(!ov.classList.contains('show') && quemAbriu[ov.id]){
+      const b = quemAbriu[ov.id]; quemAbriu[ov.id] = null;
+      if(b && document.contains(b) && !document.querySelector('.ajuda-overlay.show')) b.focus({ preventScroll: true });
+    }
+  }).observe(ov, { attributes: true, attributeFilter: ['class'] }));
+
+  // Pergunta dentro do app (o confirm() do navegador pode ser bloqueado dentro do Claude).
+  // htmlTexto já vem escapado; botoes: [{ rotulo, valor, primario }]. Esc devolve null.
+  function perguntar(htmlTexto, botoes){
+    return new Promise(resolve => {
+      const ov = document.createElement('div');
+      ov.className = 'ajuda-overlay show pergunta-overlay';
+      ov.innerHTML = '<div class="ajuda-modal modal-sm" role="alertdialog" aria-modal="true"><div class="ajuda-modal-body"><div class="pergunta-texto"></div><div class="modal-actions"></div></div></div>';
+      ov.querySelector('.pergunta-texto').innerHTML = htmlTexto;
+      const fim = v => { document.removeEventListener('keydown', tecla, true); ov.remove(); resolve(v); };
+      const tecla = e => { if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); fim(null); } };
+      document.addEventListener('keydown', tecla, true);
+      const acoes = ov.querySelector('.modal-actions');
+      botoes.forEach(b => {
+        const bt = document.createElement('button');
+        bt.type = 'button'; bt.className = 'btn ' + (b.primario ? 'btn-primary' : 'btn-outline'); bt.textContent = b.rotulo;
+        bt.addEventListener('click', () => fim(b.valor));
+        acoes.appendChild(bt);
+      });
+      document.body.appendChild(ov);
+      const prim = acoes.querySelector('.btn-primary') || acoes.querySelector('button');
+      if(prim) prim.focus();
+    });
+  }
+  // Antes de imprimir ou baixar: o que sairia errado no papel. "Preencher" leva ao campo;
+  // "Imprimir assim mesmo" segue (para o médico em branco, não pergunta de novo nesta visita).
+  let semMedicoAceito = false;
+  async function conferirAntesDeEmitir(){
+    if(!Object.keys(selected).length && !Object.keys(selectedOrient).length){ showToast('A receita está vazia'); return false; }
+    if(window.__semConferir) return true;   // testes automáticos que não tratam da checagem
+    const falta = [];
+    const porPeso = Object.values(selected).filter(it => itemPorPeso(it)).length;
+    if(porPeso && !pesoAtualKg()) falta.push({ txt: `o <b>peso</b> (${porPeso} ${porPeso === 1 ? 'item' : 'itens'} com dose por kg)`, campo: 'peso' });
+    else if(/\bDOSE\b/.test(el('receitaPaper').innerText)) falta.push({ txt: 'a <b>dose</b> de um item (a palavra DOSE sairia no papel)', campo: null });
+    if(!el('nomePaciente').value.trim()) falta.push({ txt: 'o <b>nome do paciente</b>', campo: 'nomePaciente' });
+    if(!semMedicoAceito && !el('medicoNome').value.trim()) falta.push({ txt: 'o <b>seu nome e CRM</b> (Dados do médico)', campo: 'medicoNome', medico: true });
+    if(!falta.length) return true;
+    const r = await perguntar('<b>Antes de imprimir, falta:</b><ul>' + falta.map(f => '<li>' + f.txt + '</li>').join('') + '</ul>',
+      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: 'Preencher', valor: 'preencher', primario: true }]);
+    if(r === 'segue'){ if(falta.some(f => f.medico)) semMedicoAceito = true; return true; }
+    if(r === 'preencher'){
+      const f = falta.find(x => x.campo);
+      if(f){
+        if(f.campo === 'medicoNome') el('medicoDetails').open = true;
+        el(f.campo).scrollIntoView({ block: 'center' }); el(f.campo).focus();
+      }
+    }
+    return false;
+  }
+  // Atestado e encaminhamento: marcadores "(nome do …)" que ficaram no texto
+  async function conferirDocumento(texto, campoNome){
+    if(window.__semConferir) return true;
+    const marcas = [...new Set((String(texto).match(/\((?:nome do (?:m[eé]dico|paciente)|diagn[oó]stico|nenhum medicamento[^)]*)\)/gi) || []))];
+    if(!marcas.length) return true;
+    const r = await perguntar('<b>O texto ainda tem marcadores para preencher:</b><ul>' + marcas.map(m => '<li>' + escapeHtml(m) + '</li>').join('') + '</ul>',
+      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: 'Voltar e editar', valor: 'editar', primario: true }]);
+    if(r === 'segue') return true;
+    if(/nome do paciente/i.test(marcas.join(' ')) && campoNome && !campoNome.value.trim()) campoNome.focus();
+    else if(/nome do m/i.test(marcas.join(' '))){ el('medicoDetails').open = true; }
+    return false;
+  }
+
+  // Retrato da receita na tela, para desfazer "Nova receita", "Mesmo paciente" e o ×
+  function retratoReceita(){
+    return { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)),
+      conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)), nome: el('nomePaciente').value, idade: el('idade').value,
+      peso: el('peso').value, pacienteQuadro, encRascunhoPaciente, atRascunhoPaciente };
+  }
+  function voltarRetrato(r){
+    selected = r.selected; selectedOrient = r.selectedOrient; conversaoPed = r.conversaoPed;
+    el('nomePaciente').value = r.nome; el('idade').value = r.idade; el('peso').value = r.peso;
+    pacienteQuadro = r.pacienteQuadro; encRascunhoPaciente = r.encRascunhoPaciente; atRascunhoPaciente = r.atRascunhoPaciente;
+    renderTudo(); atualizarDestaquePeso();
+    showToast('Receita de volta');
   }
 
   async function copiarTexto(){
@@ -2095,6 +2280,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     try{
       await navigator.clipboard.writeText(texto);
       showToast('Texto copiado');
+      return true;
     }catch(e){
       // fallback
       const ta = document.createElement('textarea');
@@ -2103,9 +2289,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
-      try{ document.execCommand('copy'); showToast('Texto copiado'); }
-      catch(e2){ showToast('Não consegui copiar automaticamente — selecione o texto manualmente'); }
+      let ok = false;
+      try{ ok = document.execCommand('copy'); }catch(e2){ ok = false; }
       document.body.removeChild(ta);
+      showToast(ok ? 'Texto copiado' : 'Não consegui copiar automaticamente — selecione o texto manualmente');
+      return ok;
     }
   }
 
@@ -2493,10 +2681,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         : tipo === 'controle' ? docControle(dados) : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
       const nomeArquivo = 'Receita - ' + (dados.paciente !== '—' ? dados.paciente : 'paciente') + ' - ' + dados.data.replace(/\//g,'-') + '.docx';
-      if(await salvarArquivo(nomeArquivo, blob)) showToast('Arquivo .docx gerado');
+      if(await salvarArquivo(nomeArquivo, blob)){ showToast('Arquivo .docx gerado'); return true; }
+      showToast('O arquivo .docx não foi salvo');
+      return false;
     }catch(e){
       console.error(e);
       showToast('Erro ao gerar o .docx — veja o console para detalhes');
+      return false;
     }
   }
 
@@ -2525,37 +2716,55 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       e.preventDefault();
       const f = el('search').value;
       if(!f.trim()) return;
-      const fNorm = norm(f);
-      const matches = getOrdemCondicoes().filter(nome =>
-        norm(nome).includes(fNorm) || getCondEffective(nome).meds.some(m => norm(m.nome).includes(fNorm))
-      );
-      matches.sort((a,b) => (usoCondicoes[b]||0) - (usoCondicoes[a]||0));
-      if(matches.length){
-        const nome = matches[0];
-        if(condicaoSelectionState(nome) !== 'all'){
-          toggleCondicaoInteira(nome, true);
-          showToast('"' + nome + '" adicionada à receita');
-        }
+      // nome de condição (ou sintoma) → condição; senão, nome de remédio → o remédio avulso
+      // (não a condição inteira que o contém)
+      const conds = buscarCondicoes(f);
+      const cond = conds.find(nome => pontoCondicao(nome, f) >= 3);
+      const med = buscarAvulsos(f)[0];
+      if(cond){
+        if(condicaoSelectionState(cond) !== 'all'){
+          toggleCondicaoInteira(cond, true);
+          showToast('"' + cond + '" adicionada à receita');
+        } else showToast('"' + cond + '" já está na receita');
+      } else if(med){
+        if(!selected[avulsoId(med)]){
+          toggleMedAvulso(med, true);
+          showToast('"' + [med.nome, med.concentracao].filter(Boolean).join(' ') + '" adicionado à receita');
+        } else showToast('Já está na receita');
+      } else if(conds.length){
+        if(condicaoSelectionState(conds[0]) !== 'all'){ toggleCondicaoInteira(conds[0], true); showToast('"' + conds[0] + '" adicionada à receita'); }
       }
     }
   });
   // Atalho "/" foca a busca de qualquer lugar
+  const modalAberto = () => document.querySelector('.ajuda-overlay.show');
   document.addEventListener('keydown', (e) => {
-    if(e.key === '/' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
+    if(e.key === '/' && !modalAberto() && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
       e.preventDefault();
       el('search').focus();
     }
   });
-  // Atalhos 1-9 (aplica a N-ésima condição de "mais usadas") e Ctrl/Cmd+Enter
-  // (nova receita) — só fora de campos de texto, pra não atrapalhar digitação.
+  // Atalhos: 1-9 (N-ésima condição de "mais usadas"), Ctrl/Cmd+Enter (nova receita;
+  // com Shift, mesmo paciente) e Ctrl/Cmd+P (imprimir). Com uma janela aberta,
+  // Ctrl+Enter salva/imprime a janela e Ctrl+P imprime o documento dela.
   document.addEventListener('keydown', (e) => {
     const emCampoDeTexto = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-    if(!emCampoDeTexto && /^[1-9]$/.test(e.key)){
+    const modal = modalAberto();
+    const ctrl = e.ctrlKey || e.metaKey;
+    if(modal){
+      const acao = { editItemOverlay: 'btnSaveEditItem', atestadoOverlay: 'btnImprimirAtestado', encaminhamentoOverlay: 'btnImprimirEncaminhamento' }[modal.id];
+      if(ctrl && acao && (e.key === 'Enter' || (e.key.toLowerCase() === 'p' && modal.id !== 'editItemOverlay'))){ e.preventDefault(); el(acao).click(); }
+      return;
+    }
+    if(!emCampoDeTexto && !ctrl && !e.altKey && /^[1-9]$/.test(e.key)){
       const chips = [...el('chipsMaisUsadas').querySelectorAll('.chip')];
       const chip = chips[Number(e.key) - 1];
       if(chip){ e.preventDefault(); chip.click(); }
     }
-    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    if(ctrl && e.key.toLowerCase() === 'p' && !e.shiftKey){ e.preventDefault(); el('btnImprimir').click(); return; }
+    if(ctrl && e.key === 'Enter'){
+      // digitando no nome/idade/peso: Ctrl+Enter não apaga o que está sendo escrito
+      if(emCampoDeTexto && document.activeElement.id !== 'search') return;
       e.preventDefault();
       el(e.shiftKey ? 'btnMesmoPaciente' : 'btnLimpar').click();
     }
@@ -2581,9 +2790,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   el('receitaPaper').addEventListener('click', (e) => {
     const btn = e.target.closest('.rm-item');
     if(!btn) return;
+    const antes = retratoReceita();
+    const nomeItem = btn.dataset.sel ? (selected[btn.dataset.sel] || {}).nome : 'Orientação';
     if(btn.dataset.sel){ delete selected[btn.dataset.sel]; }
     if(btn.dataset.orient){ delete selectedOrient[btn.dataset.orient]; }
     renderTudo();
+    showToast((nomeItem || 'Item') + ' removido', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
   });
 
   // Edição de itens direto pelo papel da receita (delegação)
@@ -2638,7 +2850,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       inputId.value = id;
     }
     
-    overlay.classList.add('show');
+    mostrarJanela('editItemOverlay', 'editItemPosologia');
     overlay.dataset.valoresIniciais = valoresDoFormulario(overlay);
   });
 
@@ -2764,8 +2976,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     renderTudo();
   }));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
-  el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
-  el('btnDocx').addEventListener('click', async () => { await baixarDocx(); registrarHistorico('docx'); });
+  // só conta como emitida (histórico, padrões, cartão do Quadro) a receita que de fato saiu
+  el('btnCopiar').addEventListener('click', async () => { if(await copiarTexto()) registrarHistorico('copiado'); });
+  el('btnDocx').addEventListener('click', async () => { if(await baixarDocx()) registrarHistorico('docx'); });
 
   // Encaminhamento
   el('btnEncaminhamento').addEventListener('click', abrirEncaminhamento);
@@ -2814,8 +3027,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   el('btnCopiarAtestado').addEventListener('click', () => copiarTextoSimples(el('atTexto').value));
   el('btnImprimirAtestado').addEventListener('click', imprimirAtestado);
 
-  el('medicoNome').addEventListener('change', saveMedico);
-  el('medicoCrm').addEventListener('change', saveMedico);
+  ['medicoNome', 'medicoCrm'].forEach(id => {
+    el(id).addEventListener('input', renderReceita);   // a prévia (e a impressão comum, que a copia) mostra na hora
+    el(id).addEventListener('change', saveMedico);
+  });
   el('unidadeSaude').addEventListener('input', renderReceita);
   el('unidadeSaude').addEventListener('change', saveUnidade);
 
@@ -2951,11 +3166,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   function renderEntradasHtml(entradas, peso, notaContinuacao){
-    let html = notaContinuacao ? `<div class="continuacao-nota">${notaContinuacao}</div>` : '';
+    let html = notaContinuacao ? `<div class="continuacao-nota">${escapeHtml(notaContinuacao)}</div>` : '';
     let listaAberta = false;
     entradas.forEach(e => {
       if(e.tipo === 'titulo'){
-        html += `<div class="via-titulo">Uso ${e.via}</div>`;
+        html += `<div class="via-titulo">Uso ${escapeHtml(e.via)}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
         const posologia = calcDoseItem(it, peso);
@@ -3155,7 +3370,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     `;
   }
 
-  el('btnImprimir').addEventListener('click', () => {
+  el('btnImprimir').addEventListener('click', async () => {
+    if(!await conferirAntesDeEmitir()) return;
     const sep = separacaoAtiva();
     let paperHtml, printStyles;
     if(sep){
@@ -3176,10 +3392,18 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       else paperHtml = el('receitaPaper').innerHTML;
       printStyles = estilosImpressao(ehControle, fitScale);
     }
-    if(!abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
+    if(!await abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
     registrarHistorico('impresso');
   });
-  el('btnPediatrica').addEventListener('click', () => executarConversao(false));
+  el('btnPediatrica').addEventListener('click', async () => {
+    const meses = idadeAtualMeses();
+    if(meses !== null && meses >= 144){
+      const r = await perguntar('O paciente tem <b>' + escapeHtml(window.PEDIATRIA.formatarIdade(meses)) + '</b>. A versão pediátrica troca os remédios por gotas e doses por kg. Converter assim mesmo?',
+        [{ rotulo: 'Cancelar', valor: false }, { rotulo: 'Converter', valor: true, primario: true }]);
+      if(!r) return;
+    }
+    executarConversao(false);
+  });
   el('avisoBar').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-acao]');
     if(!b) return;
@@ -3192,6 +3416,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
     if(b.dataset.acao === 'cond-queixa') toggleCondicaoInteira(b.dataset.nome, true);
+    if(b.dataset.acao === 'preencher-medico'){ el('medicoDetails').open = true; el('medicoNome').scrollIntoView({ block: 'center' }); el('medicoNome').focus(); }
+    if(b.dataset.acao === 'tirar-alergico'){
+      const antes = retratoReceita();
+      b.dataset.ids.split('|').forEach(id => { delete selected[id]; });
+      renderTudo();
+      showToast('Removido da receita', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    }
     if(b.dataset.acao === 'padrao-adiar'){ padroes.adiadas[b.dataset.chave] = (padroes.n[b.dataset.chave] || 0) + PADROES_MIN; savePadroes(); renderTudo(); }
     if(b.dataset.acao === 'padrao-dispensar'){ padroes.dispensadas[b.dataset.chave] = true; savePadroes(); renderTudo(); }
   });
@@ -3206,21 +3437,31 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
   });
   // Nova receita: próximo paciente (limpa tudo)
-  el('btnLimpar').addEventListener('click', () => {
+  el('btnLimpar').addEventListener('click', (ev) => {
+    const antes = retratoReceita();
+    const tinhaAlgo = antes.nome.trim() || Object.keys(antes.selected).length || Object.keys(antes.selectedOrient).length;
     finalizarAtendimento();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null; pacienteQuadro = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
+    usoNaAbertura = { ...usoCondicoes };
+    // próximo paciente: busca limpa e o cursor no nome (no Quadro o nome vem do cartão)
+    el('search').value = ''; el('searchWrap').classList.remove('has-text');
     renderTudo();
+    if(limpezaSilenciosa) return;
+    if(!PONTE) el('nomePaciente').focus();
+    if(tinhaAlgo) showToast('Receita limpa para o próximo paciente', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
   });
   // Mesmo paciente: outra receita para quem já está na tela (ex.: antibiótico
   // nas 2 vias e sintomáticos na comum). Mantém nome, idade, peso e os rascunhos
   // de encaminhamento/atestado; limpa remédios e orientações.
   el('btnMesmoPaciente').addEventListener('click', () => {
+    const antes = retratoReceita();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     renderTudo();
     const nome = el('nomePaciente').value.trim();
-    showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos');
+    showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    el('search').focus();
   });
 
   el('btnAddCustom').addEventListener('click', async () => {
@@ -3355,7 +3596,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       el('editorNomeCond').value = nome;
       el('editorBtnSalvar').textContent = 'Salvar Alterações';
       
-      const cond = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
+      // o editor abre o que a lista mostra: com as edições e sem os itens removidos
+      const eff = getCondEffective(nome);
+      const cond = { meds: eff.meds.map(itemDeCondicao), orientacoes: eff.orientacoes.map(o => o.texto) };
       
       if(cond.meds && cond.meds.length){
         cond.meds.forEach(m => addMedRowToEditor(m));
@@ -3394,6 +3637,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
     const box = document.createElement('div');
     box.className = 'editor-med-box';
+    box._orig = med;   // teto, faixas e idade mínima voltam se nome e fator não mudarem
     box.innerHTML = `
       <button type="button" class="btn-remove-row" title="Remover medicamento" aria-label="Remover medicamento">&times;</button>
       <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" aria-label="Nome do medicamento" value="${med ? escapeHtml(med.nome) : ''}" list="datalistMedicamentosEditor">
@@ -3402,7 +3646,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         <select class="ed-med-via" aria-label="Via">
           ${renderViaOptions(med ? med.via : null)}
         </select>
-        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}">
+        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? escapeHtml(med.fator) : ''}">
       </div>
       <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" aria-label="Posologia">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
     `;
@@ -3456,6 +3700,19 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     container.appendChild(row);
   }
 
+  // Edições da lista e itens marcados apontam para a posição do item na condição.
+  // Quando o editor troca a lista inteira, essas posições deixam de valer: as edições
+  // já foram incorporadas pelo editor e os itens na receita ficam como estão, soltos.
+  async function desligarIndicesCondicao(nome){
+    delete overrides[nome];
+    await saveOverrides();
+    const prefixo = 'cond:' + nome + ':';
+    [selected, selectedOrient].forEach(obj => Object.keys(obj).forEach(id => {
+      if(id.startsWith(prefixo)){ obj['solto:' + id] = obj[id]; delete obj[id]; }
+    }));
+    if(atendimentoAtual && atendimentoAtual.conds) delete atendimentoAtual.conds[nome];
+  }
+
   function initEditorCondicoes(){
     populateEditorSelect();
     populateEditorMedsDatalist();
@@ -3486,13 +3743,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
           const posologia = box.querySelector('.ed-med-pos').value.trim();
           const fator = parseFator(fatorTxt);
 
-          meds.push({
-            nome: mNome,
-            qtde: qtde || null,
-            via: via,
-            fator: fator,
-            posologia: posologia || null
-          });
+          const item = { nome: mNome, qtde: qtde || null, via: via, fator: fator, posologia: posologia || null };
+          const o = box._orig;
+          if(o && o.nome === mNome && (o.fator ?? null) === (fator ?? null))
+            ['max', 'faixas', 'idadeMinMeses', 'pesoMinKg'].forEach(k => { if(o[k] !== undefined) item[k] = o[k]; });
+          meds.push(item);
         }
       });
       
@@ -3504,6 +3759,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       });
       
       customCondicoes[nome] = { meds, orientacoes };
+      await desligarIndicesCondicao(nome);
       await saveCustomCondicoes();
       populateEditorMedsDatalist();
       
@@ -3525,6 +3781,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         const ok = typeof window.confirm === 'function' ? window.confirm('Deseja realmente excluir a condição "' + nome + '"?') : true;
         if(!ok) return;
         delete customCondicoes[nome];
+        await desligarIndicesCondicao(nome);
         await saveCustomCondicoes();
         populateEditorMedsDatalist();
         showToast('Condição excluída');
@@ -3532,6 +3789,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         const ok = typeof window.confirm === 'function' ? window.confirm('Restaurar a conduta "' + nome + '" para o padrão de fábrica? Isso apagará suas personalizações nela.') : true;
         if(!ok) return;
         delete customCondicoes[nome];
+        await desligarIndicesCondicao(nome);
         await saveCustomCondicoes();
         populateEditorMedsDatalist();
         showToast('Conduta restaurada ao padrão');
@@ -3558,6 +3816,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     await loadPadroes();
     atualizarAvisoBackup();
     renderHistorico();
+    usoNaAbertura = { ...usoCondicoes };
     renderTudo();
     initEditorCondicoes();
     if(PONTE) PONTE.onPaciente(aplicarPacienteDoQuadro);

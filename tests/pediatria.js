@@ -161,6 +161,9 @@ assert.strictEqual(V.classificar({ nome: 'Amoxicilina + Clavulanato 875/125 mg',
 assert.strictEqual(V.classificar({ nome: 'Ceftriaxona 1g', via: 'Intravenoso' }), 'antimicrobiano');
 assert.strictEqual(V.classificar({ nome: 'Metronidazol 100mg/g', via: 'Vaginal' }), null);       // gel vaginal fica na comum
 assert.strictEqual(V.classificar({ nome: 'Neomicina + Bacitracina Pomada', via: 'Tópico' }), null);
+assert.strictEqual(V.classificar({ nome: 'Benzoilmetronidazol 40mg/mL', via: 'Oral' }), 'antimicrobiano');
+assert.strictEqual(V.classificar({ nome: 'Levetiracetam 500mg', via: 'Oral' }), 'controle');
+assert.strictEqual(V.classificar({ nome: 'Fenobarbital Sódico 100mg', via: 'Oral' }), 'controle');
 assert.strictEqual(V.classificar({ nome: 'Tramadol 50mg', via: 'Oral' }), 'controle');
 assert.strictEqual(V.classificar({ nome: 'Paracetamol + Codeína 500/30mg', via: 'Oral' }), 'controle');
 assert.strictEqual(V.classificar({ nome: 'Fluoxetina 20mg', via: 'Oral' }), 'controle');

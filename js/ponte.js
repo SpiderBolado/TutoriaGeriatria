@@ -32,11 +32,14 @@
     if(!alergias || !alergias.length) return null;
     const t = ' ' + norm(nomeRemedio).replace(/[^a-z0-9-]+/g, ' ') + ' ';
     for(const a of alergias){
-      const na = norm(a);
-      if(na.length < 3) continue;
-      const cls = Object.keys(CLASSES_ALERGIA).find(k => na === k || na.startsWith(k) || CLASSES_ALERGIA[k].some(x => na === x || na.startsWith(x)));
-      const termos = [na].concat(cls ? CLASSES_ALERGIA[cls] : []);
-      if(termos.some(x => new RegExp(' ' + escRe(x) + '(?:s|es)? ').test(t))) return a;
+      // "Alergia a dipirona e AAS", "sulfa / cefalosporinas": cada alérgeno conta
+      const partes = norm(a).replace(/\b(?:alergi\w*|alergic\w*)\s*(?:a|ao|aos|as|:)?\s+/g, ' ')
+        .split(/[,;\/+]|\s+e\s+|\s+ou\s+/).map(x => x.trim()).filter(x => x.length >= 3);
+      for(const na of partes){
+        const classes = Object.keys(CLASSES_ALERGIA).filter(k => na === k || na.startsWith(k) || CLASSES_ALERGIA[k].some(x => na === x || na.startsWith(x)));
+        const termos = [na].concat(...classes.map(k => CLASSES_ALERGIA[k]));
+        if(termos.some(x => new RegExp(' ' + escRe(x) + '(?:s|es)? ').test(t))) return a;
+      }
     }
     return null;
   }

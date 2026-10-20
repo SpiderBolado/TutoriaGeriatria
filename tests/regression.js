@@ -4,6 +4,19 @@
 const { chromium } = require('playwright');
 const { startServer } = require('./server');
 
+// A checagem antes de imprimir (falta peso/nome/médico) abre uma pergunta; os testes que
+// não tratam dela rodam com window.__semConferir. O teste da checagem desliga isso.
+{
+  const launch0 = chromium.launch.bind(chromium);
+  chromium.launch = async (...args) => {
+    const b = await launch0(...args);
+    const novoContexto = b.newContext.bind(b);
+    b.newContext = async (o) => { const c = await novoContexto(o); await c.addInitScript(() => { window.__semConferir = true; }); return c; };
+    b.newPage = async (o) => (await b.newContext(o)).newPage();
+    return b;
+  };
+}
+
 const results = [];
 function record(name, pass, detail) {
   results.push({ name, pass, detail });
@@ -315,6 +328,7 @@ async function run(url) {
     const browser = await chromium.launch();
     const { page } = await newPage(browser);
     await page.goto(url);
+    await page.evaluate(() => localStorage.setItem('separar-auto', '0'));   // receita comum: o teste olha o "____" da quantidade
     await page.waitForTimeout(300);
     // A busca so filtra pelo nome (sem concentracao), entao busca "Azitromicina"
     // e depois acha o card cujo nome exibido bate exatamente com "Azitromicina 500mg".
@@ -953,6 +967,9 @@ async function run(url) {
     await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto(url);
+    // "separar sempre" vem ligado de fábrica; aqui começa desligado para testar a sugestão
+    await page.evaluate(() => localStorage.setItem('separar-auto', '0'));
+    await page.reload();
     await page.waitForTimeout(300);
     const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
     const partes = () => page.evaluate(() => {
@@ -1055,6 +1072,56 @@ async function run(url) {
       && consoleErrors.length === 0;
     record('dentro do Quadro: banco, paciente do cartao, alergia, receita emitida e downloads pela ponte', ok,
       JSON.stringify({ inicio: { ...inicio, avisos: inicio.avisos.slice(0, 120) }, conflito: conflito.slice(0, 120), crm: banco['medico-info'], popup: !!popup, log: log.map(x => x.tipo + (x.chave ? ':' + x.chave : '') + (x.nome ? ':' + x.nome : '')), outro, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Revisao de plantao: atalhos seguros, Desfazer, busca, checagem antes de imprimir, condicao personalizada ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const itens = () => page.evaluate(() => document.querySelectorAll('#receitaPaper .item-linha').length);
+    // busca por sintoma e Enter no nome do remedio
+    await page.fill('#search', 'garganta'); await page.waitForTimeout(250);
+    const garganta = await page.evaluate(() => [...document.querySelectorAll('#listaContainer .card-head .nome')].map((e) => e.textContent.trim()).slice(0, 3));
+    await page.fill('#search', 'azitro'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
+    const aposAzitro = await page.evaluate(() => [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()));
+    // Ctrl+Enter dentro da janela de edicao salva, nao apaga a receita
+    await page.fill('#nomePaciente', 'Paciente Atalho');
+    await page.evaluate(() => document.querySelector('#receitaPaper .edit-item-btn').click());
+    await page.waitForTimeout(150);
+    await page.fill('#editItemPosologia', 'POSOLOGIA PELO ATALHO');
+    await page.press('#editItemPosologia', 'Control+Enter'); await page.waitForTimeout(200);
+    const aposAtalho = { nome: await page.inputValue('#nomePaciente'), texto: await page.evaluate(() => receitaPaper.innerText), janela: await page.evaluate(() => editItemOverlay.classList.contains('show')) };
+    // Nova receita com Desfazer
+    await page.click('#btnLimpar'); await page.waitForTimeout(150);
+    const limpo = { nome: await page.inputValue('#nomePaciente'), itens: await itens(), foco: await page.evaluate(() => document.activeElement.id) };
+    await page.click('#toast button'); await page.waitForTimeout(200);
+    const desfeito = { nome: await page.inputValue('#nomePaciente'), itens: await itens() };
+    // checagem antes de imprimir: falta o medico
+    await page.evaluate(() => { window.__semConferir = false; });
+    await page.click('#btnImprimir'); await page.waitForTimeout(200);
+    const pergunta = await page.evaluate(() => (document.querySelector('.pergunta-overlay') || {}).innerText || '');
+    await page.click('.pergunta-overlay button.btn-primary'); await page.waitForTimeout(200);
+    const preencher = await page.evaluate(() => ({ foco: document.activeElement.id, aberto: medicoDetails.open }));
+    // condicao personalizada: remover item nao quebra a lista
+    await page.evaluate(() => { localStorage.setItem('custom-condicoes', JSON.stringify({ 'Minha Condicao': { meds: [{ nome: 'Dipirona 500mg', qtde: '01 Caixa', via: 'Oral', fator: null, posologia: 'Tomar 1 cp.' }, { nome: 'Loratadina 10mg', qtde: '01 Caixa', via: 'Oral', fator: null, posologia: 'Tomar 1 cp.' }], orientacoes: ['Repouso.'] } })); });
+    await page.reload(); await page.waitForTimeout(400);
+    await selectCondicao(page, 'Minha Condicao');
+    await page.evaluate(() => [...document.querySelectorAll('#listaContainer .card')].find((c) => /Minha Condicao/.test(c.textContent)).querySelector('.card-head').click());
+    await page.waitForTimeout(200);
+    await page.evaluate(() => { const c = [...document.querySelectorAll('#listaContainer .card')].find((x) => /Minha Condicao/.test(x.textContent)); const b = c.querySelector('.card-body .ef-remove'); if (b) b.click(); });
+    await page.waitForTimeout(250);
+    await page.fill('#search', ''); await page.waitForTimeout(250);
+    const avulsosVisiveis = await page.evaluate(() => document.querySelectorAll('#listaContainer .card.med-avulso').length);
+    const ok = garganta.includes('Faringite') && new Set(aposAzitro).size === 1 && /Azitromicina 500/.test(aposAzitro[0])
+      && aposAtalho.nome === 'Paciente Atalho' && /POSOLOGIA PELO ATALHO/.test(aposAtalho.texto) && !aposAtalho.janela
+      && limpo.nome === '' && limpo.itens === 0 && limpo.foco === 'nomePaciente' && desfeito.nome === 'Paciente Atalho' && desfeito.itens >= 1
+      && /seu nome e CRM/i.test(pergunta) && preencher.foco === 'medicoNome' && preencher.aberto
+      && avulsosVisiveis > 100 && consoleErrors.length === 0;
+    record('revisao de plantao: busca por sintoma, Enter no remedio, Ctrl+Enter salva, Desfazer, checagem, condicao personalizada', ok,
+      JSON.stringify({ garganta, aposAzitro, aposAtalho: { ...aposAtalho, texto: aposAtalho.texto.slice(0, 60) }, limpo, desfeito, pergunta: pergunta.slice(0, 120), preencher, avulsosVisiveis, consoleErrors }));
     await browser.close();
   }
 
