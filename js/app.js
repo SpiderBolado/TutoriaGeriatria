@@ -351,21 +351,61 @@
     restaurarRascunhoEdicao(cont);
   }
 
+  // ---------- Busca ----------
+  // Todas as palavras do termo precisam aparecer (sem acento; "500 mg" = "500mg"), quem
+  // começa com o termo vem antes, e sintomas ("garganta", "febre") trazem as condições
+  // que a queixa sugere. A ordem por uso é a do início do atendimento: não pula
+  // enquanto se clica (recalcula em "Nova receita").
+  const compacto = s => norm(s).replace(/(\d)\s+(mg|ml|g|mcg|ui|%)(?![a-z])/g, '$1$2');
+  const tokensBusca = f => compacto(f).split(/\s+/).filter(Boolean);
+  let usoNaAbertura = null;
+  const usoOrdem = nome => (usoNaAbertura || usoCondicoes)[nome] || 0;
+  function pontuaTexto(texto, toks){
+    const t = compacto(texto);
+    if(!toks.every(k => t.includes(k))) return 0;
+    return toks.every(k => new RegExp('(^|[^a-z0-9])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t)) ? 2 : 1;
+  }
+  // adulto: condição montada para criança vai para o fim; criança: vem antes
+  function ajusteIdade(nome){
+    if(!condicaoPorPeso(nome)) return 0;
+    const meses = idadeAtualMeses(), kg = pesoAtualKg();
+    if(meses === null && kg === null) return 0;
+    return pacientePediatrico() ? 0.5 : -3;
+  }
+  function buscarCondicoes(filtro){
+    const toks = tokensBusca(filtro);
+    const todas = getOrdemCondicoes();
+    if(!toks.length) return todas.slice().sort((a, b) => usoOrdem(b) - usoOrdem(a));
+    const sinon = window.PONTE ? window.PONTE.sugerirCondicoes(filtro, n => todas.includes(n), null) : [];
+    const pont = {};
+    todas.forEach(nome => {
+      const pn = pontuaTexto(nome, toks);
+      let p = pn ? 3 + pn : sinon.includes(nome) ? 3 : getCondEffective(nome).meds.some(m => pontuaTexto(m.nome, toks)) ? 1 : 0;
+      if(p) pont[nome] = p + ajusteIdade(nome);
+    });
+    return Object.keys(pont).sort((a, b) => pont[b] - pont[a] || usoOrdem(b) - usoOrdem(a));
+  }
+  function pontoCondicao(nome, filtro){
+    const toks = tokensBusca(filtro);
+    const pn = pontuaTexto(nome, toks);
+    if(pn) return 3 + pn;
+    const sinon = window.PONTE ? window.PONTE.sugerirCondicoes(filtro, n => n === nome, null) : [];
+    return sinon.length ? 3 : 1;
+  }
+  function buscarAvulsos(filtro){
+    const toks = tokensBusca(filtro);
+    const todos = allMedicamentos();
+    if(!toks.length) return todos;
+    return todos.map(m => [m, pontuaTexto([m.nome, m.concentracao, m.forma].filter(Boolean).join(' '), toks)])
+      .filter(x => x[1]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  }
+
   function renderListaConteudo(filtro){
     const cont = el('listaContainer');
-    const f = norm(filtro);
     cont.innerHTML = '';
 
-    // Condições
-    const condMatches = getOrdemCondicoes().filter(nome => {
-      if(!f) return true;
-      if(norm(nome).includes(f)) return true;
-      return getCondEffective(nome).meds.some(m => norm(m.nome).includes(f));
-    });
-    // Mais usadas primeiro (sort estável: empates mantêm a ordem original)
-    condMatches.sort((a,b) => (usoCondicoes[b]||0) - (usoCondicoes[a]||0));
-
-    const medsMatches = allMedicamentos().filter(m => !f || norm(m.nome).includes(f));
+    const condMatches = buscarCondicoes(filtro);
+    const medsMatches = buscarAvulsos(filtro);
 
     if(condMatches.length === 0 && medsMatches.length === 0){
       const wrap = document.createElement('div');
@@ -429,7 +469,8 @@
     head.innerHTML = `
       <input type="checkbox" ${state==='all' ? 'checked' : ''} data-role="cond-check" aria-label="Adicionar todos os itens de ${escapeHtml(nome)}">
       <span class="nome">${escapeHtml(nome)}</span>
-      <span class="count">${eff.meds.length} item${eff.meds.length!==1?'s':''}</span>
+      ${condicaoPorPeso(nome) ? '<span class="selo-crianca" title="Montada para criança: doses por kg (pede o peso)">criança · dose/kg</span>' : ''}
+      <span class="count">${eff.meds.length} ${eff.meds.length!==1?'itens':'item'}</span>
       <span class="chev" aria-hidden="true">&#9656;</span>
     `;
     const chk = head.querySelector('input');
@@ -1418,7 +1459,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   const SEPARAR_KEY = 'separar-auto';
   let separarSuspenso = false;
   function separarSempreAtivo(){
-    try{ return localStorage.getItem(SEPARAR_KEY) === '1'; }catch(e){ return false; }
+    // ligado de fábrica: quem não quiser desmarca uma vez
+    try{ return localStorage.getItem(SEPARAR_KEY) !== '0'; }catch(e){ return true; }
   }
   function pesoAtualKg(){
     const v = parseFloat(String(el('peso').value).replace(',', '.'));
@@ -1477,6 +1519,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // {nome, idade, peso, sexo, alergias:[], queixa, ficha} do cartão; vale enquanto o
   // nome na tela for o do cartão (trocou o nome à mão: as alergias não são deste).
   let pacienteQuadro = null;
+  let limpezaSilenciosa = false;   // "Nova receita" disparada pelo Quadro: sem Desfazer nem foco
   const primeiroNome = n => norm(n).split(/\s+/)[0] || '';
   function quadroAtual(){
     if(!pacienteQuadro) return null;
@@ -1495,7 +1538,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     // sem nome fica para este paciente; com outro nome, pergunta antes de apagar
     if(!mesmo && (tela || temItens)){
       const limpar = jaSaiu || !temItens || (tela && window.confirm('Trocar para ' + p.nome + '? A receita de ' + tela + ' ainda não foi impressa e será apagada.'));
-      if(limpar) el('btnLimpar').click();
+      if(limpar){ limpezaSilenciosa = true; try{ el('btnLimpar').click(); } finally { limpezaSilenciosa = false; } }
       else if(tela) return;   // ficou com o paciente anterior
     }
     pacienteQuadro = p;
@@ -2097,11 +2140,35 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     return out;
   }
 
-  function showToast(msg){
+  // Aviso curto; com acao = { rotulo, fn }, mostra um botão (ex.: Desfazer) por mais tempo
+  let toastTimer = null;
+  function showToast(msg, acao){
     const t = el('toast');
     t.textContent = msg;
+    t.classList.toggle('com-acao', !!acao);
+    if(acao){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = acao.rotulo;
+      b.addEventListener('click', () => { t.classList.remove('show'); acao.fn(); });
+      t.appendChild(b);
+    }
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), acao ? 8000 : 1800);
+  }
+  // Retrato da receita na tela, para desfazer "Nova receita", "Mesmo paciente" e o ×
+  function retratoReceita(){
+    return { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)),
+      conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)), nome: el('nomePaciente').value, idade: el('idade').value,
+      peso: el('peso').value, pacienteQuadro, encRascunhoPaciente, atRascunhoPaciente };
+  }
+  function voltarRetrato(r){
+    selected = r.selected; selectedOrient = r.selectedOrient; conversaoPed = r.conversaoPed;
+    el('nomePaciente').value = r.nome; el('idade').value = r.idade; el('peso').value = r.peso;
+    pacienteQuadro = r.pacienteQuadro; encRascunhoPaciente = r.encRascunhoPaciente; atRascunhoPaciente = r.atRascunhoPaciente;
+    renderTudo(); atualizarDestaquePeso();
+    showToast('Receita de volta');
   }
 
   async function copiarTexto(){
@@ -2548,17 +2615,23 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       e.preventDefault();
       const f = el('search').value;
       if(!f.trim()) return;
-      const fNorm = norm(f);
-      const matches = getOrdemCondicoes().filter(nome =>
-        norm(nome).includes(fNorm) || getCondEffective(nome).meds.some(m => norm(m.nome).includes(fNorm))
-      );
-      matches.sort((a,b) => (usoCondicoes[b]||0) - (usoCondicoes[a]||0));
-      if(matches.length){
-        const nome = matches[0];
-        if(condicaoSelectionState(nome) !== 'all'){
-          toggleCondicaoInteira(nome, true);
-          showToast('"' + nome + '" adicionada à receita');
-        }
+      // nome de condição (ou sintoma) → condição; senão, nome de remédio → o remédio avulso
+      // (não a condição inteira que o contém)
+      const conds = buscarCondicoes(f);
+      const cond = conds.find(nome => pontoCondicao(nome, f) >= 3);
+      const med = buscarAvulsos(f)[0];
+      if(cond){
+        if(condicaoSelectionState(cond) !== 'all'){
+          toggleCondicaoInteira(cond, true);
+          showToast('"' + cond + '" adicionada à receita');
+        } else showToast('"' + cond + '" já está na receita');
+      } else if(med){
+        if(!selected[avulsoId(med)]){
+          toggleMedAvulso(med, true);
+          showToast('"' + [med.nome, med.concentracao].filter(Boolean).join(' ') + '" adicionado à receita');
+        } else showToast('Já está na receita');
+      } else if(conds.length){
+        if(condicaoSelectionState(conds[0]) !== 'all'){ toggleCondicaoInteira(conds[0], true); showToast('"' + conds[0] + '" adicionada à receita'); }
       }
     }
   });
@@ -2616,9 +2689,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   el('receitaPaper').addEventListener('click', (e) => {
     const btn = e.target.closest('.rm-item');
     if(!btn) return;
+    const antes = retratoReceita();
+    const nomeItem = btn.dataset.sel ? (selected[btn.dataset.sel] || {}).nome : 'Orientação';
     if(btn.dataset.sel){ delete selected[btn.dataset.sel]; }
     if(btn.dataset.orient){ delete selectedOrient[btn.dataset.orient]; }
     renderTudo();
+    showToast((nomeItem || 'Item') + ' removido', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
   });
 
   // Edição de itens direto pelo papel da receita (delegação)
@@ -3244,21 +3320,31 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(e.target.checked){ autoPedSuspensa = false; renderTudo(); }
   });
   // Nova receita: próximo paciente (limpa tudo)
-  el('btnLimpar').addEventListener('click', () => {
+  el('btnLimpar').addEventListener('click', (ev) => {
+    const antes = retratoReceita();
+    const tinhaAlgo = antes.nome.trim() || Object.keys(antes.selected).length || Object.keys(antes.selectedOrient).length;
     finalizarAtendimento();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null; pacienteQuadro = null;
     el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
+    usoNaAbertura = { ...usoCondicoes };
+    // próximo paciente: busca limpa e o cursor no nome (no Quadro o nome vem do cartão)
+    el('search').value = ''; el('searchWrap').classList.remove('has-text');
     renderTudo();
+    if(limpezaSilenciosa) return;
+    if(!PONTE) el('nomePaciente').focus();
+    if(tinhaAlgo) showToast('Receita limpa para o próximo paciente', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
   });
   // Mesmo paciente: outra receita para quem já está na tela (ex.: antibiótico
   // nas 2 vias e sintomáticos na comum). Mantém nome, idade, peso e os rascunhos
   // de encaminhamento/atestado; limpa remédios e orientações.
   el('btnMesmoPaciente').addEventListener('click', () => {
+    const antes = retratoReceita();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     renderTudo();
     const nome = el('nomePaciente').value.trim();
-    showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos');
+    showToast(nome ? `Receita limpa — continua para ${nome}` : 'Receita limpa — dados do paciente mantidos', { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    el('search').focus();
   });
 
   el('btnAddCustom').addEventListener('click', async () => {
@@ -3613,6 +3699,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     await loadPadroes();
     atualizarAvisoBackup();
     renderHistorico();
+    usoNaAbertura = { ...usoCondicoes };
     renderTudo();
     initEditorCondicoes();
     if(PONTE) PONTE.onPaciente(aplicarPacienteDoQuadro);

@@ -315,6 +315,7 @@ async function run(url) {
     const browser = await chromium.launch();
     const { page } = await newPage(browser);
     await page.goto(url);
+    await page.evaluate(() => localStorage.setItem('separar-auto', '0'));   // receita comum: o teste olha o "____" da quantidade
     await page.waitForTimeout(300);
     // A busca so filtra pelo nome (sem concentracao), entao busca "Azitromicina"
     // e depois acha o card cujo nome exibido bate exatamente com "Azitromicina 500mg".
@@ -953,6 +954,9 @@ async function run(url) {
     await page.addInitScript(() => { window.__prints = []; window.open = () => ({ document: { write: (h) => window.__prints.push(h), close(){} }, focus(){}, print(){}, close(){} }); });
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto(url);
+    // "separar sempre" vem ligado de fábrica; aqui começa desligado para testar a sugestão
+    await page.evaluate(() => localStorage.setItem('separar-auto', '0'));
+    await page.reload();
     await page.waitForTimeout(300);
     const barra = () => page.evaluate(() => document.getElementById('avisoBar').textContent.replace(/\s+/g, ' '));
     const partes = () => page.evaluate(() => {
