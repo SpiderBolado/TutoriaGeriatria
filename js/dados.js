@@ -1564,7 +1564,8 @@ const DATA = {
           "qtde": "06 Comprimidos",
           "posologia": "Dose por peso (200mcg/kg — ajustar conforme faixa): 15-24kg: 1/2 comprimido; 25-35kg: 01 comprimido; 36-50kg: 01 e 1/2 comprimido; 51-65kg: 02 comprimidos; 66-79kg: 02 e 1/2 comprimidos; a partir de 80kg: 03 comprimidos. Tomar a dose correspondente agora e repetir a mesma dose em 07 dias.",
           "via": "Oral",
-          "fator": null
+          "fator": null,
+          "pesoMinKg": 15
         },
         {
           "nome": "Hidroxizina 25 mg",

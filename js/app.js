@@ -2115,10 +2115,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(separarSempreAtivo() && !separarSuspenso && tipoReceitaAtual() === 'comum' && Object.values(selected).some(precisaDuasVias)){
       document.querySelector('input[name=tipoReceita][value="auto"]').checked = true;
     }
-    // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido
+    // Conversão automática (opcional): só com idade informada < 12 anos e peso preenchido até 40 kg
+    // (idade errada vinda do Quadro não pode transformar a receita de um adulto em gotas)
     if(!convertendoAuto && autoPediatriaAtiva() && !autoPedSuspensa){
       const meses = idadeAtualMeses();
-      if(meses !== null && meses < 144 && pesoAtualKg() && window.PEDIATRIA.contarConversiveis(Object.entries(selected), meses)){
+      if(meses !== null && meses < 144 && pesoAtualKg() && pesoAtualKg() <= 40 && window.PEDIATRIA.contarConversiveis(Object.entries(selected), meses)){
         convertendoAuto = true;
         let converteu = false;
         try{ converteu = executarConversao(true); } finally { convertendoAuto = false; }
@@ -2249,12 +2250,28 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const falta = [];
     const porPeso = Object.values(selected).filter(it => itemPorPeso(it)).length;
     if(porPeso && !pesoAtualKg()) falta.push({ txt: `o <b>peso</b> (${porPeso} ${porPeso === 1 ? 'item' : 'itens'} com dose por kg)`, campo: 'peso' });
-    else if(/\bDOSE\b/.test(el('receitaPaper').innerText)) falta.push({ txt: 'a <b>dose</b> de um item (a palavra DOSE sairia no papel)', campo: null });
+    else if(/\bDOSE\b(?!\s+[ÚU]NICA)/.test(el('receitaPaper').innerText)) falta.push({ txt: 'a <b>dose</b> de um item (a palavra DOSE sairia no papel)', campo: null });
+    // Riscos que o aviso amarelo/vermelho já mostra, repetidos aqui porque imprimir com eles é perigoso
+    const risco = [];
+    const kg = pesoAtualKg(), idade = idadeAtualMeses();
+    const q = quadroAtual();
+    Object.values(selected).forEach(it => {
+      const a = q && (q.alergias || []).length && window.PONTE.conflitoAlergia(it.nome, q.alergias);
+      if(a) risco.push(`<b>${escapeHtml(it.nome)}</b>: alergia a ${escapeHtml(a)} registrada no Quadro`);
+      const d = kg && window.PEDIATRIA.doseDoItem(it, kg);
+      if(d && d.valor === null) risco.push(`<b>${escapeHtml(it.nome)}</b>: dose em branco (peso fora das faixas)`);
+      else if(kg && it.pesoMinKg && kg < it.pesoMinKg) risco.push(`<b>${escapeHtml(it.nome)}</b>: peso abaixo do mínimo de ${it.pesoMinKg} kg`);
+      if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses) risco.push(`<b>${escapeHtml(it.nome)}</b>: abaixo da idade mínima de ${escapeHtml(window.PEDIATRIA.formatarIdade(it.idadeMinMeses))}`);
+    });
+    if(!risco.some(r => /dose em branco/.test(r)) && /(?:Tomar|Dar|Aplicar|Usar|Pingar)\s+_{3,}|_{3,}\s*(?:gotas|mL|comprimid|c[áa]psul)/.test(el('receitaPaper').innerText)) risco.push('<b>dose em branco</b> (____) em um item');
+    risco.forEach(r => falta.push({ txt: r, campo: null, risco: true }));
     if(!el('nomePaciente').value.trim()) falta.push({ txt: 'o <b>nome do paciente</b>', campo: 'nomePaciente' });
     if(!semMedicoAceito && !el('medicoNome').value.trim()) falta.push({ txt: 'o <b>seu nome e CRM</b> (Dados do médico)', campo: 'medicoNome', medico: true });
     if(!falta.length) return true;
-    const r = await perguntar('<b>Antes de imprimir, falta:</b><ul>' + falta.map(f => '<li>' + f.txt + '</li>').join('') + '</ul>',
-      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: 'Preencher', valor: 'preencher', primario: true }]);
+    const lista = l => '<ul>' + l.map(f => '<li>' + f.txt + '</li>').join('') + '</ul>';
+    const riscos = falta.filter(f => f.risco), faltam = falta.filter(f => !f.risco);
+    const r = await perguntar((riscos.length ? '<b>Antes de imprimir, confira:</b>' + lista(riscos) : '') + (faltam.length ? '<b>Antes de imprimir, falta:</b>' + lista(faltam) : ''),
+      [{ rotulo: 'Imprimir assim mesmo', valor: 'segue' }, { rotulo: faltam.some(f => f.campo) ? 'Preencher' : 'Revisar', valor: 'preencher', primario: true }]);
     if(r === 'segue'){ if(falta.some(f => f.medico)) semMedicoAceito = true; return true; }
     if(r === 'preencher'){
       const f = falta.find(x => x.campo);
@@ -2739,8 +2756,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       // nome de condição (ou sintoma) → condição; senão, nome de remédio → o remédio avulso
       // (não a condição inteira que o contém)
       const conds = buscarCondicoes(f);
-      const cond = conds.find(nome => pontoCondicao(nome, f) >= 3);
       const med = buscarAvulsos(f)[0];
+      // condição achada só por sinônimo perde para o remédio que casou todas as palavras
+      const medInteiro = med && pontuaTexto([med.nome, med.concentracao, med.forma].filter(Boolean).join(' '), tokensBusca(f)) === 2;
+      const cond = conds.find(nome => { const p = pontoCondicao(nome, f); return p > 3 || (p === 3 && !medInteiro); });
       if(cond){
         if(condicaoSelectionState(cond) !== 'all'){
           toggleCondicaoInteira(cond, true);

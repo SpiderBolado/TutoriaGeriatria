@@ -122,7 +122,8 @@ assert.ok(!avisosDoItem(dip, 6, 4).some(a => /idade mínima/.test(a)));
 assert.ok(avisosDoItem(dip, 6, null).some(a => /confirme idade mínima/.test(a)));
 
 // idade em texto livre
-[['4', 48], ['4a', 48], ['4 anos', 48], ['8m', 8], ['8 meses', 8], ['1a6m', 18], ['2 anos e 3 meses', 27], ['1,5', 18], ['', null], ['abc', null]]
+[['4', 48], ['4a', 48], ['4 anos', 48], ['8m', 8], ['8 meses', 8], ['1a6m', 18], ['2 anos e 3 meses', 27], ['1,5', 18], ['', null], ['abc', null],
+  ['15 dias', 0], ['3 semanas', 0], ['10 semanas', 2], ['75 dias', 2], ['RN', 0], ['recém-nascido', 0]]
   .forEach(([txt, esperado]) => assert.strictEqual(idadeEmMeses(txt), esperado, txt));
 
 // ---------- Conferência do catálogo (js/dados.js) ----------
