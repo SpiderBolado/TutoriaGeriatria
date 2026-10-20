@@ -41,7 +41,7 @@
   function abrirImpressao(titulo, printStyles, paperHtml, paciente){
     const doc = '<html><head><title>' + escapeHtml(titulo) + '</title><meta charset="UTF-8">' +
       '<style>' + printStyles + '</style></head><body>' + paperHtml + '</body></html>';
-    if(PONTE){ PONTE.imprimir(titulo, doc, paciente, showToast); return true; }
+    if(PONTE) return PONTE.imprimir(titulo, doc, paciente, showToast);   // promessa: true quando a impressão abriu ou o arquivo foi salvo
     const printWindow = window.open('', '_blank');
     if(!printWindow){
       showToast('Pop-up bloqueado — permita pop-ups ou abra o arquivo direto no navegador');
@@ -238,6 +238,8 @@
     saveOverrides();
   }
 
+  const nomeIgual = (o, m) => o.nome === undefined || o.nome === m.nome;
+  const fatorIgual = (o, m) => o.fator === undefined || (o.fator ?? null) === (m.fator ?? null);
   // Retorna a versão "efetiva" de uma condição: base + edições - remoções
   function getCondEffective(nome){
     const base = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
@@ -252,11 +254,12 @@
         posologia: o.posologia !== undefined ? o.posologia : m.posologia,
         via: o.via !== undefined ? o.via : m.via,
         fator: o.fator !== undefined ? o.fator : m.fator,
-        // teto e idade mínima valem para o item original; editar nome ou fator os descarta
-        max: (o.nome === undefined && o.fator === undefined) ? m.max : undefined,
-        faixas: (o.nome === undefined && o.fator === undefined) ? m.faixas : undefined,
-        idadeMinMeses: o.nome === undefined ? m.idadeMinMeses : undefined,
-        pesoMinKg: o.nome === undefined ? m.pesoMinKg : undefined,
+        // teto e idade mínima valem para o item original; trocar o nome ou o fator os descarta
+        // (salvar o mesmo nome/fator, só mudando a quantidade, não descarta)
+        max: (nomeIgual(o, m) && fatorIgual(o, m)) ? m.max : undefined,
+        faixas: (nomeIgual(o, m) && fatorIgual(o, m)) ? m.faixas : undefined,
+        idadeMinMeses: nomeIgual(o, m) ? m.idadeMinMeses : undefined,
+        pesoMinKg: nomeIgual(o, m) ? m.pesoMinKg : undefined,
         editado: o.nome!==undefined || o.qtde!==undefined || o.posologia!==undefined || o.via!==undefined || o.fator!==undefined
       };
     }).filter(Boolean);
@@ -472,7 +475,7 @@
           <div class="edit-grid">
             <input type="text" class="ef-qtde" value="${escapeHtml(m.qtde)}" placeholder="Quantidade">
             <select class="ef-via">${renderViaOptions(m.via)}</select>
-            <input type="text" class="ef-fator" value="${m.fator!==null && m.fator!==undefined ? m.fator : ''}" placeholder="Fator/kg (opcional)">
+            <input type="text" class="ef-fator" value="${m.fator!==null && m.fator!==undefined ? escapeHtml(m.fator) : ''}" placeholder="Fator/kg (opcional)">
           </div>
           <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(m.posologia)}</textarea>
           <div class="edit-actions">
@@ -609,10 +612,12 @@
     if(!ov) return null;
     const map = tipo === 'meds' ? ov.meds : ov.orientacoes;
     if(!map) return null;
-    const hiddenIdxs = Object.keys(map).filter(i => map[i] && map[i].removido);
+    // a base é a mesma que a lista mostra (condição personalizada ou de fábrica)
+    const cond = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
+    const base = (tipo === 'meds' ? cond.meds : cond.orientacoes) || [];
+    const hiddenIdxs = Object.keys(map).filter(i => map[i] && map[i].removido && base[i] !== undefined);
     if(!hiddenIdxs.length) return null;
 
-    const base = tipo === 'meds' ? DATA.condicoes[nome].meds : DATA.condicoes[nome].orientacoes;
     const box = document.createElement('div');
     box.className = 'hidden-box';
     const title = document.createElement('div');
@@ -680,7 +685,7 @@
         <div class="edit-grid">
           <input type="text" class="ef-qtde" value="${escapeHtml(efetivo.qtde||'')}" placeholder="Quantidade">
           <select class="ef-via">${renderViaOptions(efetivo.via)}</select>
-          <input type="text" class="ef-fator" value="${efetivo.fator!==null && efetivo.fator!==undefined ? efetivo.fator : ''}" placeholder="Fator/kg (opcional)">
+          <input type="text" class="ef-fator" value="${efetivo.fator!==null && efetivo.fator!==undefined ? escapeHtml(efetivo.fator) : ''}" placeholder="Fator/kg (opcional)">
         </div>
         <textarea class="ef-pos" placeholder="Posologia (use DOSE onde entra o valor calculado pelo peso)">${escapeHtml(efetivo.posologia||'')}</textarea>
         <div class="edit-actions">
@@ -786,7 +791,7 @@
       selected[id] = {
         nome: displayNome, qtde: efetivo.qtde, posologiaBase: efetivo.posologia,
         via: efetivo.via || 'Outro', fator: efetivo.fator !== undefined ? efetivo.fator : null,
-        max: (efetivo.fator === m.fator) ? m.max : undefined, faixas: (efetivo.fator === m.fator) ? m.faixas : undefined,
+        max: ((efetivo.fator ?? null) === (m.fator ?? null)) ? m.max : undefined, faixas: ((efetivo.fator ?? null) === (m.fator ?? null)) ? m.faixas : undefined,
         idadeMinMeses: m.idadeMinMeses, pesoMinKg: m.pesoMinKg, origemCondicao: null
       };
     } else {
@@ -890,7 +895,7 @@
 
     let html = '';
     viaOrder.forEach(via => {
-      html += `<div class="via-titulo">Uso ${via}</div>`;
+      html += `<div class="via-titulo">Uso ${escapeHtml(via)}</div>`;
       grupos[via].forEach(([id, it], idx) => {
         const posologia = calcDoseItem(it, peso);
         const precisaPeso = itemPorPeso(it) && !peso;
@@ -1482,9 +1487,17 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function aplicarPacienteDoQuadro(p){
     if(!p){ return; }
     const tela = el('nomePaciente').value.trim();
-    const outro = !tela || !p.nome || norm(tela) !== norm(p.nome);
-    // outro paciente: receita nova (a anterior já saiu); o mesmo: só completa o que falta
-    if(outro && (tela || Object.keys(selected).length || Object.keys(selectedOrient).length)) el('btnLimpar').click();
+    const temItens = Object.keys(selected).length || Object.keys(selectedOrient).length;
+    const idsAtuais = Object.keys(selected).sort().join('|') + '§' + Object.keys(selectedOrient).sort().join('|');
+    const jaSaiu = temItens && historico.length && historico[0].ids === idsAtuais && (historico[0].paciente || '') === tela;
+    const mesmo = tela && p.nome && (norm(tela) === norm(p.nome) || (primeiroNome(tela) === primeiroNome(p.nome) && norm(p.nome).startsWith(norm(tela))));
+    // outro paciente: receita nova se a anterior já saiu; receita ainda não impressa
+    // sem nome fica para este paciente; com outro nome, pergunta antes de apagar
+    if(!mesmo && (tela || temItens)){
+      const limpar = jaSaiu || !temItens || (tela && window.confirm('Trocar para ' + p.nome + '? A receita de ' + tela + ' ainda não foi impressa e será apagada.'));
+      if(limpar) el('btnLimpar').click();
+      else if(tela) return;   // ficou com o paciente anterior
+    }
     pacienteQuadro = p;
     if(p.nome) el('nomePaciente').value = p.nome;
     if(p.idade && !el('idade').value.trim()) el('idade').value = window.PONTE.idadeParaCampo(p.idade);
@@ -1853,8 +1866,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function registrarHistorico(tipo){
     if(Object.keys(selected).length === 0 && Object.keys(selectedOrient).length === 0) return;
     const idsAtuais = Object.keys(selected).sort().join('|') + '§' + Object.keys(selectedOrient).sort().join('|');
-    // Dedup: se a última entrada tem os mesmos itens, só atualiza
-    if(historico.length && historico[0].ids === idsAtuais){
+    // Dedup: mesma receita do mesmo paciente (reimpressão) só atualiza; outro paciente
+    // com os mesmos itens, ou receita editada, vira entrada nova
+    const pacienteAtual = el('nomePaciente').value.trim();
+    const retrato = JSON.stringify([selected, selectedOrient]);
+    if(historico.length && historico[0].ids === idsAtuais && (historico[0].paciente || '') === pacienteAtual
+       && JSON.stringify([historico[0].selected, historico[0].selectedOrient]) === retrato){
       historico[0].quando = new Date().toISOString();
       historico[0].tipo = tipo;
       historico[0].paciente = el('nomePaciente').value.trim();
@@ -1903,7 +1920,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       const quando = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
       row.innerHTML = `
         <div class="hist-info">
-          <b>${escapeHtml(h.paciente || 'Sem nome')}</b> — ${quando}${h.peso ? ' · ' + h.peso + 'kg' : ''}
+          <b>${escapeHtml(h.paciente || 'Sem nome')}</b> — ${quando}${h.peso ? ' · ' + escapeHtml(h.peso) + 'kg' : ''}
           <span>${escapeHtml(h.resumo)}</span>
         </div>
       `;
@@ -2095,6 +2112,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     try{
       await navigator.clipboard.writeText(texto);
       showToast('Texto copiado');
+      return true;
     }catch(e){
       // fallback
       const ta = document.createElement('textarea');
@@ -2103,9 +2121,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
-      try{ document.execCommand('copy'); showToast('Texto copiado'); }
-      catch(e2){ showToast('Não consegui copiar automaticamente — selecione o texto manualmente'); }
+      let ok = false;
+      try{ ok = document.execCommand('copy'); }catch(e2){ ok = false; }
       document.body.removeChild(ta);
+      showToast(ok ? 'Texto copiado' : 'Não consegui copiar automaticamente — selecione o texto manualmente');
+      return ok;
     }
   }
 
@@ -2493,10 +2513,13 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         : tipo === 'controle' ? docControle(dados) : gerarDocComum(dados);
       const blob = await docx.Packer.toBlob(doc);
       const nomeArquivo = 'Receita - ' + (dados.paciente !== '—' ? dados.paciente : 'paciente') + ' - ' + dados.data.replace(/\//g,'-') + '.docx';
-      if(await salvarArquivo(nomeArquivo, blob)) showToast('Arquivo .docx gerado');
+      if(await salvarArquivo(nomeArquivo, blob)){ showToast('Arquivo .docx gerado'); return true; }
+      showToast('O arquivo .docx não foi salvo');
+      return false;
     }catch(e){
       console.error(e);
       showToast('Erro ao gerar o .docx — veja o console para detalhes');
+      return false;
     }
   }
 
@@ -2540,22 +2563,34 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
   });
   // Atalho "/" foca a busca de qualquer lugar
+  const modalAberto = () => document.querySelector('.ajuda-overlay.show');
   document.addEventListener('keydown', (e) => {
-    if(e.key === '/' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
+    if(e.key === '/' && !modalAberto() && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
       e.preventDefault();
       el('search').focus();
     }
   });
-  // Atalhos 1-9 (aplica a N-ésima condição de "mais usadas") e Ctrl/Cmd+Enter
-  // (nova receita) — só fora de campos de texto, pra não atrapalhar digitação.
+  // Atalhos: 1-9 (N-ésima condição de "mais usadas"), Ctrl/Cmd+Enter (nova receita;
+  // com Shift, mesmo paciente) e Ctrl/Cmd+P (imprimir). Com uma janela aberta,
+  // Ctrl+Enter salva/imprime a janela e Ctrl+P imprime o documento dela.
   document.addEventListener('keydown', (e) => {
     const emCampoDeTexto = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-    if(!emCampoDeTexto && /^[1-9]$/.test(e.key)){
+    const modal = modalAberto();
+    const ctrl = e.ctrlKey || e.metaKey;
+    if(modal){
+      const acao = { editItemOverlay: 'btnSaveEditItem', atestadoOverlay: 'btnImprimirAtestado', encaminhamentoOverlay: 'btnImprimirEncaminhamento' }[modal.id];
+      if(ctrl && acao && (e.key === 'Enter' || (e.key.toLowerCase() === 'p' && modal.id !== 'editItemOverlay'))){ e.preventDefault(); el(acao).click(); }
+      return;
+    }
+    if(!emCampoDeTexto && !ctrl && !e.altKey && /^[1-9]$/.test(e.key)){
       const chips = [...el('chipsMaisUsadas').querySelectorAll('.chip')];
       const chip = chips[Number(e.key) - 1];
       if(chip){ e.preventDefault(); chip.click(); }
     }
-    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    if(ctrl && e.key.toLowerCase() === 'p' && !e.shiftKey){ e.preventDefault(); el('btnImprimir').click(); return; }
+    if(ctrl && e.key === 'Enter'){
+      // digitando no nome/idade/peso: Ctrl+Enter não apaga o que está sendo escrito
+      if(emCampoDeTexto && document.activeElement.id !== 'search') return;
       e.preventDefault();
       el(e.shiftKey ? 'btnMesmoPaciente' : 'btnLimpar').click();
     }
@@ -2764,8 +2799,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     renderTudo();
   }));
   document.querySelectorAll('input[name=localReceita]').forEach(r => r.addEventListener('change', () => { saveLocal(); renderReceita(); }));
-  el('btnCopiar').addEventListener('click', async () => { await copiarTexto(); registrarHistorico('copiado'); });
-  el('btnDocx').addEventListener('click', async () => { await baixarDocx(); registrarHistorico('docx'); });
+  // só conta como emitida (histórico, padrões, cartão do Quadro) a receita que de fato saiu
+  el('btnCopiar').addEventListener('click', async () => { if(await copiarTexto()) registrarHistorico('copiado'); });
+  el('btnDocx').addEventListener('click', async () => { if(await baixarDocx()) registrarHistorico('docx'); });
 
   // Encaminhamento
   el('btnEncaminhamento').addEventListener('click', abrirEncaminhamento);
@@ -2814,8 +2850,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   el('btnCopiarAtestado').addEventListener('click', () => copiarTextoSimples(el('atTexto').value));
   el('btnImprimirAtestado').addEventListener('click', imprimirAtestado);
 
-  el('medicoNome').addEventListener('change', saveMedico);
-  el('medicoCrm').addEventListener('change', saveMedico);
+  ['medicoNome', 'medicoCrm'].forEach(id => {
+    el(id).addEventListener('input', renderReceita);   // a prévia (e a impressão comum, que a copia) mostra na hora
+    el(id).addEventListener('change', saveMedico);
+  });
   el('unidadeSaude').addEventListener('input', renderReceita);
   el('unidadeSaude').addEventListener('change', saveUnidade);
 
@@ -2951,11 +2989,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   function renderEntradasHtml(entradas, peso, notaContinuacao){
-    let html = notaContinuacao ? `<div class="continuacao-nota">${notaContinuacao}</div>` : '';
+    let html = notaContinuacao ? `<div class="continuacao-nota">${escapeHtml(notaContinuacao)}</div>` : '';
     let listaAberta = false;
     entradas.forEach(e => {
       if(e.tipo === 'titulo'){
-        html += `<div class="via-titulo">Uso ${e.via}</div>`;
+        html += `<div class="via-titulo">Uso ${escapeHtml(e.via)}</div>`;
       } else if(e.tipo === 'item'){
         const it = e.it;
         const posologia = calcDoseItem(it, peso);
@@ -3155,7 +3193,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     `;
   }
 
-  el('btnImprimir').addEventListener('click', () => {
+  el('btnImprimir').addEventListener('click', async () => {
     const sep = separacaoAtiva();
     let paperHtml, printStyles;
     if(sep){
@@ -3176,7 +3214,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       else paperHtml = el('receitaPaper').innerHTML;
       printStyles = estilosImpressao(ehControle, fitScale);
     }
-    if(!abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
+    if(!await abrirImpressao('Receita', printStyles, paperHtml, el('nomePaciente').value.trim())) return;
     registrarHistorico('impresso');
   });
   el('btnPediatrica').addEventListener('click', () => executarConversao(false));
@@ -3355,7 +3393,9 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       el('editorNomeCond').value = nome;
       el('editorBtnSalvar').textContent = 'Salvar Alterações';
       
-      const cond = customCondicoes[nome] || DATA.condicoes[nome] || { meds: [], orientacoes: [] };
+      // o editor abre o que a lista mostra: com as edições e sem os itens removidos
+      const eff = getCondEffective(nome);
+      const cond = { meds: eff.meds.map(itemDeCondicao), orientacoes: eff.orientacoes.map(o => o.texto) };
       
       if(cond.meds && cond.meds.length){
         cond.meds.forEach(m => addMedRowToEditor(m));
@@ -3394,6 +3434,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
 
     const box = document.createElement('div');
     box.className = 'editor-med-box';
+    box._orig = med;   // teto, faixas e idade mínima voltam se nome e fator não mudarem
     box.innerHTML = `
       <button type="button" class="btn-remove-row" title="Remover medicamento" aria-label="Remover medicamento">&times;</button>
       <input type="text" class="ed-med-nome" placeholder="Nome do medicamento (ex: Dipirona 500mg)" aria-label="Nome do medicamento" value="${med ? escapeHtml(med.nome) : ''}" list="datalistMedicamentosEditor">
@@ -3402,7 +3443,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         <select class="ed-med-via" aria-label="Via">
           ${renderViaOptions(med ? med.via : null)}
         </select>
-        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? med.fator : ''}">
+        <input type="text" class="ed-med-fator" placeholder="Fator/kg" aria-label="Fator dose por kg" value="${med && med.fator !== null && med.fator !== undefined ? escapeHtml(med.fator) : ''}">
       </div>
       <textarea class="ed-med-pos" placeholder="Posologia (use DOSE para cálculo por peso)" aria-label="Posologia">${med ? escapeHtml(med.posologia || '') : ''}</textarea>
     `;
@@ -3456,6 +3497,19 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     container.appendChild(row);
   }
 
+  // Edições da lista e itens marcados apontam para a posição do item na condição.
+  // Quando o editor troca a lista inteira, essas posições deixam de valer: as edições
+  // já foram incorporadas pelo editor e os itens na receita ficam como estão, soltos.
+  async function desligarIndicesCondicao(nome){
+    delete overrides[nome];
+    await saveOverrides();
+    const prefixo = 'cond:' + nome + ':';
+    [selected, selectedOrient].forEach(obj => Object.keys(obj).forEach(id => {
+      if(id.startsWith(prefixo)){ obj['solto:' + id] = obj[id]; delete obj[id]; }
+    }));
+    if(atendimentoAtual && atendimentoAtual.conds) delete atendimentoAtual.conds[nome];
+  }
+
   function initEditorCondicoes(){
     populateEditorSelect();
     populateEditorMedsDatalist();
@@ -3486,13 +3540,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
           const posologia = box.querySelector('.ed-med-pos').value.trim();
           const fator = parseFator(fatorTxt);
 
-          meds.push({
-            nome: mNome,
-            qtde: qtde || null,
-            via: via,
-            fator: fator,
-            posologia: posologia || null
-          });
+          const item = { nome: mNome, qtde: qtde || null, via: via, fator: fator, posologia: posologia || null };
+          const o = box._orig;
+          if(o && o.nome === mNome && (o.fator ?? null) === (fator ?? null))
+            ['max', 'faixas', 'idadeMinMeses', 'pesoMinKg'].forEach(k => { if(o[k] !== undefined) item[k] = o[k]; });
+          meds.push(item);
         }
       });
       
@@ -3504,6 +3556,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       });
       
       customCondicoes[nome] = { meds, orientacoes };
+      await desligarIndicesCondicao(nome);
       await saveCustomCondicoes();
       populateEditorMedsDatalist();
       
@@ -3525,6 +3578,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         const ok = typeof window.confirm === 'function' ? window.confirm('Deseja realmente excluir a condição "' + nome + '"?') : true;
         if(!ok) return;
         delete customCondicoes[nome];
+        await desligarIndicesCondicao(nome);
         await saveCustomCondicoes();
         populateEditorMedsDatalist();
         showToast('Condição excluída');
@@ -3532,6 +3586,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         const ok = typeof window.confirm === 'function' ? window.confirm('Restaurar a conduta "' + nome + '" para o padrão de fábrica? Isso apagará suas personalizações nela.') : true;
         if(!ok) return;
         delete customCondicoes[nome];
+        await desligarIndicesCondicao(nome);
         await saveCustomCondicoes();
         populateEditorMedsDatalist();
         showToast('Conduta restaurada ao padrão');

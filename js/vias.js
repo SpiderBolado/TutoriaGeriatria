@@ -3,6 +3,8 @@
 //   antimicrobiano — RDC ANVISA 471/2021: receita em 2 vias, a 1ª fica na farmácia;
 //   controle       — Portaria SVS/MS 344/1998, lista C1 e preparações da A2
 //                    (tramadol, codeína): Receita de Controle Especial em 2 vias;
+//                    fenobarbital: adendo da lista B1 — como anticonvulsivante vai em
+//                    Receita de Controle Especial (conferir no texto consolidado da Anvisa);
 //   notificacao    — listas B1/B2 (benzodiazepínicos, zolpidem): exigem a
 //                    Notificação de Receita B (azul), que este app não imprime.
 // Só vale para via sistêmica (oral, sublingual, injetável): pomada, creme,
@@ -11,8 +13,8 @@
 (function(root){
   const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
-  const ANTIMICROBIANOS = /\b(amoxicilina|ampicilina|azitromicina|claritromicina|eritromicina|cefalexina|cefadroxila|cefaclor|cefuroxima|cefixima|cefpodoxima|ceftriaxona|cefazolina|cefotaxima|cefepima|penicilina|benzilpenicilina|benzetacil|oxacilina|ciprofloxacino|levofloxacino|norfloxacino|moxifloxacino|ofloxacino|sulfametoxazol|trimetoprima|bactrim|nitrofurantoina|fosfomicina|metronidazol|secnidazol|tinidazol|doxiciclina|tetraciclina|minociclina|clindamicina|linezolida|gentamicina|amicacina|vancomicina)\b/;
-  const CONTROLE = /\b(tramadol|codeina|amitriptilina|nortriptilina|imipramina|clomipramina|fluoxetina|sertralina|paroxetina|citalopram|escitalopram|venlafaxina|desvenlafaxina|duloxetina|bupropiona|trazodona|mirtazapina|carbamazepina|oxcarbazepina|valproico|valproato|divalproato|lamotrigina|topiramato|gabapentina|pregabalina|fenitoina|haloperidol|quetiapina|risperidona|olanzapina|aripiprazol|clorpromazina|levomepromazina|biperideno|litio)\b/;
+  const ANTIMICROBIANOS = /\b(amoxicilina|ampicilina|azitromicina|claritromicina|eritromicina|cefalexina|cefadroxila|cefaclor|cefuroxima|cefixima|cefpodoxima|ceftriaxona|cefazolina|cefotaxima|cefepima|penicilina|benzilpenicilina|benzetacil|oxacilina|ciprofloxacino|levofloxacino|norfloxacino|moxifloxacino|ofloxacino|sulfametoxazol|trimetoprima|bactrim|nitrofurantoina|fosfomicina|(?:benzoil)?metronidazol|secnidazol|tinidazol|doxiciclina|tetraciclina|minociclina|clindamicina|linezolida|gentamicina|amicacina|vancomicina)\b/;
+  const CONTROLE = /\b(tramadol|codeina|amitriptilina|nortriptilina|imipramina|clomipramina|fluoxetina|sertralina|paroxetina|citalopram|escitalopram|venlafaxina|desvenlafaxina|duloxetina|bupropiona|trazodona|mirtazapina|carbamazepina|oxcarbazepina|valproico|valproato|divalproato|lamotrigina|topiramato|gabapentina|pregabalina|fenitoina|levetiracetam|fenobarbital|haloperidol|quetiapina|risperidona|olanzapina|aripiprazol|clorpromazina|levomepromazina|biperideno|litio)\b/;
   const NOTIFICACAO_B = /\b(clonazepam|diazepam|alprazolam|lorazepam|bromazepam|midazolam|clobazam|nitrazepam|flunitrazepam|cloxazolam|zolpidem|zopiclona)\b/;
   const VIA_SISTEMICA = /^(|oral|sublingual|intramuscular|intravenoso|subcutaneo|injetavel)$/;
 
