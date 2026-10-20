@@ -8,6 +8,11 @@ const existe = n => !!D.condicoes[n];
 // alergia: nome direto, grupo e falso positivo
 assert.strictEqual(P.conflitoAlergia('Dipirona 500mg', ['dipirona']), 'dipirona');
 assert.strictEqual(P.conflitoAlergia('Novalgina gotas', ['dipirona']), 'dipirona');
+// componente e classe: Buscopan composto tem dipirona; flurbiprofeno e ácido mefenâmico são AINE
+assert.strictEqual(P.conflitoAlergia('Buscopan composto', ['dipirona']), 'dipirona');
+assert.strictEqual(P.conflitoAlergia('Flurbiprofeno 8,75mg', ['AINE']), 'AINE');
+assert.strictEqual(P.conflitoAlergia('Ácido Mefenâmico 500 mg', ['anti-inflamatório']), 'anti-inflamatório');
+assert.strictEqual(P.conflitoAlergia('Buscopan', ['dipirona']), null);
 assert.strictEqual(P.conflitoAlergia('Amoxicilina + Clavulanato 875mg', ['penicilina']), 'penicilina');
 assert.strictEqual(P.conflitoAlergia('Ibuprofeno 600 mg', ['aine']), 'aine');
 assert.strictEqual(P.conflitoAlergia('Nimesulida 100mg', ['anti-inflamatorio']), 'anti-inflamatorio');
@@ -24,6 +29,9 @@ assert.strictEqual(P.conflitoAlergia('Paracetamol 750mg', ['Dipirona e AAS']), n
 
 // queixa → condições que existem no catálogo (no máximo 3)
 const sug = q => P.sugerirCondicoes(q, existe);
+// "gotas" não é gota (doença)
+assert.ok(!P.sugerirCondicoes('dipirona gotas', () => true).includes('Gota'));
+assert.ok(P.sugerirCondicoes('crise de gota', () => true).includes('Gota'));
 assert.deepStrictEqual(sug('dor lombar há 2 dias'), ['Dor Muscular']);
 assert.deepStrictEqual(sug('Ardência para urinar e polaciúria'), ['ITU']);
 assert.deepStrictEqual(sug('dor de garganta e febre'), ['Faringoamigdalite', 'Faringite']);

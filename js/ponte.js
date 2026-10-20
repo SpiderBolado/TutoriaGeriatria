@@ -13,9 +13,9 @@
   // ---------- Alergia: o remédio da receita bate com a alergia do cartão? ----------
   // Mesmo grupo também conta (reação cruzada): o aviso pede conferência, não bloqueia.
   const CLASSES_ALERGIA = {
-    dipirona: ['dipirona', 'metamizol', 'novalgina'],
-    aine: ['aine', 'anti-inflamatorio', 'antiinflamatorio', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam', 'meloxicam', 'piroxicam', 'indometacina', 'aas', 'acido acetilsalicilico', 'aspirina'],
-    aas: ['aas', 'acido acetilsalicilico', 'aspirina', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam'],
+    dipirona: ['dipirona', 'metamizol', 'novalgina', 'buscopan composto'],
+    aine: ['aine', 'anti-inflamatorio', 'antiinflamatorio', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam', 'meloxicam', 'piroxicam', 'indometacina', 'flurbiprofeno', 'acido mefenamico', 'mefenamico', 'ponstan', 'aas', 'acido acetilsalicilico', 'aspirina'],
+    aas: ['aas', 'acido acetilsalicilico', 'aspirina', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam', 'flurbiprofeno', 'acido mefenamico', 'mefenamico'],
     penicilina: ['penicilina', 'amoxicilina', 'ampicilina', 'oxacilina', 'piperacilina', 'benzetacil', 'benzilpenicilina', 'clavulanato'],
     cefalosporina: ['cefalosporina', 'ceftriaxona', 'cefazolina', 'cefalexina', 'cefadroxila', 'cefaclor', 'cefepima', 'cefuroxima', 'ceftazidima', 'cefalotina'],
     sulfa: ['sulfa', 'sulfametoxazol', 'bactrim', 'sulfadiazina'],
@@ -83,7 +83,7 @@
     [/\b(crise hipertensiva|pressao alta|pa elevada)/, ['Crise Hipertensiva']],
     [/\b(constipa\w*|intestino preso|prisao de ventre)/, ['Constipação']],
     [/\b(hemorroid\w*)/, ['Hemorroidas']],
-    [/\b(gota|acido urico)/, ['Gota']],
+    [/\b(gota|acido urico)\b/, ['Gota']],
     [/\b(herpes zoster|cobreiro)/, ['Herpes Zoster']],
     [/\b(corrimento|vaginose)/, ['Vaginose Bacteriana']],
     [/\b(micose|frieira)/, ['Micose']],

@@ -177,14 +177,18 @@
   function idadeEmMeses(texto){
     const t = norm(texto).replace(/,/g, '.').replace(/\be\b/g, ' ');
     if(!t.trim()) return null;
-    const token = /(\d+(?:\.\d+)?)\s*(anos|ano|a|meses|mes|m)?/g;
-    let total = 0, achou = false, m;
+    if(/^\s*(?:rn|recem[- ]nascid[oa])\s*$/.test(t)) return 0;
+    const token = /(\d+(?:\.\d+)?)\s*(anos|ano|a|meses|mes|m|semanas|semana|sem|dias|dia|d)?/g;
+    let total = 0, achou = false, fracao = false, m;
     while((m = token.exec(t))){
       achou = true;
-      total += /^m/.test(m[2] || '') ? Number(m[1]) : Number(m[1]) * 12;
+      const u = m[2] || '';
+      if(/^s/.test(u)){ total += Number(m[1]) * 7 / 30.44; fracao = true; }
+      else if(/^d/.test(u)){ total += Number(m[1]) / 30.44; fracao = true; }
+      else total += /^m/.test(u) ? Number(m[1]) : Number(m[1]) * 12;
     }
     if(!achou || t.replace(token, '').trim()) return null; // sobrou texto que não é idade
-    return Math.round(total);
+    return fracao ? Math.floor(total) : Math.round(total); // em dias/semanas não arredonda para cima
   }
 
   const formatarIdade = meses => meses >= 24 ? `${Math.floor(meses / 12)} anos` : `${meses} meses`;

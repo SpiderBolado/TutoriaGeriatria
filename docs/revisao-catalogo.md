@@ -1097,3 +1097,8 @@ Os demais achados da 3ª revisão (omeprazol na DRGE, duração do ATB na sinusi
 - **Nistatina suspensão oral** (candidíase oral, catálogo e condição): quantidade de 03 → **06 frascos de 50 mL**. Conta: 5 mL × 4 vezes × 14 dias = 280 mL. Três frascos não cobriam o tempo máximo prescrito.
 - **Hidrocortisona creme**: de 06/06 h → **08/08 h (até 3 vezes ao dia)**, que é o máximo da bula do creme de acetato de hidrocortisona 1%.
 - Pendentes para decisão do médico (não alterados): a dose do Omeprazol na DRGE (hoje 40 mg/dia por 8 semanas, que é a dose para esofagite erosiva; para DRGE não erosiva o padrão é 20 mg/dia) e a duração da Amoxicilina+Clavulanato na sinusite (hoje 10 dias; a IDSA 2012 sugere 5 a 7 dias no adulto).
+
+## Quinta revisão (testes em massa, pronto-socorro)
+
+- **Ivermectina 6 mg** na condição Escabiose: peso mínimo de **15 kg** (bula: não usar abaixo de 15 kg). O item do catálogo avulso já deixava a dose em branco abaixo disso.
+- **Alergia por componente ou classe:** Buscopan composto conta como dipirona; Flurbiprofeno e Ácido mefenâmico contam como AINE (e como AAS, pela reatividade cruzada). A ligação amoxicilina → cefalexina ficou de fora porque é decisão do médico.
