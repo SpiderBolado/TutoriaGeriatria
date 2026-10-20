@@ -654,6 +654,8 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
 .aviso.amber{background:var(--amber-wash);border:1px solid var(--amber-line);color:var(--amber-ink);}
 .aviso.teal{background:var(--teal-wash);border:1px solid var(--teal);color:var(--teal-dark);}
 .aviso.teal button{border-color:var(--teal);color:var(--teal-dark);}
+.aviso.perigo{background:var(--danger-wash);border:1px solid var(--danger);color:var(--danger);}
+.aviso.perigo b{font-weight:700;}
 .aviso.teal button:hover{background:var(--primary);border-color:var(--primary);color:var(--on-primary);}
 .aviso button:disabled{opacity:.5;cursor:not-allowed;}
 .aviso button:disabled:hover{background:transparent;color:inherit;}
