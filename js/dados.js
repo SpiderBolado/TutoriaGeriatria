@@ -772,7 +772,7 @@ const DATA = {
         {
           "nome": "Acetato de Hidrocortisona Creme 10 mg/g (1%)",
           "qtde": "01 Tubo",
-          "posologia": "Aplicar fina camada, de 06/06 horas, massageando sobre a lesão. \nApós melhora dos sintomas, aplicar 01 vez ao dia.",
+          "posologia": "Aplicar fina camada, de 08/08 horas (até 3 vezes ao dia), massageando sobre a lesão. \nApós melhora dos sintomas, aplicar 01 vez ao dia.",
           "via": "Tópico",
           "fator": null
         }
@@ -2202,7 +2202,7 @@ const DATA = {
       "meds": [
         {
           "nome": "Nistatina Suspensão Oral 100.000 UI/mL",
-          "qtde": "03 Frascos",
+          "qtde": "06 Frascos",
           "posologia": "Bochechar 05 mL, 04 vezes ao dia, mantendo na boca o máximo de tempo possível antes de engolir, por 07 a 14 dias (manter até 48 horas após o desaparecimento das lesões).",
           "via": "Oral",
           "fator": null
@@ -3533,7 +3533,7 @@ const DATA = {
       "nome": "Nistatina Suspensão Oral",
       "concentracao": "100.000 UI/mL",
       "forma": "",
-      "qtde": "03 Frascos",
+      "qtde": "06 Frascos",
       "posologia": "Bochechar 05 mL, 04 vezes ao dia, mantendo na boca o máximo de tempo possível antes de engolir, por 07 a 14 dias (manter até 48 horas após o desaparecimento das lesões).",
       "tempo": "",
       "via": "Oral"

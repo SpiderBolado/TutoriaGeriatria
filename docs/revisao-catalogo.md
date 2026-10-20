@@ -1091,3 +1091,9 @@ Cada linha pode ser revertida trocando o texto "Agora" pelo "Antes" em `js/dados
 | Hordéolo — Tobramicina 0,3% Pomada | de 06/06 horas | de 08/08 horas | Bula: 2 a 3 vezes ao dia nos casos leves e moderados. | Bula Tobrex pomada (Novartis) |
 
 Os demais achados da 3ª revisão (omeprazol na DRGE, duração do ATB na sinusite, idade mínima da ondansetrona, cálcio elementar, quantidade de nistatina, hidrocortisona, simeticona, azitromicina, clonazepam SL e 12 pontos clínicos) ficaram para decisão do médico.
+
+## Quarta revisão (precisão de quantidade e posologia)
+
+- **Nistatina suspensão oral** (candidíase oral, catálogo e condição): quantidade de 03 → **06 frascos de 50 mL**. Conta: 5 mL × 4 vezes × 14 dias = 280 mL. Três frascos não cobriam o tempo máximo prescrito.
+- **Hidrocortisona creme**: de 06/06 h → **08/08 h (até 3 vezes ao dia)**, que é o máximo da bula do creme de acetato de hidrocortisona 1%.
+- Pendentes para decisão do médico (não alterados): a dose do Omeprazol na DRGE (hoje 40 mg/dia por 8 semanas, que é a dose para esofagite erosiva; para DRGE não erosiva o padrão é 20 mg/dia) e a duração da Amoxicilina+Clavulanato na sinusite (hoje 10 dias; a IDSA 2012 sugere 5 a 7 dias no adulto).
