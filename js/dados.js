@@ -19,7 +19,7 @@ const DATA = {
         {
           "nome": "Sumatriptano 25mg",
           "qtde": "01 Caixa",
-          "posologia": "Se dor, apesar das medicações acima, tomar 01 comprimido. Se a dor melhorar e depois voltar, pode tomar mais 01 comprimido após pelo menos 2 horas; se o primeiro comprimido não aliviar nada, não repita nesta crise. No máximo 04 comprimidos (100mg) em 24 horas.",
+          "posologia": "Se dor, apesar das medicações acima, tomar 01 comprimido. Se a dor melhorar e depois voltar, pode tomar mais 01 comprimido após pelo menos 2 horas; se o primeiro comprimido não aliviar nada, não repita nesta crise. No máximo 04 comprimidos (100mg) em 24 horas. Não use se você tem doença do coração, já teve infarto ou AVC, ou tem pressão alta sem controle. Se sentir dor ou aperto forte no peito depois de tomar, procure atendimento.",
           "via": "Oral",
           "fator": null
         },
@@ -918,7 +918,7 @@ const DATA = {
         {
           "nome": "Tropinal",
           "qtde": "01 Caixa",
-          "posologia": "Tomar 02 comprimidos de 08/08 horas, se dor abdominal, por 05 dias.",
+          "posologia": "Tomar 02 comprimidos, até de 08/08 horas, se dor abdominal, por no máximo 05 dias. Não usar se estiver grávida, amamentando ou se tiver glaucoma.",
           "via": "Oral",
           "fator": null
         },
@@ -1055,7 +1055,7 @@ const DATA = {
         {
           "nome": "Tobramicina 0,3% Pomada",
           "qtde": "01 Tubo",
-          "posologia": "Aplicar, aproximadamente, 01 cm da pomada na borda da pálpebra acometida, de 06/06 horas, por 07 dias.",
+          "posologia": "Aplicar, aproximadamente, 01 cm da pomada na borda da pálpebra acometida, de 08/08 horas, por 07 dias.",
           "via": "Oftálmico",
           "fator": null
         },
@@ -2972,7 +2972,7 @@ const DATA = {
       "concentracao": "",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Aplicar 03 gotas no ouvido acometido, de 08/08 horas, por 05 a 07 dias.",
+      "posologia": "Aplicar 05 gotas no ouvido acometido, de 08/08 horas, por 05 a 07 dias.",
       "tempo": "",
       "via": "Tópico"
     },
@@ -3307,7 +3307,7 @@ const DATA = {
       "concentracao": "200mg/mL",
       "forma": "",
       "qtde": "01 Frasco",
-      "posologia": "Dar DOSE gotas, de 08/08 horas, por 05 dias.",
+      "posologia": "Dar DOSE gotas, de 08/08 horas, se dor ou febre, por no máximo 05 dias.",
       "tempo": "",
       "via": "Oral",
       "fator": 0.5,
