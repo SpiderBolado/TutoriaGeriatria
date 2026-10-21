@@ -1500,9 +1500,20 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(!automatica) showToast('Nenhum item com versão pediátrica cadastrada');
       return false;
     }
-    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
+    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
     selected = Object.fromEntries(r.entries);
     const acum = conversaoPed || { motivos: [], fixos: [] };
+    // orientação que cita remédio retirado (ex.: urina laranja do Pyridium) sai junto; volta no Desfazer
+    const restantes = Object.values(selected).map(it => norm(it.nome)).join(' | ');
+    const citaRetirado = texto => r.removidos.map(x => x.nome).find(nome => [...principiosDoNome(nome, true)]
+      .some(tk => !restantes.includes(tk) && new RegExp('\\b' + tk.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(norm(texto))));
+    Object.entries(selectedOrient).forEach(([id, o]) => {
+      const nome = citaRetirado(o.texto || '');
+      if(!nome) return;
+      delete selectedOrient[id];
+      const t = `Orientação retirada (citava ${nome}): “${String(o.texto).slice(0, 70)}${String(o.texto).length > 70 ? '…' : ''}”`;
+      if(!acum.fixos.includes(t)) acum.fixos.push(t);
+    });
     r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
     r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
     acum.automatica = !!automatica;
@@ -1514,6 +1525,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function desfazerConversao(){
     if(!desfazerPediatria) return;
     selected = desfazerPediatria.selected;
+    if(desfazerPediatria.selectedOrient) selectedOrient = desfazerPediatria.selectedOrient;
     conversaoPed = desfazerPediatria.conversaoPed;
     desfazerPediatria = null;
     autoPedSuspensa = true;
@@ -1619,14 +1631,14 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // palavra genérica ("Ácido", "Soro", "Vacina") leva a seguinte junto; composto conta o que tem dentro.
   const TOKEN_GENERICO = /^(?:acido|soro|vacina|solucao|sal|sais|cloreto|sulfato|acetato|valerato|carbonato|fosfato|vitamina|insulina|compressas?|tala|meias?|banho|lavagem)$/;
   const COMPOSTOS = { 'buscopan composto': ['dipirona'] };
-  function principiosDoNome(nome){
+  function principiosDoNome(nome, semCompostos){
     const n = norm(nome), out = new Set();
     n.split('+').forEach(parte => {
       const pal = parte.split(/\s+/).filter(w => /[a-z]/.test(w) && !/^(?:de|da|do|dos|das)$/.test(w));
       if(!pal.length) return;
       out.add(TOKEN_GENERICO.test(pal[0]) && pal[1] ? pal[0] + ' ' + pal[1] : pal[0]);
     });
-    Object.keys(COMPOSTOS).forEach(k => { if(n.includes(k)) COMPOSTOS[k].forEach(x => out.add(x)); });
+    if(!semCompostos) Object.keys(COMPOSTOS).forEach(k => { if(n.includes(k)) COMPOSTOS[k].forEach(x => out.add(x)); });
     return out;
   }
   function renderAvisos(){
@@ -1669,6 +1681,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(alto) itens.push(alto);
       itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
       convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
+      // orientação com volume de água de adulto ("2 litros por dia"): só avisa, o texto é do médico
+      if(!(kg > window.PEDIATRIA.PESO_MAX_KG)) Object.values(selectedOrient).forEach(o => {
+        const m = String(o.texto || '').match(/[^.;()]*\d+(?:,\d+)?\s*litros\b[^.;()]*/i);
+        if(m) itens.push(`Orientação com volume de água de adulto (“${m[0].trim()}”): ajuste para a criança.`);
+      });
       const titulo = 'Receita convertida ' + (conversaoPed.automatica ? 'automaticamente ' : '') + 'para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
       bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
         + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,

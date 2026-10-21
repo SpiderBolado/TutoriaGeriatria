@@ -1217,6 +1217,29 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Conversao pediatrica: orientacao de remedio retirado sai; volume de agua de adulto so avisa ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const orient = () => page.evaluate(() => receitaPaper.innerText.split(/ORIENTAÇÕES/)[1] || '');
+    await page.fill('#idade', '7'); await page.fill('#peso', '24');
+    await selectCondicao(page, 'ITU');
+    const antes = await orient();
+    await page.click('#avisoBar button[data-acao="converter-ped"]'); await page.waitForTimeout(300);
+    const depois = await orient();
+    const avisos = await page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    await page.click('#avisoBar button[data-acao="desfazer-ped"]'); await page.waitForTimeout(300);
+    const desfeito = await orient();
+    const ok = /Pyridium/.test(antes) && !/Pyridium/.test(depois) && /2 litros/.test(depois) && /Retorne imediatamente/.test(depois)
+      && /Orientação retirada \(citava Pyridium/.test(avisos) && /volume de água de adulto/.test(avisos)
+      && /Pyridium/.test(desfeito) && consoleErrors.length === 0;
+    record('conversao pediatrica: orientacao do Pyridium sai (volta no Desfazer) e 2 litros de agua vira aviso', ok,
+      JSON.stringify({ depois: depois.slice(0, 200), avisos: avisos.slice(0, 400), desfeito: /Pyridium/.test(desfeito), consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
