@@ -4543,6 +4543,16 @@ const DATA = {
       "idadeMinMeses": 24
     },
     {
+      "nome": "Desloratadina",
+      "concentracao": "0,5mg/mL",
+      "forma": "",
+      "qtde": "01 Frasco",
+      "posologia": "Dose por idade: 6 a 11 meses: 02 mL; 1 a 5 anos: 2,5 mL; 6 a 11 anos: 05 mL; a partir de 12 anos: 10 mL. Tomar a dose correspondente, 01 vez ao dia, por 05 dias.",
+      "tempo": "",
+      "via": "Oral",
+      "idadeMinMeses": 6
+    },
+    {
       "nome": "Medroxiprogesterona Acetato",
       "concentracao": "150mg/mL",
       "forma": "",

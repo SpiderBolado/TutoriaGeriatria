@@ -1102,3 +1102,11 @@ Os demais achados da 3ª revisão (omeprazol na DRGE, duração do ATB na sinusi
 
 - **Ivermectina 6 mg** na condição Escabiose: peso mínimo de **15 kg** (bula: não usar abaixo de 15 kg). O item do catálogo avulso já deixava a dose em branco abaixo disso.
 - **Alergia por componente ou classe:** Buscopan composto conta como dipirona; Flurbiprofeno e Ácido mefenâmico contam como AINE (e como AAS, pela reatividade cruzada). A ligação amoxicilina → cefalexina ficou de fora porque é decisão do médico.
+
+## Sexta revisão (anti-histamínico em lactente)
+
+Pedido do médico: loratadina é para crianças a partir de 2 anos; antes disso, a desloratadina é a escolha.
+
+- **Conversão pediátrica** (idade informada): de 12 a 23 meses a loratadina vira **Desloratadina 0,5 mg/mL, 2,5 mL, 01 vez ao dia**; de 6 a 11 meses, **2 mL**; abaixo de 6 meses a loratadina é **removida** com o motivo (a desloratadina só tem bula a partir de 6 meses). De 2 anos em diante e sem idade informada, nada muda (Loratadina 1 mg/mL, 5 mL até 30 kg e 10 mL acima).
+- **Catálogo avulso:** novo item **Desloratadina 0,5 mg/mL**, com a dose por idade (6–11 meses 2 mL; 1–5 anos 2,5 mL; 6–11 anos 5 mL; a partir de 12 anos 10 mL) e idade mínima de 6 meses.
+- Fonte das doses: bula da desloratadina xarope 0,5 mg/mL. **Conferir com a bula do fabricante usado.**
