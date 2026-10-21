@@ -291,12 +291,19 @@
 
   // Dose por peso do item (fator com teto, ou faixa de peso) — cálculo único em js/pediatria.js.
   // Peso fora das faixas sai como "____" para preencher à mão (com aviso).
+  // Sexo do paciente (campo opcional): masculino tira o que fala de gravidez e amamentação.
+  const sexoAtual = () => el('sexo').value;
+  const txtSexo = t => window.PONTE.paraSexo(t, sexoAtual());
+  // orientações como [id, o]; as que só falavam de gravidez somem
+  const orientDoSexo = entradas => entradas
+    .map(([id, o]) => [id, sexoAtual() === 'M' ? Object.assign({}, o, { texto: txtSexo(o.texto) }) : o])
+    .filter(([, o]) => o.texto !== '');
   function calcDoseItem(it, peso){
     const posologia = it.posologiaBase;
     if(!posologia) return posologia;
     const d = window.PEDIATRIA.doseDoItem(it, peso);
-    if(!d) return posologia;
-    return posologia.replace(/DOSE/g, d.valor === null ? '____' : String(d.valor));
+    if(!d) return txtSexo(posologia);
+    return txtSexo(posologia.replace(/DOSE/g, d.valor === null ? '____' : String(d.valor)));
   }
   const itemPorPeso = it => window.PEDIATRIA.itemPorPeso(it);
 
@@ -1373,7 +1380,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const nomePaciente = el('nomePaciente').value.trim();
     const peso = el('peso').value;
     const medEntries = Object.entries(selected);
-    const orientEntries = Object.entries(selectedOrient);
+    const orientEntries = orientDoSexo(Object.entries(selectedOrient));
     const local = localAtual();
     const dataStr = new Date().toLocaleDateString('pt-BR');
     const vazio = medEntries.length === 0 && orientEntries.length === 0;
@@ -1572,6 +1579,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     if(p.nome) el('nomePaciente').value = p.nome;
     if(p.idade && !el('idade').value.trim()) el('idade').value = window.PONTE.idadeParaCampo(p.idade);
     if(p.peso && !el('peso').value) el('peso').value = String(p.peso);
+    if(!el('sexo').value){ const sx = /^m/i.test(p.sexo || '') ? 'M' : /^f/i.test(p.sexo || '') ? 'F' : ''; if(sx) el('sexo').value = sx; }
     renderReceita(); atualizarDestaquePeso(); renderTudo();
     // receita vazia: o foco vai para a 1ª sugestão pela queixa (Enter adiciona) ou para a busca
     if(!Object.keys(selected).length){
@@ -2213,7 +2221,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const nomePaciente = el('nomePaciente').value.trim();
     const peso = el('peso').value;
     const itens = Object.values(selected);
-    const orientacoes = Object.values(selectedOrient);
+    const orientacoes = orientDoSexo(Object.entries(selectedOrient)).map(([, o]) => o);
     let out = `Paciente: ${nomePaciente || '---'}\nData: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
 
     const viaOrder = [];
@@ -2360,11 +2368,11 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function retratoReceita(){
     return { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)),
       conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)), nome: el('nomePaciente').value, idade: el('idade').value,
-      peso: el('peso').value, pacienteQuadro, encRascunhoPaciente, atRascunhoPaciente };
+      peso: el('peso').value, sexo: el('sexo').value, pacienteQuadro, encRascunhoPaciente, atRascunhoPaciente };
   }
   function voltarRetrato(r){
     selected = r.selected; selectedOrient = r.selectedOrient; conversaoPed = r.conversaoPed;
-    el('nomePaciente').value = r.nome; el('idade').value = r.idade; el('peso').value = r.peso;
+    el('nomePaciente').value = r.nome; el('idade').value = r.idade; el('peso').value = r.peso; el('sexo').value = r.sexo || '';
     pacienteQuadro = r.pacienteQuadro; encRascunhoPaciente = r.encRascunhoPaciente; atRascunhoPaciente = r.atRascunhoPaciente;
     renderTudo(); atualizarDestaquePeso();
     showToast('Receita de volta');
@@ -2441,7 +2449,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function coletarDadosReceita(){
     const peso = el('peso').value;
     const itens = Object.values(selected);
-    const orientacoes = Object.values(selectedOrient).map(o => ({ texto: o.texto, espacoAntes: !!o.espacoAntes }));
+    const orientacoes = orientDoSexo(Object.entries(selectedOrient)).map(([, o]) => ({ texto: o.texto, espacoAntes: !!o.espacoAntes }));
 
     const viaOrder = [];
     const grupos = {};
@@ -3078,6 +3086,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   };
   el('peso').addEventListener('input', aoMudarPesoOuIdade);
   el('idade').addEventListener('input', aoMudarPesoOuIdade);
+  el('sexo').addEventListener('change', () => { renderReceita(); renderTudo(); });
   document.querySelectorAll('input[name=tipoReceita]').forEach(r => r.addEventListener('change', () => {
     if(tipoReceitaAtual() !== 'auto') separarSuspenso = true;   // escolheu o tipo à mão: não separa sozinho
     renderTudo();
@@ -3373,7 +3382,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const nomePaciente = el('nomePaciente').value.trim();
     const peso = el('peso').value;
     const medEntries = Object.entries(selected);
-    const orientEntries = Object.entries(selectedOrient);
+    const orientEntries = orientDoSexo(Object.entries(selectedOrient));
     const dataStr = new Date().toLocaleDateString('pt-BR');
 
     if(medEntries.length === 0 && orientEntries.length === 0){
@@ -3557,7 +3566,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     finalizarAtendimento();
     selected = {}; selectedOrient = {}; conversaoPed = null; desfazerPediatria = null; autoPedSuspensa = false; separarSuspenso = false;
     encRascunhoPaciente = null; atRascunhoPaciente = null; pacienteQuadro = null;
-    el('nomePaciente').value=''; el('peso').value=''; el('idade').value='';
+    el('nomePaciente').value=''; el('peso').value=''; el('idade').value=''; el('sexo').value='';
     usoNaAbertura = { ...usoCondicoes };
     // próximo paciente: busca limpa e o cursor no nome (no Quadro o nome vem do cartão)
     el('search').value = ''; el('searchWrap').classList.remove('has-text');

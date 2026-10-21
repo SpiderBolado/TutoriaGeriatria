@@ -111,7 +111,19 @@
     return s;
   }
 
-  const puras = { conflitoAlergia, sugerirCondicoes, idadeParaCampo, CLASSES_ALERGIA };
+  // Paciente masculino: sai do texto o que fala de gravidez e amamentação da própria paciente
+  // ("Não usar se estiver grávida, amamentando ou se tiver glaucoma." → "Não usar se tiver glaucoma.";
+  // "Se estiver grávida ou houver chance de gravidez, …" some). Devolve '' se não sobrar nada.
+  function paraSexo(texto, sexo){
+    const t = String(texto == null ? '' : texto);
+    if(sexo !== 'M') return t;
+    return t
+      .replace(/estiver grávida, amamentando ou se tiver/gi, 'tiver')
+      .replace(/(^|[.!?]\s+)(?:Se|Não (?:tomar|usar) se) estiver grávida[^.!?]*[.!?]\s*/gi, '$1')
+      .trim();
+  }
+
+  const puras = { conflitoAlergia, sugerirCondicoes, idadeParaCampo, paraSexo, CLASSES_ALERGIA };
   if(typeof module !== 'undefined' && module.exports){ module.exports = puras; return; }
 
   // ---------- Ponte (só no navegador) ----------
