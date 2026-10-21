@@ -1569,6 +1569,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
   // condição montada para criança: a maioria dos itens com dose por peso (ex.: Faringoamigdalite, em suspensão)
   function condicaoPorPeso(nome){
+    if(/\bdengue\b/.test(norm(nome))) return false;   // hidratação por kg vale para qualquer idade
     const meds = getCondEffective(nome).meds;
     return meds.length > 0 && meds.filter(m => m.fator != null || m.faixas).length * 2 > meds.length;
   }
@@ -1660,7 +1661,18 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
         desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
     }
 
-    // 3) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
+    // 3) Condição montada para criança aplicada a adulto (≥ 12 anos ou > 40 kg)
+    if((idade !== null && idade >= 144) || (kg && kg > window.PEDIATRIA.PESO_MAX_KG)){
+      const quem = idade !== null && idade >= 144 ? window.PEDIATRIA.formatarIdade(idade) : numBR(kg) + ' kg';
+      [...new Set(entradas.map(([, it]) => it.origemCondicao).filter(Boolean))].filter(condicaoPorPeso).forEach(nome => {
+        const base = norm(nome.replace(/\s*\(crian[cç]a\)\s*$/i, ''));
+        const adulto = base !== norm(nome) && Object.keys(Object.assign({}, DATA.condicoes, customCondicoes)).find(n => norm(n).startsWith(base + ' (adulto'));
+        bar.appendChild(avisoHtml('amber', '&#9888;',
+          `<b>Condição pediátrica para paciente de ${escapeHtml(quem)}:</b> ${escapeHtml(nome)} tem doses por kg e apresentações de criança. Confira cada item.`,
+          adulto ? `<button type="button" data-acao="trocar-cond" data-de="${escapeHtml(nome)}" data-para="${escapeHtml(adulto)}">Trocar por ${escapeHtml(adulto)}</button>` : ''));
+      });
+    }
+    // 4) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
     const soltos = [];
     entradas.forEach(([, it]) => {
       if(it.convertidoPediatrico) return;
@@ -3477,6 +3489,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
     if(b.dataset.acao === 'cond-queixa') toggleCondicaoInteira(b.dataset.nome, true);
+    if(b.dataset.acao === 'trocar-cond'){
+      const antes = retratoReceita();
+      toggleCondicaoInteira(b.dataset.de, false);
+      toggleCondicaoInteira(b.dataset.para, true);
+      showToast('Trocado por ' + b.dataset.para, { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    }
     if(b.dataset.acao === 'preencher-medico'){ el('medicoDetails').open = true; el('medicoNome').scrollIntoView({ block: 'center' }); el('medicoNome').focus(); }
     if(b.dataset.acao === 'tirar-alergico'){
       const antes = retratoReceita();

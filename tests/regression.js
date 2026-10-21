@@ -1156,6 +1156,36 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Avisos de seguranca: condicao de crianca em adulto ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const avisos = () => page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    const conds = () => page.evaluate(() => [...new Set([...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()))]);
+    await page.fill('#idade', '8'); await page.fill('#peso', '25');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const crianca = await avisos();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '45'); await page.fill('#peso', '84');
+    await selectCondicao(page, 'Dengue');
+    const dengue = await avisos();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '45'); await page.fill('#peso', '84');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const adulto = await avisos();
+    await page.click('#avisoBar button[data-acao="trocar-cond"]'); await page.waitForTimeout(250);
+    const trocado = await conds();
+    const ok = !/Condição pediátrica/.test(crianca) && !/Condição pediátrica/.test(dengue)
+      && /Condição pediátrica para paciente de 45 anos.*Pneumonia \(Criança\).*Trocar por Pneumonia \(Adulto/.test(adulto)
+      && !trocado.some((n) => /mg\/mL/.test(n)) && trocado.length > 0 && !/Condição pediátrica/.test(await avisos())
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: condicao pediatrica em adulto (aviso e troca pela versao adulto)', ok,
+      JSON.stringify({ crianca: crianca.slice(0, 100), dengue: dengue.slice(0, 100), adulto: adulto.slice(0, 300), trocado, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
