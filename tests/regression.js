@@ -1203,12 +1203,17 @@ async function run(url) {
     await selectCondicao(page, 'Dor Muscular');
     await page.fill('#search', 'Dipirona gotas'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
     const duasDipironas = await dup();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '5'); await page.fill('#peso', '18');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const azitro = await dup();
     const ok = raiva.length === 0
       && dismen.length === 1 && /Dipirona.*Buscopan composto.*Dipirona 500mg/.test(dismen[0])
       && duasDipironas.length === 1 && /Dipirona/.test(duasDipironas[0])
+      && !azitro.some((t) => /Azitromicina/.test(t))
       && consoleErrors.length === 0;
     record('avisos de seguranca: duplicidade sem falso positivo (Vacina) e com dipirona dentro do Buscopan composto', ok,
-      JSON.stringify({ raiva, dismen, duasDipironas, consoleErrors }));
+      JSON.stringify({ raiva, dismen, duasDipironas, azitro, consoleErrors }));
     await browser.close();
   }
 
