@@ -35,6 +35,13 @@ assert.ok(P.sugerirCondicoes('crise de gota', () => true).includes('Gota'));
 assert.deepStrictEqual(sug('dor lombar há 2 dias'), ['Dor Muscular']);
 assert.deepStrictEqual(sug('Ardência para urinar e polaciúria'), ['ITU']);
 assert.deepStrictEqual(sug('dor de garganta e febre'), ['Faringoamigdalite', 'Faringite']);
+// sinônimos comuns de disúria e de sinusite
+['ardência urinária', 'dor ao urinar', 'ardor urinário', 'dor para urinar'].forEach(q => assert.deepStrictEqual(sug(q), ['ITU'], q));
+['dor facial', 'pressão na face', 'dor facial, pressão em fronte e secreção nasal'].forEach(q => assert.deepStrictEqual(sug(q), ['Sinusite bomba'], q));
+// sem sugestão nova inesperada
+assert.deepStrictEqual(sug('pressão alta'), ['Crise Hipertensiva']);
+assert.deepStrictEqual(sug('dor abdominal'), ['Dor Abdominal']);
+assert.deepStrictEqual(sug('urina com cheiro forte'), []);
 assert.deepStrictEqual(sug('vômitos e diarreia'), ['GECA']);
 assert.deepStrictEqual(sug('cefaleia'), ['Cefaleia Tensional', 'Enxaqueca']);
 assert.deepStrictEqual(P.sugerirCondicoes('pneumonia', existe, 5), ['Pneumonia (Criança)']);

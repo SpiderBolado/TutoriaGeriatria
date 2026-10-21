@@ -1125,6 +1125,121 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Avisos de seguranca: AINE na dengue ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const avisos = () => page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    const nomes = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()));
+    await page.fill('#idade', '35'); await page.fill('#peso', '65');
+    await selectCondicao(page, 'Dengue');
+    const dengueSo = await avisos();
+    await page.fill('#search', 'Ibuprofeno 600'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
+    await page.fill('#search', ''); await page.waitForTimeout(150);
+    const dengueIbu = await avisos();
+    await page.fill('#nomePaciente', 'Caso Dengue');
+    await page.evaluate(() => { medicoDetails.open = true; window.__semConferir = false; });
+    await page.fill('#medicoNome', 'Dr. Teste');
+    await page.click('#btnImprimir'); await page.waitForTimeout(200);
+    const pergunta = await page.evaluate(() => (document.querySelector('.pergunta-overlay') || {}).innerText || '');
+    await page.click('.pergunta-overlay button.btn-primary'); await page.waitForTimeout(150);
+    await page.click('#avisoBar button[data-acao="tirar-alergico"]'); await page.waitForTimeout(200);
+    const depois = await nomes();
+    const ok = !/contraindicado/.test(dengueSo) && /Dengue com anti-inflamat.*Ibuprofeno 600/.test(dengueIbu)
+      && /Ibuprofeno 600.*contraindicado na dengue/.test(pergunta.replace(/\s+/g, ' '))
+      && !depois.some((n) => /Ibuprofeno/.test(n)) && depois.some((n) => /Dipirona/.test(n))
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: AINE na dengue (aviso, checagem antes de imprimir, tirar da receita)', ok,
+      JSON.stringify({ dengueSo: dengueSo.slice(0, 120), dengueIbu: dengueIbu.slice(0, 200), pergunta: pergunta.slice(0, 200), depois, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Avisos de seguranca: condicao de crianca em adulto ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const avisos = () => page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    const conds = () => page.evaluate(() => [...new Set([...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()))]);
+    await page.fill('#idade', '8'); await page.fill('#peso', '25');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const crianca = await avisos();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '45'); await page.fill('#peso', '84');
+    await selectCondicao(page, 'Dengue');
+    const dengue = await avisos();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '45'); await page.fill('#peso', '84');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const adulto = await avisos();
+    await page.click('#avisoBar button[data-acao="trocar-cond"]'); await page.waitForTimeout(250);
+    const trocado = await conds();
+    const ok = !/Condição pediátrica/.test(crianca) && !/Condição pediátrica/.test(dengue)
+      && /Condição pediátrica para paciente de 45 anos.*Pneumonia \(Criança\).*Trocar por Pneumonia \(Adulto/.test(adulto)
+      && !trocado.some((n) => /mg\/mL/.test(n)) && trocado.length > 0 && !/Condição pediátrica/.test(await avisos())
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: condicao pediatrica em adulto (aviso e troca pela versao adulto)', ok,
+      JSON.stringify({ crianca: crianca.slice(0, 100), dengue: dengue.slice(0, 100), adulto: adulto.slice(0, 300), trocado, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Avisos de seguranca: duplicidade por principio ativo, nao pela 1a palavra ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const dup = () => page.evaluate(() => [...document.querySelectorAll('#avisoBar .aviso')].map((a) => a.innerText.replace(/\s+/g, ' ')).filter((t) => /duplicidade/.test(t)));
+    await page.fill('#idade', '30'); await page.fill('#peso', '70');
+    await selectCondicao(page, 'Ferimento com Risco de Raiva');
+    const raiva = await dup();
+    await page.click('#btnLimpar');
+    await selectCondicao(page, 'Dismenorreia Secundária');
+    const dismen = await dup();
+    await page.click('#btnLimpar');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.fill('#search', 'Dipirona gotas'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
+    const duasDipironas = await dup();
+    await page.click('#btnLimpar');
+    await page.fill('#idade', '5'); await page.fill('#peso', '18');
+    await selectCondicao(page, 'Pneumonia (Criança)');
+    const azitro = await dup();
+    const ok = raiva.length === 0
+      && dismen.length === 1 && /Dipirona.*Buscopan composto.*Dipirona 500mg/.test(dismen[0])
+      && duasDipironas.length === 1 && /Dipirona/.test(duasDipironas[0])
+      && !azitro.some((t) => /Azitromicina/.test(t))
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: duplicidade sem falso positivo (Vacina) e com dipirona dentro do Buscopan composto', ok,
+      JSON.stringify({ raiva, dismen, duasDipironas, azitro, consoleErrors }));
+    await browser.close();
+  }
+
+  // ---- Conversao pediatrica: orientacao de remedio retirado sai; volume de agua de adulto so avisa ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const orient = () => page.evaluate(() => receitaPaper.innerText.split(/ORIENTAÇÕES/)[1] || '');
+    await page.fill('#idade', '7'); await page.fill('#peso', '24');
+    await selectCondicao(page, 'ITU');
+    const antes = await orient();
+    await page.click('#avisoBar button[data-acao="converter-ped"]'); await page.waitForTimeout(300);
+    const depois = await orient();
+    const avisos = await page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    await page.click('#avisoBar button[data-acao="desfazer-ped"]'); await page.waitForTimeout(300);
+    const desfeito = await orient();
+    const ok = /Pyridium/.test(antes) && !/Pyridium/.test(depois) && /2 litros/.test(depois) && /Retorne imediatamente/.test(depois)
+      && /Orientação retirada \(citava Pyridium/.test(avisos) && /volume de água de adulto/.test(avisos)
+      && /Pyridium/.test(desfeito) && consoleErrors.length === 0;
+    record('conversao pediatrica: orientacao do Pyridium sai (volta no Desfazer) e 2 litros de agua vira aviso', ok,
+      JSON.stringify({ depois: depois.slice(0, 200), avisos: avisos.slice(0, 400), desfeito: /Pyridium/.test(desfeito), consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

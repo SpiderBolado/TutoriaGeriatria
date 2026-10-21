@@ -1500,9 +1500,20 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(!automatica) showToast('Nenhum item com versão pediátrica cadastrada');
       return false;
     }
-    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
+    desfazerPediatria = { selected: JSON.parse(JSON.stringify(selected)), selectedOrient: JSON.parse(JSON.stringify(selectedOrient)), conversaoPed: conversaoPed && JSON.parse(JSON.stringify(conversaoPed)) };
     selected = Object.fromEntries(r.entries);
     const acum = conversaoPed || { motivos: [], fixos: [] };
+    // orientação que cita remédio retirado (ex.: urina laranja do Pyridium) sai junto; volta no Desfazer
+    const restantes = Object.values(selected).map(it => norm(it.nome)).join(' | ');
+    const citaRetirado = texto => r.removidos.map(x => x.nome).find(nome => [...principiosDoNome(nome, true)]
+      .some(tk => !restantes.includes(tk) && new RegExp('\\b' + tk.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(norm(texto))));
+    Object.entries(selectedOrient).forEach(([id, o]) => {
+      const nome = citaRetirado(o.texto || '');
+      if(!nome) return;
+      delete selectedOrient[id];
+      const t = `Orientação retirada (citava ${nome}): “${String(o.texto).slice(0, 70)}${String(o.texto).length > 70 ? '…' : ''}”`;
+      if(!acum.fixos.includes(t)) acum.fixos.push(t);
+    });
     r.removidos.forEach(x => { if(!acum.motivos.includes(x.motivo)) acum.motivos.push(x.motivo); });
     r.fixos.forEach(t => { if(!acum.fixos.includes(t)) acum.fixos.push(t); });
     acum.automatica = !!automatica;
@@ -1514,6 +1525,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   function desfazerConversao(){
     if(!desfazerPediatria) return;
     selected = desfazerPediatria.selected;
+    if(desfazerPediatria.selectedOrient) selectedOrient = desfazerPediatria.selectedOrient;
     conversaoPed = desfazerPediatria.conversaoPed;
     desfazerPediatria = null;
     autoPedSuspensa = true;
@@ -1569,8 +1581,18 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
   // condição montada para criança: a maioria dos itens com dose por peso (ex.: Faringoamigdalite, em suspensão)
   function condicaoPorPeso(nome){
+    if(/\bdengue\b/.test(norm(nome))) return false;   // hidratação por kg vale para qualquer idade
     const meds = getCondEffective(nome).meds;
     return meds.length > 0 && meds.filter(m => m.fator != null || m.faixas).length * 2 > meds.length;
+  }
+  // Dengue (condição na receita ou queixa do Quadro) + AINE/AAS: contraindicados
+  // pelo MS (Dengue: diagnóstico e manejo clínico, 2024). Devolve [[id, nome], ...].
+  function aineNaDengue(){
+    const q = quadroAtual();
+    const dengue = Object.values(selected).concat(Object.values(selectedOrient)).some(x => /\bdengue\b/.test(norm(x.origemCondicao || '')))
+      || !!(q && /\bdengue\b/.test(norm(q.queixa || '')));
+    if(!dengue) return [];
+    return Object.entries(selected).filter(([, it]) => window.PONTE.conflitoAlergia(it.nome, ['aine'])).map(([id, it]) => [id, it.nome]);
   }
   // adulto não recebe sugestão de condição pediátrica
   function condicaoParaSugerir(nome){
@@ -1605,19 +1627,37 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   // ---------- Avisos (pediatria, teto de dose, duplicidade de princípio ativo) ----------
+  // Duplicidade: 1ª palavra de cada componente ("Amoxicilina + Clavulanato" conta os dois);
+  // palavra genérica ("Ácido", "Soro", "Vacina") leva a seguinte junto; composto conta o que tem dentro.
+  const TOKEN_GENERICO = /^(?:acido|soro|vacina|solucao|sal|sais|cloreto|sulfato|acetato|valerato|carbonato|fosfato|vitamina|insulina|compressas?|tala|meias?|banho|lavagem)$/;
+  const COMPOSTOS = { 'buscopan composto': ['dipirona'] };
+  function principiosDoNome(nome, semCompostos){
+    const n = norm(nome), out = new Set();
+    n.split('+').forEach(parte => {
+      const pal = parte.split(/\s+/).filter(w => /[a-z]/.test(w) && !/^(?:de|da|do|dos|das)$/.test(w));
+      if(!pal.length) return;
+      out.add(TOKEN_GENERICO.test(pal[0]) && pal[1] ? pal[0] + ' ' + pal[1] : pal[0]);
+    });
+    if(!semCompostos) Object.keys(COMPOSTOS).forEach(k => { if(n.includes(k)) COMPOSTOS[k].forEach(x => out.add(x)); });
+    return out;
+  }
   function renderAvisos(){
     const bar = el('avisoBar');
     bar.innerHTML = '';
     const porToken = {};
     Object.values(selected).forEach(it => {
-      const token = norm(it.nome).split(/[\s+]/)[0];
-      if(!token) return;
-      if(!porToken[token]) porToken[token] = [];
-      porToken[token].push(it.nome);
+      principiosDoNome(it.nome).forEach(token => {
+        if(!porToken[token]) porToken[token] = [];
+        porToken[token].push(it.nome);
+      });
     });
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
     renderAvisosQuadro(bar, entradas);
+    const aineDengue = aineNaDengue();
+    if(aineDengue.length) bar.appendChild(avisoHtml('perigo', '&#9888;',
+      '<b>Dengue com anti-inflamatório/AAS — contraindicado (risco de sangramento, Ministério da Saúde):</b>' + listaHtml(aineDengue.map(x => x[1])),
+      `<button type="button" data-acao="tirar-alergico" data-ids="${escapeHtml(aineDengue.map(x => x[0]).join('|'))}">Tirar da receita</button>`));
     if(entradas.length && !el('medicoNome').value.trim() && !semMedicoAceito)
       bar.appendChild(avisoHtml('teal', '&#9998;', 'Seu <b>nome e CRM</b> ainda não aparecem na receita (preenche uma vez neste aparelho).',
         '<button type="button" data-acao="preencher-medico">Preencher</button>'));
@@ -1641,18 +1681,36 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(alto) itens.push(alto);
       itens.push(...conversaoPed.motivos, ...conversaoPed.fixos);
       convertidos.forEach(([, it]) => itens.push(...window.PEDIATRIA.avisosDoItem(it, kg || 0, idade)));
+      // orientação com volume de água de adulto ("2 litros por dia"): só avisa, o texto é do médico
+      if(!(kg > window.PEDIATRIA.PESO_MAX_KG)) Object.values(selectedOrient).forEach(o => {
+        const m = String(o.texto || '').match(/[^.;()]*\d+(?:,\d+)?\s*litros\b[^.;()]*/i);
+        if(m) itens.push(`Orientação com volume de água de adulto (“${m[0].trim()}”): ajuste para a criança.`);
+      });
       const titulo = 'Receita convertida ' + (conversaoPed.automatica ? 'automaticamente ' : '') + 'para pediátrica' + (kg ? ` (peso ${numBR(kg)} kg)` : '') + '. Confira cada dose antes de imprimir.';
       bar.appendChild(avisoHtml('amber', '&#9888;', '<b>' + escapeHtml(titulo) + '</b>' + listaHtml(itens)
         + `<label class="aviso-check"><input type="checkbox" data-acao="auto-ped" ${autoPediatriaAtiva() ? 'checked' : ''}> Converter sozinho quando a idade informada for menor que 12 anos</label>`,
         desfazerPediatria ? '<button type="button" data-acao="desfazer-ped">Desfazer</button>' : ''));
     }
 
-    // 3) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
+    // 3) Condição montada para criança aplicada a adulto (≥ 12 anos ou > 40 kg)
+    if((idade !== null && idade >= 144) || (kg && kg > window.PEDIATRIA.PESO_MAX_KG)){
+      const quem = idade !== null && idade >= 144 ? window.PEDIATRIA.formatarIdade(idade) : numBR(kg) + ' kg';
+      [...new Set(entradas.map(([, it]) => it.origemCondicao).filter(Boolean))].filter(condicaoPorPeso).forEach(nome => {
+        const base = norm(nome.replace(/\s*\(crian[cç]a\)\s*$/i, ''));
+        const adulto = base !== norm(nome) && Object.keys(Object.assign({}, DATA.condicoes, customCondicoes)).find(n => norm(n).startsWith(base + ' (adulto'));
+        bar.appendChild(avisoHtml('amber', '&#9888;',
+          `<b>Condição pediátrica para paciente de ${escapeHtml(quem)}:</b> ${escapeHtml(nome)} tem doses por kg e apresentações de criança. Confira cada item.`,
+          adulto ? `<button type="button" data-acao="trocar-cond" data-de="${escapeHtml(nome)}" data-para="${escapeHtml(adulto)}">Trocar por ${escapeHtml(adulto)}</button>` : ''));
+      });
+    }
+    // 4) Itens por peso escolhidos direto (não convertidos): teto por dose e idade mínima
     const soltos = [];
     entradas.forEach(([, it]) => {
       if(it.convertidoPediatrico) return;
       const d = window.PEDIATRIA.doseDoItem(it, kg);
       if(d && d.limitada) soltos.push(`${it.nome}: dose calculada (${d.semTeto}) excede o máximo de ${it.max} por dose; a receita sai com ${it.max}.`);
+      const frascos = window.PEDIATRIA.avisoFrascos(it, kg);
+      if(frascos) soltos.push(frascos);
       if(d && d.valor === null) soltos.push(`ATENÇÃO — ${it.nome}: peso fora das faixas de dose (mínimo ${it.pesoMinKg || '?'} kg). Preencha à mão ou revise.`);
       if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)) soltos.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){
@@ -1660,8 +1718,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       }
     });
     if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Confira doses e idade mínima</b>' + listaHtml(soltos)));
+    // mesmo esquema em partes ("Azitromicina 40mg/mL - 1º dia" / "- 2º ao 5º dia") não é duplicidade
+    const parteDeEsquema = nomes => nomes.every(n => / - .*\bdias?\b/i.test(n)) && new Set(nomes.map(n => norm(n).split(' - ')[0].trim())).size === 1 && new Set(nomes).size === nomes.length;
     Object.keys(porToken).forEach(token => {
-      if(porToken[token].length >= 2){
+      if(porToken[token].length >= 2 && !parteDeEsquema(porToken[token])){
         const div = document.createElement('div');
         div.className = 'aviso amber';
         const nomeExib = token.charAt(0).toUpperCase() + token.slice(1);
@@ -2263,6 +2323,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       else if(kg && it.pesoMinKg && kg < it.pesoMinKg) risco.push(`<b>${escapeHtml(it.nome)}</b>: peso abaixo do mínimo de ${it.pesoMinKg} kg`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses) risco.push(`<b>${escapeHtml(it.nome)}</b>: abaixo da idade mínima de ${escapeHtml(window.PEDIATRIA.formatarIdade(it.idadeMinMeses))}`);
     });
+    aineNaDengue().forEach(([, n]) => risco.push(`<b>${escapeHtml(n)}</b>: anti-inflamatório/AAS contraindicado na dengue`));
     if(!risco.some(r => /dose em branco/.test(r)) && /(?:Tomar|Dar|Aplicar|Usar|Pingar)\s+_{3,}|_{3,}\s*(?:gotas|mL|comprimid|c[áa]psul)/.test(el('receitaPaper').innerText)) risco.push('<b>dose em branco</b> (____) em um item');
     risco.forEach(r => falta.push({ txt: r, campo: null, risco: true }));
     if(!el('nomePaciente').value.trim()) falta.push({ txt: 'o <b>nome do paciente</b>', campo: 'nomePaciente' });
@@ -3463,6 +3524,12 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     }
     if(b.dataset.acao === 'padrao-aplicar') aplicarSugestao(b.dataset.chave);
     if(b.dataset.acao === 'cond-queixa') toggleCondicaoInteira(b.dataset.nome, true);
+    if(b.dataset.acao === 'trocar-cond'){
+      const antes = retratoReceita();
+      toggleCondicaoInteira(b.dataset.de, false);
+      toggleCondicaoInteira(b.dataset.para, true);
+      showToast('Trocado por ' + b.dataset.para, { rotulo: 'Desfazer', fn: () => voltarRetrato(antes) });
+    }
     if(b.dataset.acao === 'preencher-medico'){ el('medicoDetails').open = true; el('medicoNome').scrollIntoView({ block: 'center' }); el('medicoNome').focus(); }
     if(b.dataset.acao === 'tirar-alergico'){
       const antes = retratoReceita();
