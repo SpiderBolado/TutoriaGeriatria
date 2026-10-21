@@ -227,7 +227,7 @@
     if(!vol || !/DOSE\s*mL\b/.test(pos)) return null;
     const d = doseDoItem(it, peso);
     const h = pos.match(/\bde (\d{1,2})\/\1 horas/), dias = pos.match(/\bpor (\d{1,2}) dias/);
-    if(!d || typeof d.valor !== 'number' || !h || !dias || 24 % Number(h[1])) return null;
+    if(!d || typeof d.valor !== 'number' || !h || !dias || !(Number(h[1]) > 0) || 24 % Number(h[1])) return null;
     const totalMl = d.valor * (24 / Number(h[1])) * Number(dias[1]);
     return { frascos: Math.ceil(totalMl / vol), totalMl, volumeFrascoMl: vol };
   }

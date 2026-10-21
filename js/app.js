@@ -1719,7 +1719,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     });
     if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Confira doses e idade mínima</b>' + listaHtml(soltos)));
     // mesmo esquema em partes ("Azitromicina 40mg/mL - 1º dia" / "- 2º ao 5º dia") não é duplicidade
-    const parteDeEsquema = nomes => nomes.every(n => / - /.test(n)) && new Set(nomes.map(n => norm(n).split(' - ')[0].trim())).size === 1 && new Set(nomes).size === nomes.length;
+    const parteDeEsquema = nomes => nomes.every(n => / - .*\bdias?\b/i.test(n)) && new Set(nomes.map(n => norm(n).split(' - ')[0].trim())).size === 1 && new Set(nomes).size === nomes.length;
     Object.keys(porToken).forEach(token => {
       if(porToken[token].length >= 2 && !parteDeEsquema(porToken[token])){
         const div = document.createElement('div');

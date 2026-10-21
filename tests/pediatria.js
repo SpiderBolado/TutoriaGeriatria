@@ -197,6 +197,7 @@ assert.strictEqual(V.classificar('Azitromicina 500mg'), 'antimicrobiano');      
   assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { posologiaBase: 'Tomar DOSE mL, 3 vezes ao dia, por 07 dias.' }), 52), null);
   assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { nome: 'Azitromicina 40mg/mL' }), 52), null);
   assert.strictEqual(frascosNecessarios(amox, ''), null);
+  assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { posologiaBase: 'Tomar DOSE mL, de 00/00 horas, por 07 dias.' }), 52), null);
   assert.strictEqual(avisoFrascos(Object.assign({}, amox, { qtde: '(mesmo frasco)' }), 52), null);
 }
 
