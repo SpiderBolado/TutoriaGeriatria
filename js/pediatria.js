@@ -37,7 +37,7 @@
       aviso: '1 gota = 5 mg (bula: 1–2 gotas/kg, máx. 40 gotas por dose). Evitar na suspeita de dengue ou desidratação.',
       fonte: 'Dose baixa da bula (5 mg/kg); o "Ibuprofeno 200mg/mL" do catálogo usa 10 mg/kg — conferir a apresentação da farmácia.' },
     { match: /^amoxicilina\b/, exceto: /clavul/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 50,
-      por: { nome: 'Amoxicilina 50mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.33, max: 10, idadeMinMeses: 3,
+      por: { nome: 'Amoxicilina 50mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.33, max: 10, idadeMinMeses: 3, volumeFrascoMl: 150,
         posologiaBase: 'Tomar DOSE mL, de 08/08 horas, {duracao}.' },
       duracaoPadrao: 'por 10 dias',
       aviso: 'Teto de 10 mL (500 mg) por dose; na pneumonia pode ir até 20 mL (1 g). Frasco de 150 mL: confira a quantidade.',
@@ -52,13 +52,13 @@
       aviso: 'Esquema pediátrico do catálogo: 10 mg/kg no 1º dia e 5 mg/kg do 2º ao 5º (total de bula).',
       fonte: 'Fatores do catálogo (Pneumonia Criança); tetos = dose adulta (500/250 mg).' },
     { match: /^cefalexina\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 50,
-      por: { nome: 'Cefalexina 50mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.25, max: 10, idadeMinMeses: 3,
+      por: { nome: 'Cefalexina 50mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.25, max: 10, idadeMinMeses: 3, volumeFrascoMl: 100,
         posologiaBase: 'Tomar DOSE mL, de 06/06 horas, {duracao}.' },
       duracaoPadrao: 'por 07 dias',
       aviso: '50 mg/kg/dia de 6/6 h (otite pode pedir dose maior). Frasco de 100 mL: confira a quantidade.',
       fonte: 'Bula: 25–50 mg/kg/dia; teto 500 mg/dose.' },
     { match: /^sulfametoxazol\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 8,
-      por: { nome: 'Sulfametoxazol + Trimetoprima 40+8mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.375, max: 20, idadeMinMeses: 2,
+      por: { nome: 'Sulfametoxazol + Trimetoprima 40+8mg/mL', qtde: '02 Frascos', via: 'Oral', fator: 0.375, max: 20, idadeMinMeses: 2, volumeFrascoMl: 100,
         posologiaBase: 'Tomar DOSE mL, de 12/12 horas, {duracao}.' },
       duracaoPadrao: 'por 07 dias',
       aviso: 'mg calculados como trimetoprima (6 mg/kg/dia). Na ITU, considere 0,5 mL/kg. Evitar na deficiência de G6PD. Frasco de 100 mL: confira a quantidade.',
@@ -216,6 +216,30 @@
     return !!it && ((Array.isArray(it.faixas) && it.faixas.length > 0) || (it.fator !== null && it.fator !== undefined && it.fator !== ''));
   }
 
+  // Frascos para o tratamento todo: dose (mL) x doses/dia x dias ÷ volume do frasco, para cima.
+  // Só quando tudo é legível ("DOSE mL", "de 08/08 horas", "por 07 dias") e o volume é
+  // conhecido (volumeFrascoMl da regra ou pelo nome da suspensão); senão null.
+  const FRASCO_ML = [[/^amoxicilina\b(?!.*clavul)/, 150], [/^cefalexina\b/, 100], [/^sulfametoxazol\b/, 100]];
+  function frascosNecessarios(it, peso){
+    if(!it) return null;
+    const pos = String(it.posologiaBase || '');
+    const vol = Number(it.volumeFrascoMl) || (FRASCO_ML.find(([re]) => re.test(norm(it.nome))) || [])[1];
+    if(!vol || !/DOSE\s*mL\b/.test(pos)) return null;
+    const d = doseDoItem(it, peso);
+    const h = pos.match(/\bde (\d{1,2})\/\1 horas/), dias = pos.match(/\bpor (\d{1,2}) dias/);
+    if(!d || typeof d.valor !== 'number' || !h || !dias || 24 % Number(h[1])) return null;
+    const totalMl = d.valor * (24 / Number(h[1])) * Number(dias[1]);
+    return { frascos: Math.ceil(totalMl / vol), totalMl, volumeFrascoMl: vol };
+  }
+  const frascosDaQtde = q => { const m = String(q || '').match(/^\s*(\d+)\s*frascos?\s*$/i); return m ? Number(m[1]) : null; };
+  const qtdeFrascos = n => String(n).padStart(2, '0') + (n === 1 ? ' Frasco' : ' Frascos');
+  // Aviso quando a quantidade da receita não cobre o tratamento (ou null)
+  function avisoFrascos(it, peso){
+    const f = frascosNecessarios(it, peso), atual = frascosDaQtde(it && it.qtde);
+    if(!f || !atual || f.frascos <= atual) return null;
+    return `${it.nome}: o tratamento soma ${numBR(f.totalMl)} mL; ${it.qtde} de ${f.volumeFrascoMl} mL não bastam — são ${qtdeFrascos(f.frascos)}.`;
+  }
+
   // Itens que uma conversão mudaria (substituir/remover); regras só de aviso não contam.
   function contarConversiveis(entradas, idadeMeses){
     return entradas.filter(([, it]) => { const r = regraPara(it, idadeMeses); return r && r.acao !== 'avisar'; }).length;
@@ -241,6 +265,8 @@
     } else if(info.aviso){
       out.push(`${it.nome}. ${info.aviso}`);
     }
+    const frascos = avisoFrascos(it, peso);
+    if(frascos) out.push(frascos);
     if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)){
       out.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
     }
@@ -300,6 +326,9 @@
           pedInfo: { unidade: regra.unidade || '', mgPorUnidade: regra.mgPorUnidade || null, aviso: i === 0 ? (regra.aviso || '') : '', origem: it.nome }
         });
         ['fator', 'max', 'idadeMinMeses', 'pesoMinKg', 'faixas'].forEach(k => { if(p[k] === undefined) delete novo[k]; });
+        // suspensão: frascos suficientes para o tratamento todo (só aumenta)
+        const f = frascosNecessarios(novo, kg), atual = frascosDaQtde(novo.qtde);
+        if(f && atual && f.frascos > atual) novo.qtde = qtdeFrascos(f.frascos);
         entries.push([lista.length > 1 ? `${id}#ped${i + 1}` : id, novo]);
         doItens.push(...avisosDoItem(novo, kg, idade));
       });
@@ -309,7 +338,7 @@
     return { entries, removidos, fixos, convertidos, avisos: [...(alto ? [alto] : []), ...fixos, ...doItens] };
   }
 
-  const api = { converterParaPediatrico, contarConversiveis, avisosDoItem, avisoPesoAlto, regraPara, idadeEmMeses, formatarIdade, doseDoItem, itemPorPeso, REGRAS, PESO_MAX_KG };
+  const api = { converterParaPediatrico, contarConversiveis, avisosDoItem, avisoPesoAlto, frascosNecessarios, avisoFrascos, regraPara, idadeEmMeses, formatarIdade, doseDoItem, itemPorPeso, REGRAS, PESO_MAX_KG };
   if(typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.PEDIATRIA = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1692,6 +1692,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(it.convertidoPediatrico) return;
       const d = window.PEDIATRIA.doseDoItem(it, kg);
       if(d && d.limitada) soltos.push(`${it.nome}: dose calculada (${d.semTeto}) excede o máximo de ${it.max} por dose; a receita sai com ${it.max}.`);
+      const frascos = window.PEDIATRIA.avisoFrascos(it, kg);
+      if(frascos) soltos.push(frascos);
       if(d && d.valor === null) soltos.push(`ATENÇÃO — ${it.nome}: peso fora das faixas de dose (mínimo ${it.pesoMinKg || '?'} kg). Preencha à mão ou revise.`);
       if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)) soltos.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){

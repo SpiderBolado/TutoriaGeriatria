@@ -173,4 +173,31 @@ assert.strictEqual(V.classificar({ nome: 'Dipirona 500mg', via: 'Oral' }), null)
 assert.strictEqual(V.classificar({ nome: 'Ciclobenzaprina 10mg', via: 'Oral' }), null);
 assert.strictEqual(V.classificar('Azitromicina 500mg'), 'antimicrobiano');                        // sem via = oral
 
+// frascos de suspensão para o tratamento todo: dose x doses/dia x dias ÷ volume, para cima
+{
+  const { frascosNecessarios, avisoFrascos } = P;
+  // Pioderma 31 kg: cefalexina 8 mL de 6/6 h por 7 dias = 224 mL -> 3 frascos de 100 mL
+  const cef = converterParaPediatrico([['x', item('Cefalexina 500mg', 'Tomar 01 cápsula, de 06/06 horas, por 07 dias.', { qtde: '28 Cápsulas' })]], 31).entries[0][1];
+  assert.strictEqual(cef.nome, 'Cefalexina 50mg/mL');
+  assert.deepStrictEqual(frascosNecessarios(cef, 31), { frascos: 3, totalMl: 224, volumeFrascoMl: 100 });
+  assert.strictEqual(cef.qtde, '03 Frascos');
+  assert.strictEqual(avisoFrascos(cef, 31), null);                                   // já corrigido
+  // 10 kg: 3 mL x 4 x 7 = 84 mL cabe em 1 frasco; a quantidade do catálogo (02) não diminui
+  assert.strictEqual(converterParaPediatrico([['x', item('Cefalexina 500mg', 'Tomar 01 cápsula, de 06/06 horas, por 07 dias.')]], 10).entries[0][1].qtde, '02 Frascos');
+  // SMX-TMP 40 kg: 15 mL de 12/12 h por 7 dias = 210 mL -> 3 frascos
+  const smx = converterParaPediatrico([['x', item('Sulfametoxazol + Trimetoprima 800/160mg', 'Tomar 01 comprimido, de 12/12 horas, por 07 dias.')]], 40).entries[0][1];
+  assert.strictEqual(smx.qtde, '03 Frascos');
+  // catálogo (Pneumonia Criança, 52 kg): 17 mL de 8/8 h por 7 dias = 357 mL; 02 frascos de 150 mL não bastam
+  const amox = { nome: 'Amoxicilina 50mg/mL', qtde: '02 Frascos', posologiaBase: 'Tomar DOSE mL, de 08/08 horas, por 07 dias.', via: 'Oral', fator: 0.33, max: 20 };
+  assert.deepStrictEqual(frascosNecessarios(amox, 52), { frascos: 3, totalMl: 357, volumeFrascoMl: 150 });
+  assert.ok(/357 mL; 02 Frascos de 150 mL não bastam — são 03 Frascos/.test(avisoFrascos(amox, 52)));
+  assert.strictEqual(avisoFrascos(amox, 20), null);                                 // 7 mL: 147 mL cabe em 2
+  // posologia ilegível, sem volume conhecido ou quantidade que não é "NN Frascos": nada muda
+  assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { posologiaBase: 'Tomar DOSE mL, de 08/08 horas, por 07 a 10 dias.' }), 52), null);
+  assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { posologiaBase: 'Tomar DOSE mL, 3 vezes ao dia, por 07 dias.' }), 52), null);
+  assert.strictEqual(frascosNecessarios(Object.assign({}, amox, { nome: 'Azitromicina 40mg/mL' }), 52), null);
+  assert.strictEqual(frascosNecessarios(amox, ''), null);
+  assert.strictEqual(avisoFrascos(Object.assign({}, amox, { qtde: '(mesmo frasco)' }), 52), null);
+}
+
 console.log('pediatria: OK');
