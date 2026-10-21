@@ -80,6 +80,22 @@
         posologiaBase: 'Tomar DOSE, se náuseas ou vômitos importantes, até de 08/08 horas, por no máximo 02 dias.' },
       aviso: 'Faixas de peso do catálogo (Freedman, NEJM 2006). Alarga o QT: cautela junto com azitromicina.',
       fonte: 'Item pediátrico do catálogo (Pneumonia Criança).' },
+    // Abaixo de 2 anos a loratadina não é indicada (bula); a desloratadina xarope é a escolha, a partir de 6 meses.
+    // Só vale com a idade informada (idadeEntreMeses); sem idade, segue a regra da loratadina com o aviso de idade mínima.
+    { match: /^loratadina\b/, acao: 'substituir', idadeEntreMeses: [6, 12], unidade: 'mL', mgPorUnidade: 0.5,
+      por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
+        posologiaBase: 'Tomar 02 mL (1 mg), 01 vez ao dia, {duracao}.' },
+      duracaoPadrao: 'por 05 dias',
+      aviso: 'Abaixo de 2 anos a loratadina não é indicada: desloratadina xarope, 2 mL (6 a 11 meses).',
+      fonte: 'Bula desloratadina xarope 0,5 mg/mL (6 a 11 meses: 2 mL, 01 vez ao dia).' },
+    { match: /^loratadina\b/, acao: 'substituir', idadeEntreMeses: [12, 24], unidade: 'mL', mgPorUnidade: 0.5,
+      por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
+        posologiaBase: 'Tomar 2,5 mL (1,25 mg), 01 vez ao dia, {duracao}.' },
+      duracaoPadrao: 'por 05 dias',
+      aviso: 'Abaixo de 2 anos a loratadina não é indicada: desloratadina xarope, 2,5 mL (1 a 5 anos).',
+      fonte: 'Bula desloratadina xarope 0,5 mg/mL (1 a 5 anos: 2,5 mL, 01 vez ao dia).' },
+    { match: /^loratadina\b/, exceto: /\/\s*ml|xarope|solucao/, acao: 'remover', idadeEntreMeses: [0, 6],
+      motivo: 'Loratadina: removida — não é indicada abaixo de 2 anos, e a desloratadina só tem bula a partir de 6 meses; reavalie a necessidade.' },
     { match: /^loratadina\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 1,
       por: { nome: 'Loratadina 1mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 24,
         faixas: [ { ateKg: 30, valor: 5 }, { ateKg: 999, valor: 10 } ],
@@ -166,6 +182,7 @@
     // mesmo princípio ativo não viram gotas/xarope
     const oral = ehOral(it);
     const regra = REGRAS.find(r => r.match.test(n) && !(r.exceto && r.exceto.test(n))
+      && (!r.idadeEntreMeses || (typeof idadeMeses === 'number' && idadeMeses >= r.idadeEntreMeses[0] && idadeMeses < r.idadeEntreMeses[1]))
       && (r.acao !== 'substituir' || (oral && !itemPorPeso(it) && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
     if(!regra) return null;
     if(regra.idadeLimiteMeses && typeof idadeMeses === 'number' && idadeMeses >= regra.idadeLimiteMeses) return null;
