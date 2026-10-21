@@ -1268,6 +1268,33 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Sexo: masculino sem os avisos de gravidez/amamentacao (papel, copia, docx); feminino igual a antes ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.addInitScript(() => { window.__semConferir = true; window.open = () => ({ document: { write(){}, close(){} }, focus(){}, print(){}, close(){} }); });
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const papel = () => page.evaluate(() => document.getElementById('receitaPaper').innerText);
+    await page.fill('#nomePaciente', 'Paciente Sexo');
+    await selectCondicao(page, 'SUA');
+    await selectCondicao(page, 'Candidíase');
+    const f = await papel();
+    await page.selectOption('#sexo', 'M'); await page.waitForTimeout(300);
+    const m = await papel();
+    await page.selectOption('#sexo', 'F'); await page.waitForTimeout(300);
+    const f2 = await papel();
+    // nova receita limpa o sexo
+    await page.selectOption('#sexo', 'M'); await page.waitForTimeout(200);
+    await page.click('#btnLimpar'); await page.waitForTimeout(300);
+    const sexoDepois = await page.$eval('#sexo', (e) => e.value);
+    const ok = /grávida, amamentando/.test(f) && /Se estiver grávida ou houver chance/.test(f)
+      && !/grávida|amamentando/.test(m) && /Não usar se tiver glaucoma/.test(m) && /Fluconazol|Tropinal/.test(m)
+      && f2 === f && sexoDepois === '' && consoleErrors.length === 0;
+    record('sexo: masculino tira gravidez/amamentacao do papel; feminino igual; nova receita limpa', ok, JSON.stringify({ temGravidezF: /grávida/.test(f), temGravidezM: /grávida|amamentando/.test(m), glaucoma: /Não usar se tiver glaucoma/.test(m), igualF: f2 === f, sexoDepois, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Resumo ----
   const total = results.length;
   const passed = results.filter((r) => r.pass).length;

@@ -58,3 +58,13 @@ nomes.forEach(n => assert.ok(existe(n), 'condição inexistente na sugestão: ' 
 assert.strictEqual(P.idadeParaCampo('3 dias'), '0m');
 assert.strictEqual(P.idadeParaCampo('54 anos'), '54 anos');
 console.log('ponte: OK (' + nomes.length + ' nomes de condição conferidos)');
+
+// paciente masculino: sem gravidez/amamentação da própria paciente
+assert.strictEqual(P.paraSexo('Tomar 01 comprimido. Não usar se estiver grávida, amamentando ou se tiver glaucoma.', 'M'), 'Tomar 01 comprimido. Não usar se tiver glaucoma.');
+assert.strictEqual(P.paraSexo('Tomar 01 comprimido, em dose única. Não tomar se estiver grávida ou com chance de gravidez.', 'M'), 'Tomar 01 comprimido, em dose única.');
+assert.strictEqual(P.paraSexo('Se estiver grávida ou houver chance de gravidez, NÃO tome o Fluconazol: use apenas o creme vaginal e avise o médico.', 'M'), '');
+assert.strictEqual(P.paraSexo('Procure atendimento se não urinar. Se estiver grávida, avise o médico do pré-natal.', 'M'), 'Procure atendimento se não urinar.');
+assert.strictEqual(P.paraSexo('Evite contato próximo com gestantes não imunizadas.', 'M'), 'Evite contato próximo com gestantes não imunizadas.');
+const g = 'Não usar se estiver grávida, amamentando ou se tiver glaucoma.';
+assert.strictEqual(P.paraSexo(g, 'F'), g);
+assert.strictEqual(P.paraSexo(g, ''), g);
