@@ -1190,3 +1190,13 @@ input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
   .ver-receita[hidden]{display:none;}
 }
 @media print{ .ver-receita, .selo-alergia, .resumo-separada{display:none !important;} }
+
+/* Na tela, a linha do item quebra em vez de empurrar ✎ e × para fora da receita (nome longo, "2 vias", quantidade) */
+@media screen{
+  .item-linha{flex-wrap:wrap;row-gap:2px;}
+}
+@media screen and (max-width:880px){
+  .item-linha .nome-med{flex:1 1 140px;min-width:0;}
+  .item-linha .dots{display:none;}
+  .item-linha .qtde{margin-left:auto;}
+}
