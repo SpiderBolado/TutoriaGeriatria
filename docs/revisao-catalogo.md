@@ -1107,6 +1107,6 @@ Os demais achados da 3ª revisão (omeprazol na DRGE, duração do ATB na sinusi
 
 Pedido do médico: loratadina é para crianças a partir de 2 anos; antes disso, a desloratadina é a escolha.
 
-- **Conversão pediátrica** (idade informada): de 12 a 23 meses a loratadina vira **Desloratadina 0,5 mg/mL, 2,5 mL, 01 vez ao dia**; de 6 a 11 meses, **2 mL**; abaixo de 6 meses a loratadina é **removida** com o motivo (a desloratadina só tem bula a partir de 6 meses). De 2 anos em diante e sem idade informada, nada muda (Loratadina 1 mg/mL, 5 mL até 30 kg e 10 mL acima).
+- **Conversão pediátrica** (idade informada): de 12 a 23 meses a loratadina vira **Desloratadina 0,5 mg/mL, 2,5 mL, 01 vez ao dia**; de 6 a 11 meses, **2 mL** (a solução de loratadina escolhida à mão também é trocada, e o aviso de idade mínima da loratadina cita a desloratadina); abaixo de 6 meses a loratadina é **removida** com o motivo (a desloratadina só tem bula a partir de 6 meses). De 2 anos em diante e sem idade informada, nada muda (Loratadina 1 mg/mL, 5 mL até 30 kg e 10 mL acima).
 - **Catálogo avulso:** novo item **Desloratadina 0,5 mg/mL**, com a dose por idade (6–11 meses 2 mL; 1–5 anos 2,5 mL; 6–11 anos 5 mL; a partir de 12 anos 10 mL) e idade mínima de 6 meses.
 - Fonte das doses: bula da desloratadina xarope 0,5 mg/mL. **Conferir com a bula do fabricante usado.**
