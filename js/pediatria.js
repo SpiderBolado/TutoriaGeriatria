@@ -80,28 +80,24 @@
         posologiaBase: 'Tomar DOSE, se náuseas ou vômitos importantes, até de 08/08 horas, por no máximo 02 dias.' },
       aviso: 'Faixas de peso do catálogo (Freedman, NEJM 2006). Alarga o QT: cautela junto com azitromicina.',
       fonte: 'Item pediátrico do catálogo (Pneumonia Criança).' },
-    // Abaixo de 2 anos a loratadina não é indicada (bula); a desloratadina xarope é a escolha, a partir de 6 meses.
-    // Só vale com a idade informada (idadeEntreMeses); sem idade, segue a regra da loratadina com o aviso de idade mínima.
-    { match: /^loratadina\b/, acao: 'substituir', idadeEntreMeses: [6, 12], unidade: 'mL', mgPorUnidade: 0.5,
-      por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
-        posologiaBase: 'Tomar 02 mL (1 mg), 01 vez ao dia, {duracao}.' },
+    // abaixo de 2 anos a loratadina não é indicada: desloratadina xarope, dose pela idade (só com a idade preenchida)
+    { match: /^loratadina\b/, soAbaixoMeses: 24, incluiLiquidos: true, incluiPorPeso: true, acao: 'substituir', unidade: 'mL', mgPorUnidade: 0.5,
+      porIdade: [
+        { ateMeses: 5, remover: 'Loratadina: removida — anti-histamínico oral não indicado antes de 6 meses (loratadina a partir de 2 anos; desloratadina a partir de 6 meses).' },
+        { ateMeses: 11, por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
+          posologiaBase: 'Dar 02 mL, 01 vez ao dia, {duracao}.' } },
+        { ateMeses: 23, por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
+          posologiaBase: 'Dar 2,5 mL, 01 vez ao dia, {duracao}.' } }
+      ],
       duracaoPadrao: 'por 05 dias',
-      aviso: 'Abaixo de 2 anos a loratadina não é indicada: desloratadina xarope, 2 mL (6 a 11 meses).',
-      fonte: 'Bula desloratadina xarope 0,5 mg/mL (6 a 11 meses: 2 mL, 01 vez ao dia).' },
-    { match: /^loratadina\b/, acao: 'substituir', idadeEntreMeses: [12, 24], unidade: 'mL', mgPorUnidade: 0.5,
-      por: { nome: 'Desloratadina 0,5mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 6,
-        posologiaBase: 'Tomar 2,5 mL (1,25 mg), 01 vez ao dia, {duracao}.' },
-      duracaoPadrao: 'por 05 dias',
-      aviso: 'Abaixo de 2 anos a loratadina não é indicada: desloratadina xarope, 2,5 mL (1 a 5 anos).',
-      fonte: 'Bula desloratadina xarope 0,5 mg/mL (1 a 5 anos: 2,5 mL, 01 vez ao dia).' },
-    { match: /^loratadina\b/, exceto: /\/\s*ml|xarope|solucao/, acao: 'remover', idadeEntreMeses: [0, 6],
-      motivo: 'Loratadina: removida — não é indicada abaixo de 2 anos, e a desloratadina só tem bula a partir de 6 meses; reavalie a necessidade.' },
+      aviso: 'Loratadina só a partir de 2 anos; abaixo disso, desloratadina (bula): 6 a 11 meses 2 mL (1 mg), 1 a 5 anos 2,5 mL (1,25 mg), 1 vez ao dia. Não usar antes de 6 meses.',
+      fonte: 'Bula desloratadina xarope 0,5 mg/mL; preferência do médico (21/10).' },
     { match: /^loratadina\b/, acao: 'substituir', unidade: 'mL', mgPorUnidade: 1,
       por: { nome: 'Loratadina 1mg/mL', qtde: '01 Frasco', via: 'Oral', idadeMinMeses: 24,
         faixas: [ { ateKg: 30, valor: 5 }, { ateKg: 999, valor: 10 } ],
         posologiaBase: 'Tomar DOSE mL, 01 vez ao dia, {duracao}.' },
       duracaoPadrao: 'por 05 dias',
-      aviso: 'Dose por faixa (bula): 5 mL até 30 kg; 10 mL acima.',
+      aviso: 'Dose por faixa (bula): 5 mL até 30 kg; 10 mL acima. Abaixo de 2 anos, use desloratadina (com a idade preenchida, a conversão troca sozinha).',
       fonte: 'Bula loratadina xarope 1 mg/mL.' },
     { match: /^simeticona\b/, incluiLiquidos: true, acao: 'substituir',
       por: { nome: 'Simeticona 75mg/mL', qtde: '01 Frasco', via: 'Oral',
@@ -182,8 +178,8 @@
     // mesmo princípio ativo não viram gotas/xarope
     const oral = ehOral(it);
     const regra = REGRAS.find(r => r.match.test(n) && !(r.exceto && r.exceto.test(n))
-      && (!r.idadeEntreMeses || (typeof idadeMeses === 'number' && idadeMeses >= r.idadeEntreMeses[0] && idadeMeses < r.idadeEntreMeses[1]))
-      && (r.acao !== 'substituir' || (oral && !itemPorPeso(it) && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
+      && (!r.soAbaixoMeses || (typeof idadeMeses === 'number' && idadeMeses < r.soAbaixoMeses))
+      && (r.acao !== 'substituir' || (oral && (r.incluiPorPeso || !itemPorPeso(it)) && (r.incluiLiquidos || !jaPediatrico(it.nome)))));
     if(!regra) return null;
     if(regra.idadeLimiteMeses && typeof idadeMeses === 'number' && idadeMeses >= regra.idadeLimiteMeses) return null;
     return regra;
@@ -209,6 +205,9 @@
   }
 
   const formatarIdade = meses => meses >= 24 ? `${Math.floor(meses / 12)} anos` : `${meses} meses`;
+  // o que usar no lugar quando a criança está abaixo da idade mínima do item
+  const ALTERNATIVA = [[/^loratadina\b/, 'abaixo de 2 anos, a escolha é a desloratadina xarope 0,5 mg/mL (6 a 11 meses 2 mL; 1 a 5 anos 2,5 mL, 1 vez ao dia)']];
+  const alternativaIdade = nome => { const a = ALTERNATIVA.find(([re]) => re.test(norm(nome))); return a ? a[1] : ''; };
 
   // Dose por peso de um item: round(peso x fator) com teto (max), ou por faixa de
   // peso (faixas: [{ateKg, fator} | {ateKg, valor}]). null se não for por peso
@@ -289,7 +288,7 @@
     }
     if(it.idadeMinMeses){
       if(typeof idadeMeses !== 'number') out.push(`${it.nome}: confirme idade mínima de ${formatarIdade(it.idadeMinMeses)}.`);
-      else if(idadeMeses < it.idadeMinMeses) out.push(`ATENÇÃO — ${it.nome}: paciente com ${formatarIdade(idadeMeses)}, abaixo da idade mínima de ${formatarIdade(it.idadeMinMeses)}. Revise.`);
+      else if(idadeMeses < it.idadeMinMeses) out.push(`ATENÇÃO — ${it.nome}: paciente com ${formatarIdade(idadeMeses)}, abaixo da idade mínima de ${formatarIdade(it.idadeMinMeses)}. ${alternativaIdade(it.nome) ? alternativaIdade(it.nome)[0].toUpperCase() + alternativaIdade(it.nome).slice(1) + '.' : 'Revise.'}`);
     }
     return out;
   }
@@ -334,7 +333,10 @@
         entries.push([id, it]);
         return;
       }
-      const lista = Array.isArray(regra.por) ? regra.por : [regra.por];
+      const faixa = regra.porIdade ? (regra.porIdade.find(f => idade <= f.ateMeses) || regra.porIdade[regra.porIdade.length - 1]) : null;
+      if(faixa && faixa.remover){ removidos.push({ nome: it.nome, motivo: faixa.remover }); return; }
+      const por = faixa ? faixa.por : regra.por;
+      const lista = Array.isArray(por) ? por : [por];
       const duracao = duracaoDe(it.posologiaBase) || regra.duracaoPadrao || '';
       lista.forEach((p, i) => {
         const novo = Object.assign({}, it, p, {
@@ -355,7 +357,7 @@
     return { entries, removidos, fixos, convertidos, avisos: [...(alto ? [alto] : []), ...fixos, ...doItens] };
   }
 
-  const api = { converterParaPediatrico, contarConversiveis, avisosDoItem, avisoPesoAlto, frascosNecessarios, avisoFrascos, regraPara, idadeEmMeses, formatarIdade, doseDoItem, itemPorPeso, REGRAS, PESO_MAX_KG };
+  const api = { converterParaPediatrico, contarConversiveis, avisosDoItem, avisoPesoAlto, frascosNecessarios, avisoFrascos, regraPara, idadeEmMeses, formatarIdade, alternativaIdade, doseDoItem, itemPorPeso, REGRAS, PESO_MAX_KG };
   if(typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.PEDIATRIA = api;
 })(typeof window !== 'undefined' ? window : globalThis);

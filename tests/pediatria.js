@@ -58,15 +58,16 @@ assert.strictEqual(lor.nome, 'Loratadina 1mg/mL');
 const lorIdade = (meses, nome = 'Loratadina 10mg') => converterParaPediatrico([['l', item(nome, 'Tomar 01 comprimido ao dia, por 05 dias.')]], 10, { idadeMeses: meses });
 const d8 = lorIdade(8).entries[0][1];
 assert.strictEqual(d8.nome, 'Desloratadina 0,5mg/mL');
-assert.strictEqual(d8.posologiaBase, 'Tomar 02 mL (1 mg), 01 vez ao dia, por 05 dias.');
-assert.strictEqual(lorIdade(18).entries[0][1].posologiaBase, 'Tomar 2,5 mL (1,25 mg), 01 vez ao dia, por 05 dias.');
+assert.strictEqual(d8.posologiaBase, 'Dar 02 mL, 01 vez ao dia, por 05 dias.');
+assert.strictEqual(lorIdade(18).entries[0][1].posologiaBase, 'Dar 2,5 mL, 01 vez ao dia, por 05 dias.');
 assert.strictEqual(lorIdade(23).entries[0][1].nome, 'Desloratadina 0,5mg/mL');
 assert.strictEqual(lorIdade(24).entries[0][1].nome, 'Loratadina 1mg/mL');     // 2 anos: loratadina
 assert.strictEqual(lorIdade(60).entries[0][1].nome, 'Loratadina 1mg/mL');
 const l4 = lorIdade(4);
 assert.strictEqual(l4.entries.length, 0);                                    // 4 meses: removida, com motivo
-assert.ok(/abaixo de 2 anos/.test(l4.removidos[0].motivo));
-assert.strictEqual(lorIdade(4, 'Loratadina 1mg/mL').entries.length, 1);      // a solução escolhida à mão não é removida
+assert.ok(/antes de 6 meses/.test(l4.removidos[0].motivo));
+assert.strictEqual(lorIdade(4, 'Loratadina 1mg/mL').entries.length, 0);      // a solução escolhida à mão também sai abaixo de 6 meses
+assert.strictEqual(lorIdade(8, 'Loratadina 1mg/mL').entries[0][1].nome, 'Desloratadina 0,5mg/mL');   // e vira desloratadina de 6 a 23 meses
 assert.strictEqual(converterParaPediatrico([['l', item('Loratadina 10mg', 'x')]], 10).entries[0][1].nome, 'Loratadina 1mg/mL');  // sem idade: regra de sempre
 assert.strictEqual(lor.posologiaBase, 'Tomar DOSE mL, 01 vez ao dia, por 05 dias.');
 assert.strictEqual(doseDoItem(lor, 20).valor, 5);
