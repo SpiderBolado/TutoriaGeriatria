@@ -1615,15 +1615,29 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   }
 
   // ---------- Avisos (pediatria, teto de dose, duplicidade de princípio ativo) ----------
+  // Duplicidade: 1ª palavra de cada componente ("Amoxicilina + Clavulanato" conta os dois);
+  // palavra genérica ("Ácido", "Soro", "Vacina") leva a seguinte junto; composto conta o que tem dentro.
+  const TOKEN_GENERICO = /^(?:acido|soro|vacina|solucao|sal|sais|cloreto|sulfato|acetato|valerato|carbonato|fosfato|vitamina|insulina|compressas?|tala|meias?|banho|lavagem)$/;
+  const COMPOSTOS = { 'buscopan composto': ['dipirona'] };
+  function principiosDoNome(nome){
+    const n = norm(nome), out = new Set();
+    n.split('+').forEach(parte => {
+      const pal = parte.split(/\s+/).filter(w => /[a-z]/.test(w) && !/^(?:de|da|do|dos|das)$/.test(w));
+      if(!pal.length) return;
+      out.add(TOKEN_GENERICO.test(pal[0]) && pal[1] ? pal[0] + ' ' + pal[1] : pal[0]);
+    });
+    Object.keys(COMPOSTOS).forEach(k => { if(n.includes(k)) COMPOSTOS[k].forEach(x => out.add(x)); });
+    return out;
+  }
   function renderAvisos(){
     const bar = el('avisoBar');
     bar.innerHTML = '';
     const porToken = {};
     Object.values(selected).forEach(it => {
-      const token = norm(it.nome).split(/[\s+]/)[0];
-      if(!token) return;
-      if(!porToken[token]) porToken[token] = [];
-      porToken[token].push(it.nome);
+      principiosDoNome(it.nome).forEach(token => {
+        if(!porToken[token]) porToken[token] = [];
+        porToken[token].push(it.nome);
+      });
     });
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();

@@ -1186,6 +1186,32 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Avisos de seguranca: duplicidade por principio ativo, nao pela 1a palavra ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const dup = () => page.evaluate(() => [...document.querySelectorAll('#avisoBar .aviso')].map((a) => a.innerText.replace(/\s+/g, ' ')).filter((t) => /duplicidade/.test(t)));
+    await page.fill('#idade', '30'); await page.fill('#peso', '70');
+    await selectCondicao(page, 'Ferimento com Risco de Raiva');
+    const raiva = await dup();
+    await page.click('#btnLimpar');
+    await selectCondicao(page, 'Dismenorreia Secundária');
+    const dismen = await dup();
+    await page.click('#btnLimpar');
+    await selectCondicao(page, 'Dor Muscular');
+    await page.fill('#search', 'Dipirona gotas'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
+    const duasDipironas = await dup();
+    const ok = raiva.length === 0
+      && dismen.length === 1 && /Dipirona.*Buscopan composto.*Dipirona 500mg/.test(dismen[0])
+      && duasDipironas.length === 1 && /Dipirona/.test(duasDipironas[0])
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: duplicidade sem falso positivo (Vacina) e com dipirona dentro do Buscopan composto', ok,
+      JSON.stringify({ raiva, dismen, duasDipironas, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();
