@@ -68,3 +68,8 @@ assert.strictEqual(P.paraSexo('Evite contato próximo com gestantes não imuniza
 const g = 'Não usar se estiver grávida, amamentando ou se tiver glaucoma.';
 assert.strictEqual(P.paraSexo(g, 'F'), g);
 assert.strictEqual(P.paraSexo(g, ''), g);
+
+// Tropinal leva dipirona e escopolamina
+assert.strictEqual(P.conflitoAlergia('Tropinal', ['dipirona']), 'dipirona');
+assert.strictEqual(P.conflitoAlergia('Tropinal', ['buscopan']), 'buscopan');
+assert.strictEqual(P.conflitoAlergia('Tropinal', ['penicilina']), null);
