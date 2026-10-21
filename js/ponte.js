@@ -13,7 +13,7 @@
   // ---------- Alergia: o remédio da receita bate com a alergia do cartão? ----------
   // Mesmo grupo também conta (reação cruzada): o aviso pede conferência, não bloqueia.
   const CLASSES_ALERGIA = {
-    dipirona: ['dipirona', 'metamizol', 'novalgina', 'buscopan composto'],
+    dipirona: ['dipirona', 'metamizol', 'novalgina', 'buscopan composto', 'tropinal'],
     aine: ['aine', 'anti-inflamatorio', 'antiinflamatorio', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam', 'meloxicam', 'piroxicam', 'indometacina', 'flurbiprofeno', 'acido mefenamico', 'mefenamico', 'ponstan', 'aas', 'acido acetilsalicilico', 'aspirina'],
     aas: ['aas', 'acido acetilsalicilico', 'aspirina', 'ibuprofeno', 'diclofenaco', 'cetoprofeno', 'cetorolaco', 'nimesulida', 'naproxeno', 'tenoxicam', 'flurbiprofeno', 'acido mefenamico', 'mefenamico'],
     penicilina: ['penicilina', 'amoxicilina', 'ampicilina', 'oxacilina', 'piperacilina', 'benzetacil', 'benzilpenicilina', 'clavulanato'],
@@ -23,7 +23,7 @@
     quinolona: ['quinolona', 'ciprofloxacino', 'levofloxacino', 'moxifloxacino', 'norfloxacino'],
     opioide: ['opioide', 'morfina', 'tramadol', 'codeina', 'fentanil', 'oxicodona', 'metadona', 'nalbufina'],
     metoclopramida: ['metoclopramida', 'plasil'],
-    escopolamina: ['escopolamina', 'butilescopolamina', 'buscopan', 'hioscina'],
+    escopolamina: ['escopolamina', 'butilescopolamina', 'buscopan', 'hioscina', 'tropinal'],
     paracetamol: ['paracetamol', 'acetaminofeno', 'tylenol']
   };
   const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

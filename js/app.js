@@ -1638,7 +1638,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
   // Duplicidade: 1ª palavra de cada componente ("Amoxicilina + Clavulanato" conta os dois);
   // palavra genérica ("Ácido", "Soro", "Vacina") leva a seguinte junto; composto conta o que tem dentro.
   const TOKEN_GENERICO = /^(?:acido|soro|vacina|solucao|sal|sais|cloreto|sulfato|acetato|valerato|carbonato|fosfato|vitamina|insulina|compressas?|tala|meias?|banho|lavagem)$/;
-  const COMPOSTOS = { 'buscopan composto': ['dipirona'] };
+  const COMPOSTOS = { 'buscopan composto': ['dipirona'], 'tropinal': ['dipirona'] };
   function principiosDoNome(nome, semCompostos){
     const n = norm(nome), out = new Set();
     n.split('+').forEach(parte => {
@@ -1722,7 +1722,8 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       if(d && d.valor === null) soltos.push(`ATENÇÃO — ${it.nome}: peso fora das faixas de dose (mínimo ${it.pesoMinKg || '?'} kg). Preencha à mão ou revise.`);
       if(kg && it.pesoMinKg && kg < it.pesoMinKg && !(d && d.valor === null)) soltos.push(`ATENÇÃO — ${it.nome}: peso abaixo do mínimo de ${it.pesoMinKg} kg. Revise.`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses){
-        soltos.push(`ATENÇÃO — ${it.nome}: paciente com ${window.PEDIATRIA.formatarIdade(idade)}, abaixo da idade mínima de ${window.PEDIATRIA.formatarIdade(it.idadeMinMeses)}. Revise.`);
+        const alt = window.PEDIATRIA.alternativaIdade(it.nome);
+        soltos.push(`ATENÇÃO — ${it.nome}: paciente com ${window.PEDIATRIA.formatarIdade(idade)}, abaixo da idade mínima de ${window.PEDIATRIA.formatarIdade(it.idadeMinMeses)}. ${alt ? alt[0].toUpperCase() + alt.slice(1) + '.' : 'Revise.'}`);
       }
     });
     if(soltos.length) bar.appendChild(avisoHtml('amber', '&#9888;', '<b>Confira doses e idade mínima</b>' + listaHtml(soltos)));
