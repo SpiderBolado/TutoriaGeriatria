@@ -1125,6 +1125,37 @@ async function run(url) {
     await browser.close();
   }
 
+  // ---- Avisos de seguranca: AINE na dengue ----
+  {
+    const browser = await chromium.launch();
+    const { page, consoleErrors } = await newPage(browser);
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const avisos = () => page.evaluate(() => avisoBar.innerText.replace(/\s+/g, ' '));
+    const nomes = () => page.evaluate(() => [...document.querySelectorAll('#receitaPaper .nome-med')].map((e) => e.textContent.trim()));
+    await page.fill('#idade', '35'); await page.fill('#peso', '65');
+    await selectCondicao(page, 'Dengue');
+    const dengueSo = await avisos();
+    await page.fill('#search', 'Ibuprofeno 600'); await page.press('#search', 'Enter'); await page.waitForTimeout(250);
+    await page.fill('#search', ''); await page.waitForTimeout(150);
+    const dengueIbu = await avisos();
+    await page.fill('#nomePaciente', 'Caso Dengue');
+    await page.evaluate(() => { medicoDetails.open = true; window.__semConferir = false; });
+    await page.fill('#medicoNome', 'Dr. Teste');
+    await page.click('#btnImprimir'); await page.waitForTimeout(200);
+    const pergunta = await page.evaluate(() => (document.querySelector('.pergunta-overlay') || {}).innerText || '');
+    await page.click('.pergunta-overlay button.btn-primary'); await page.waitForTimeout(150);
+    await page.click('#avisoBar button[data-acao="tirar-alergico"]'); await page.waitForTimeout(200);
+    const depois = await nomes();
+    const ok = !/contraindicado/.test(dengueSo) && /Dengue com anti-inflamat.*Ibuprofeno 600/.test(dengueIbu)
+      && /Ibuprofeno 600.*contraindicado na dengue/.test(pergunta.replace(/\s+/g, ' '))
+      && !depois.some((n) => /Ibuprofeno/.test(n)) && depois.some((n) => /Dipirona/.test(n))
+      && consoleErrors.length === 0;
+    record('avisos de seguranca: AINE na dengue (aviso, checagem antes de imprimir, tirar da receita)', ok,
+      JSON.stringify({ dengueSo: dengueSo.slice(0, 120), dengueIbu: dengueIbu.slice(0, 200), pergunta: pergunta.slice(0, 200), depois, consoleErrors }));
+    await browser.close();
+  }
+
   // ---- Controle especial: cada folha montada vira exatamente 1 pagina no PDF ----
   {
     const browser = await chromium.launch();

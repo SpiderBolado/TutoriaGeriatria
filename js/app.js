@@ -1572,6 +1572,15 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const meds = getCondEffective(nome).meds;
     return meds.length > 0 && meds.filter(m => m.fator != null || m.faixas).length * 2 > meds.length;
   }
+  // Dengue (condição na receita ou queixa do Quadro) + AINE/AAS: contraindicados
+  // pelo MS (Dengue: diagnóstico e manejo clínico, 2024). Devolve [[id, nome], ...].
+  function aineNaDengue(){
+    const q = quadroAtual();
+    const dengue = Object.values(selected).concat(Object.values(selectedOrient)).some(x => /\bdengue\b/.test(norm(x.origemCondicao || '')))
+      || !!(q && /\bdengue\b/.test(norm(q.queixa || '')));
+    if(!dengue) return [];
+    return Object.entries(selected).filter(([, it]) => window.PONTE.conflitoAlergia(it.nome, ['aine'])).map(([id, it]) => [id, it.nome]);
+  }
   // adulto não recebe sugestão de condição pediátrica
   function condicaoParaSugerir(nome){
     if(!(DATA.condicoes[nome] || customCondicoes[nome])) return false;
@@ -1618,6 +1627,10 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
     const entradas = Object.entries(selected);
     const kg = pesoAtualKg(), idade = idadeAtualMeses();
     renderAvisosQuadro(bar, entradas);
+    const aineDengue = aineNaDengue();
+    if(aineDengue.length) bar.appendChild(avisoHtml('perigo', '&#9888;',
+      '<b>Dengue com anti-inflamatório/AAS — contraindicado (risco de sangramento, Ministério da Saúde):</b>' + listaHtml(aineDengue.map(x => x[1])),
+      `<button type="button" data-acao="tirar-alergico" data-ids="${escapeHtml(aineDengue.map(x => x[0]).join('|'))}">Tirar da receita</button>`));
     if(entradas.length && !el('medicoNome').value.trim() && !semMedicoAceito)
       bar.appendChild(avisoHtml('teal', '&#9998;', 'Seu <b>nome e CRM</b> ainda não aparecem na receita (preenche uma vez neste aparelho).',
         '<button type="button" data-acao="preencher-medico">Preencher</button>'));
@@ -2263,6 +2276,7 @@ ${muni.fornecedor.map(l => '            ' + escapeHtml(l) + '<br>').join('\n')}<
       else if(kg && it.pesoMinKg && kg < it.pesoMinKg) risco.push(`<b>${escapeHtml(it.nome)}</b>: peso abaixo do mínimo de ${it.pesoMinKg} kg`);
       if(it.idadeMinMeses && idade !== null && idade < it.idadeMinMeses) risco.push(`<b>${escapeHtml(it.nome)}</b>: abaixo da idade mínima de ${escapeHtml(window.PEDIATRIA.formatarIdade(it.idadeMinMeses))}`);
     });
+    aineNaDengue().forEach(([, n]) => risco.push(`<b>${escapeHtml(n)}</b>: anti-inflamatório/AAS contraindicado na dengue`));
     if(!risco.some(r => /dose em branco/.test(r)) && /(?:Tomar|Dar|Aplicar|Usar|Pingar)\s+_{3,}|_{3,}\s*(?:gotas|mL|comprimid|c[áa]psul)/.test(el('receitaPaper').innerText)) risco.push('<b>dose em branco</b> (____) em um item');
     risco.forEach(r => falta.push({ txt: r, campo: null, risco: true }));
     if(!el('nomePaciente').value.trim()) falta.push({ txt: 'o <b>nome do paciente</b>', campo: 'nomePaciente' });
